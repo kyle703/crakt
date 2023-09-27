@@ -8,13 +8,17 @@
 import SwiftUI
 
 @main
-struct craktApp: App {
+struct MainApp: App {
     let persistenceController = PersistenceController.shared
+    let appState = AppState(context: PersistenceController.shared.container.viewContext)
+
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(appState)
+                
         }
     }
 }

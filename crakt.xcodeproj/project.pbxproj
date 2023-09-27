@@ -7,7 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		084FDAAC2AB6590B0015E8EE /* craktApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAB2AB6590B0015E8EE /* craktApp.swift */; };
+		084FA4B52ABF57CE00ADF994 /* SessionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */; };
+		084FA4B72ABF57E900ADF994 /* ActionFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B62ABF57E900ADF994 /* ActionFooter.swift */; };
+		084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B82ABF581B00ADF994 /* PickerMenu.swift */; };
+		084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */; };
+		084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */; };
+		084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */; };
+		084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */; };
+		084FA4C32ABF58F200ADF994 /* RouteLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C22ABF58F200ADF994 /* RouteLogEntry.swift */; };
+		084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */; };
+		084FA4C72ABF592F00ADF994 /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C62ABF592F00ADF994 /* ActionButton.swift */; };
+		084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */; };
+		084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */; };
+		084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */; };
+		084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4D02AC2645A00ADF994 /* HomeView.swift */; };
+		084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAB2AB6590B0015E8EE /* MainApp.swift */; };
 		084FDAAE2AB6590B0015E8EE /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAD2AB6590B0015E8EE /* Persistence.swift */; };
 		084FDAB12AB6590B0015E8EE /* crakt.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAF2AB6590B0015E8EE /* crakt.xcdatamodeld */; };
 		084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAB22AB6590B0015E8EE /* ContentView.swift */; };
@@ -16,6 +30,13 @@
 		084FDAC32AB6590D0015E8EE /* craktTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAC22AB6590D0015E8EE /* craktTests.swift */; };
 		084FDACD2AB6590D0015E8EE /* craktUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDACC2AB6590D0015E8EE /* craktUITests.swift */; };
 		084FDACF2AB6590D0015E8EE /* craktUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDACE2AB6590D0015E8EE /* craktUITestsLaunchTests.swift */; };
+		084FDADC2AB75C3C0015E8EE /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDADB2AB75C3C0015E8EE /* AppState.swift */; };
+		084FDAE42AB7E3430015E8EE /* ScrollingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAE32AB7E3430015E8EE /* ScrollingSectionView.swift */; };
+		084FDAEC2AB7EEC60015E8EE /* Date+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAEB2AB7EEC60015E8EE /* Date+String.swift */; };
+		084FDAEE2AB7F5570015E8EE /* SessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAED2AB7F5570015E8EE /* SessionView.swift */; };
+		084FDAF32ABF1E560015E8EE /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF22ABF1E560015E8EE /* Color.swift */; };
+		084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */; };
+		084FDAF72ABF20C90015E8EE /* ClimbingGrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,8 +57,23 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHeader.swift; sourceTree = "<group>"; };
+		084FA4B62ABF57E900ADF994 /* ActionFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionFooter.swift; sourceTree = "<group>"; };
+		084FA4B82ABF581B00ADF994 /* PickerMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerMenu.swift; sourceTree = "<group>"; };
+		084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbTypePicker.swift; sourceTree = "<group>"; };
+		084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeSystemPicker.swift; sourceTree = "<group>"; };
+		084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbStatus.swift; sourceTree = "<group>"; };
+		084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionActionBar.swift; sourceTree = "<group>"; };
+		084FA4C22ABF58F200ADF994 /* RouteLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteLogEntry.swift; sourceTree = "<group>"; };
+		084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteLogRowItem.swift; sourceTree = "<group>"; };
+		084FA4C62ABF592F00ADF994 /* ActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
+		084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stopwatch.swift; sourceTree = "<group>"; };
+		084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Preview.swift"; sourceTree = "<group>"; };
+		084FA4CC2AC0F32D00ADF994 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
+		084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeSystemSelectionView.swift; sourceTree = "<group>"; };
+		084FA4D02AC2645A00ADF994 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		084FDAA82AB6590B0015E8EE /* crakt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = crakt.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		084FDAAB2AB6590B0015E8EE /* craktApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = craktApp.swift; sourceTree = "<group>"; };
+		084FDAAB2AB6590B0015E8EE /* MainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainApp.swift; sourceTree = "<group>"; };
 		084FDAAD2AB6590B0015E8EE /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		084FDAB02AB6590B0015E8EE /* crakt.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = crakt.xcdatamodel; sourceTree = "<group>"; };
 		084FDAB22AB6590B0015E8EE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -49,6 +85,13 @@
 		084FDAC82AB6590D0015E8EE /* craktUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = craktUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		084FDACC2AB6590D0015E8EE /* craktUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = craktUITests.swift; sourceTree = "<group>"; };
 		084FDACE2AB6590D0015E8EE /* craktUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = craktUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		084FDADB2AB75C3C0015E8EE /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		084FDAE32AB7E3430015E8EE /* ScrollingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingSectionView.swift; sourceTree = "<group>"; };
+		084FDAEB2AB7EEC60015E8EE /* Date+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+String.swift"; sourceTree = "<group>"; };
+		084FDAED2AB7F5570015E8EE /* SessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionView.swift; sourceTree = "<group>"; };
+		084FDAF22ABF1E560015E8EE /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGradeSelector.swift; sourceTree = "<group>"; };
+		084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGrade.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,9 +119,45 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		084FA4B22ABF577D00ADF994 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				084FA4CF2AC2644C00ADF994 /* Home */,
+				084FA4B32ABF57A300ADF994 /* Session */,
+				084FDAE92AB7E4D10015E8EE /* Selectors */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		084FA4B32ABF57A300ADF994 /* Session */ = {
+			isa = PBXGroup;
+			children = (
+				084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */,
+				084FDAED2AB7F5570015E8EE /* SessionView.swift */,
+				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
+				084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */,
+				084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */,
+				084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */,
+				084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */,
+				084FA4B82ABF581B00ADF994 /* PickerMenu.swift */,
+				084FA4B62ABF57E900ADF994 /* ActionFooter.swift */,
+				084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */,
+			);
+			path = Session;
+			sourceTree = "<group>";
+		};
+		084FA4CF2AC2644C00ADF994 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				084FA4D02AC2645A00ADF994 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
 		084FDA9F2AB6590B0015E8EE = {
 			isa = PBXGroup;
 			children = (
+				084FA4CC2AC0F32D00ADF994 /* TODO.md */,
 				084FDAAA2AB6590B0015E8EE /* crakt */,
 				084FDAC12AB6590D0015E8EE /* craktTests */,
 				084FDACB2AB6590D0015E8EE /* craktUITests */,
@@ -99,7 +178,11 @@
 		084FDAAA2AB6590B0015E8EE /* crakt */ = {
 			isa = PBXGroup;
 			children = (
-				084FDAAB2AB6590B0015E8EE /* craktApp.swift */,
+				084FA4B22ABF577D00ADF994 /* Views */,
+				084FDAF12ABF1D900015E8EE /* Models */,
+				084FDAEA2AB7EE860015E8EE /* Extensions */,
+				084FDAAB2AB6590B0015E8EE /* MainApp.swift */,
+				084FDADB2AB75C3C0015E8EE /* AppState.swift */,
 				084FDAAD2AB6590B0015E8EE /* Persistence.swift */,
 				084FDAB22AB6590B0015E8EE /* ContentView.swift */,
 				084FDAB42AB6590C0015E8EE /* Assets.xcassets */,
@@ -133,6 +216,36 @@
 				084FDACE2AB6590D0015E8EE /* craktUITestsLaunchTests.swift */,
 			);
 			path = craktUITests;
+			sourceTree = "<group>";
+		};
+		084FDAE92AB7E4D10015E8EE /* Selectors */ = {
+			isa = PBXGroup;
+			children = (
+				084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */,
+				084FDAE32AB7E3430015E8EE /* ScrollingSectionView.swift */,
+			);
+			path = Selectors;
+			sourceTree = "<group>";
+		};
+		084FDAEA2AB7EE860015E8EE /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				084FDAEB2AB7EEC60015E8EE /* Date+String.swift */,
+				084FDAF22ABF1E560015E8EE /* Color.swift */,
+				084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		084FDAF12ABF1D900015E8EE /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */,
+				084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */,
+				084FA4C22ABF58F200ADF994 /* RouteLogEntry.swift */,
+				084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -265,10 +378,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				084FDAAC2AB6590B0015E8EE /* craktApp.swift in Sources */,
+				084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */,
+				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,
+				084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */,
+				084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */,
+				084FDADC2AB75C3C0015E8EE /* AppState.swift in Sources */,
+				084FDAEE2AB7F5570015E8EE /* SessionView.swift in Sources */,
+				084FA4C32ABF58F200ADF994 /* RouteLogEntry.swift in Sources */,
 				084FDAAE2AB6590B0015E8EE /* Persistence.swift in Sources */,
+				084FDAF32ABF1E560015E8EE /* Color.swift in Sources */,
 				084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */,
+				084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */,
+				084FDAEC2AB7EEC60015E8EE /* Date+String.swift in Sources */,
+				084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */,
+				084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */,
+				084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */,
+				084FA4B52ABF57CE00ADF994 /* SessionHeader.swift in Sources */,
+				084FA4B72ABF57E900ADF994 /* ActionFooter.swift in Sources */,
+				084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */,
+				084FDAE42AB7E3430015E8EE /* ScrollingSectionView.swift in Sources */,
 				084FDAB12AB6590B0015E8EE /* crakt.xcdatamodeld in Sources */,
+				084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */,
+				084FDAF72ABF20C90015E8EE /* ClimbingGrade.swift in Sources */,
+				084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */,
+				084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */,
+				084FA4C72ABF592F00ADF994 /* ActionButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
