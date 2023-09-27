@@ -1,9 +1,6 @@
 #  TODOs
 
-## Active route card
-[] Modify to show send icons if it's active
-
-## Session View
+## Active Session View
 
  [X] Move climb/system menus to top
  [X] Have grade selector start with no selection
@@ -11,23 +8,29 @@
  [X] Disable flash if not first attempt
  [X] Scroll route list to bottom on add
  [X] Connect active climb to session header counts
- [] Connect session state to core data on exit
+ [X] Connect session state to core data on exit
+ [X] Modify to show send icons if it's active
+
  
  [] Make session header collapsable
  [] Make climb on action button float on top 
+ [] Update grade system selector to use abbr text
  
- [] Change options for bouldering vs ropes (no topped on boulders, just fall, send, flash)
+ [] Change action button options for bouldering vs ropes (no topped on boulders, just fall, send, flash)
  
- [] Undo/redo
+ [] Undo/Redo
  
  
  
  ## Home/Session log 
- [] Overview collection layout
+ [X] Overview collection layout
  [] Session collection item
  [] Session details view
+ [] Restart a session?
+ [] Metrics on sessions
+ 
  
 
 
 ## Grades
-[] Add abbreviation description
+[] Apply gradient coloring to active/logged route grade bubble?
