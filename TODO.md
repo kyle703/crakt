@@ -30,6 +30,11 @@
  [] Metrics on sessions
  
  
+ # Database
+ [] Convert data model to SwiftData
+ [] Convert interface functions to SwiftData queries
+ 
+ 
 
 
 ## Grades

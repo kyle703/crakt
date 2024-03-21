@@ -21,6 +21,7 @@
 		084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */; };
 		084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */; };
 		084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4D02AC2645A00ADF994 /* HomeView.swift */; };
+		084FA4D32AC5B90300ADF994 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4D22AC5B86A00ADF994 /* LoadingView.swift */; };
 		084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAB2AB6590B0015E8EE /* MainApp.swift */; };
 		084FDAAE2AB6590B0015E8EE /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAD2AB6590B0015E8EE /* Persistence.swift */; };
 		084FDAB12AB6590B0015E8EE /* crakt.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAF2AB6590B0015E8EE /* crakt.xcdatamodeld */; };
@@ -72,6 +73,7 @@
 		084FA4CC2AC0F32D00ADF994 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeSystemSelectionView.swift; sourceTree = "<group>"; };
 		084FA4D02AC2645A00ADF994 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		084FA4D22AC5B86A00ADF994 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		084FDAA82AB6590B0015E8EE /* crakt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = crakt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		084FDAAB2AB6590B0015E8EE /* MainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainApp.swift; sourceTree = "<group>"; };
 		084FDAAD2AB6590B0015E8EE /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 				084FDADB2AB75C3C0015E8EE /* AppState.swift */,
 				084FDAAD2AB6590B0015E8EE /* Persistence.swift */,
 				084FDAB22AB6590B0015E8EE /* ContentView.swift */,
+				084FA4D22AC5B86A00ADF994 /* LoadingView.swift */,
 				084FDAB42AB6590C0015E8EE /* Assets.xcassets */,
 				084FDAB62AB6590C0015E8EE /* crakt.entitlements */,
 				084FDAAF2AB6590B0015E8EE /* crakt.xcdatamodeld */,
@@ -389,6 +392,7 @@
 				084FDAF32ABF1E560015E8EE /* Color.swift in Sources */,
 				084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */,
 				084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */,
+				084FA4D32AC5B90300ADF994 /* LoadingView.swift in Sources */,
 				084FDAEC2AB7EEC60015E8EE /* Date+String.swift in Sources */,
 				084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */,
 				084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */,
@@ -492,6 +496,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -543,6 +548,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -557,6 +563,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"crakt/Preview Content\"";
+				DEVELOPMENT_TEAM = WLBYAWXK4G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -569,7 +576,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
@@ -577,7 +584,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = kthompson.crakt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -593,6 +600,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"crakt/Preview Content\"";
+				DEVELOPMENT_TEAM = WLBYAWXK4G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -605,7 +613,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
@@ -613,7 +621,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = kthompson.crakt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -12,7 +12,7 @@ import CoreData
 
 extension Session {
     func toActiveSession() -> ActiveSession {
-        var activeSession = ActiveSession()
+        let activeSession = ActiveSession()
         
         if let startDate = self.start {
             activeSession.start = startDate

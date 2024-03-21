@@ -17,6 +17,8 @@ struct PersistenceController {
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
+        
+        
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
@@ -34,5 +36,23 @@ struct PersistenceController {
             }
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
+    }
+}
+
+func printCoreSchema(container: NSPersistentContainer) {
+    let model = container.managedObjectModel
+
+    for entity in model.entities {
+        print("Entity name: \(entity.name ?? "Unknown")")
+        for property in entity.properties {
+            switch property {
+            case let attribute as NSAttributeDescription:
+                print("Attribute - \(attribute.name): \(attribute.attributeType)")
+            case let relationship as NSRelationshipDescription:
+                print("Relationship - \(relationship.name): \(relationship.destinationEntity?.name ?? "Unknown")")
+            default:
+                print("Unknown property type")
+            }
+        }
     }
 }
