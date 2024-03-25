@@ -8,20 +8,20 @@
 import SwiftUI
 
 struct RouteLogRowItem: View {
-    var logEntry: RouteLogEntry
+    var route: Route
     @State private var isExpanded: Bool = false
     
     var body: some View {
         ExpandableSection(isExpanded: $isExpanded, label: {
-            RouteSummaryView(logEntry: logEntry)
+            RouteSummaryView(route: route)
         }, content: {
-            AttemptsList(attempts: logEntry.attempts)
+            AttemptsList(attempts: route.attempts)
         })
     }
 }
 
 struct AttemptsList: View {
-    var attempts: [ClimbAttempt]
+    var attempts: [RouteAttempt]
     
     var body: some View {
         VStack {
@@ -77,21 +77,20 @@ struct ExpandableSection<Label: View, Content: View>: View {
 }
 
 struct RouteSummaryView: View {
-    var logEntry: RouteLogEntry
+    var route: Route
     var actionButton: AnyView?
-    
-    
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 
                 let height: CGFloat = actionButton != nil ? 50 : 20
+                let _system = GradeSystems.systems[route.gradeSystem]!
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(logEntry.gradeSystem.colors(for: logEntry.grade).first ?? Color.purple)
+                    .fill(_system.colors(for: route.grade!).first ?? Color.purple)
                     .frame(width: 50, height: height)
                     .overlay(
-                        Text(logEntry.gradeSystem.description(for: logEntry.grade))
+                        Text(_system.description(for: route.grade!))
                             .font(.headline)
                             .foregroundColor(Color.white)
                     )
@@ -103,7 +102,7 @@ struct RouteSummaryView: View {
                 Spacer()
                 
                 ForEach(ClimbStatus.allCases, id: \.self) { action in
-                    if let count = logEntry.actionCounts[action], count > 0 {
+                    if let count = route.actionCounts[action], count > 0 {
                         HStack {
                             Image(systemName: action.iconName)
                                 .foregroundColor(action.color)
@@ -120,7 +119,7 @@ struct RouteSummaryView: View {
     }
 }
 struct SelectedRouteSummaryView: View {
-    let logEntry: RouteLogEntry
+    let route: Route
     var actionButton: AnyView?
     
     let cornerRadius: CGFloat = 8
@@ -128,7 +127,7 @@ struct SelectedRouteSummaryView: View {
     
     
     var body: some View {
-        RouteSummaryView(logEntry: logEntry, actionButton: actionButton)
+        RouteSummaryView(route: route, actionButton: actionButton)
             .padding()
             .overlay(
                 Rectangle()
@@ -149,31 +148,31 @@ struct SelectedRouteSummaryView: View {
 struct RouteLogRowItem_Previews: PreviewProvider {
     
     
-    static let mockAttempts1: [ClimbAttempt] = [
-        ClimbAttempt(status: .topped, date: Date()),
-        ClimbAttempt(status: .fall, date: Date().addingTimeInterval(-3600))
+    static let mockAttempts1: [RouteAttempt] = [
+        RouteAttempt(status: .topped),
+        RouteAttempt(status: .fall)
     ]
     
-    static let mockAttempts2: [ClimbAttempt] = [
-        ClimbAttempt(status: .topped, date: Date().addingTimeInterval(-7200)),
-        ClimbAttempt(status: .fall, date: Date().addingTimeInterval(-10000)),
-        ClimbAttempt(status: .fall, date: Date().addingTimeInterval(-15000))
+    static let mockAttempts2: [RouteAttempt] = [
+        RouteAttempt(status: .topped),
+        RouteAttempt(status: .fall),
+        RouteAttempt(status: .fall)
     ]
     
-    static let entry1 = RouteLogEntry(gradeSystem: AnyGradeProtocol(VGrade()), grade: "4", attempts: mockAttempts1) // Cannot convert value of type 'VGrade' to expected argument type 'AnyGradeProtocol'
-    static let entry2 = RouteLogEntry(gradeSystem: AnyGradeProtocol(YDS()), grade: "5.11b", attempts: mockAttempts2)
+    static let entry1 = Route(gradeSystem: GradeSystem.vscale, grade: "4", attempts: mockAttempts1) // Cannot convert value of type 'VGrade' to expected argument type 'AnyGradeProtocol'
+    static let entry2 = Route(gradeSystem: GradeSystem.yds, grade: "5.11b", attempts: mockAttempts2)
     static let mockEntries = [entry1, entry2]
     
     
     static var previews: some View {
         Group {
             List (mockEntries, id: \.id) { entry in
-                RouteLogRowItem(logEntry: entry)
+                RouteLogRowItem(route: entry)
                     .previewLayout(.sizeThatFits)
             }
             VStack {
                 ForEach(mockEntries, id: \.id) { entry in
-                    SelectedRouteSummaryView(logEntry: entry)
+                    SelectedRouteSummaryView(route: entry)
                         .previewLayout(.sizeThatFits)
                     
                 }

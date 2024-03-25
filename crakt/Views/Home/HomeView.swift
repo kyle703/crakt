@@ -6,25 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
-
-struct UserProfile {
-    var name: String
-    var id: UUID
-    // Add any other necessary user attributes you'd like here...
-
-    init(from user: User?) {
-        self.name = user?.name ?? "Unknown"
-        self.id = user?.id ?? UUID()
-    }
-}
 
 let tileSize = (UIScreen.main.bounds.width - (3 * 15)) / 2
 
 struct HomeView: View {
-    var user: UserProfile
-    var sessions: [ActiveSession]
+//    @Bindable var user: User
     
+    @Query 
+    var sessions: [Session] = []
+        
     let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
@@ -33,12 +25,13 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                ProfileHeaderView(user: user)
+                // ProfileHeaderView(user: user)
 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 10) {
                         NavigationLink {
-                            SessionView()
+                            
+                            SessionView(session: Session())
                                 .navigationBarHidden(true)
                                 .interactiveDismissDisabled(true)
                         } label : {
@@ -60,7 +53,7 @@ struct HomeView: View {
 
 
 struct ProfileHeaderView: View {
-    var user: UserProfile
+    var user: User
 
     var body: some View {
         HStack {
@@ -92,19 +85,21 @@ struct BaseTileView<Content: View>: View {
             content
         }
         .frame(width: tileSize, height: tileSize)
-        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(.white.shadow(.drop(radius: 2))))
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(.white.shadow(.drop(radius: 2))))
     }
 }
 
 struct SessionTile: View {
-    var session: ActiveSession
+    var session: Session
 
     var body: some View {
         BaseTileView {
             VStack(alignment: .leading) {
                 Text("\(session.routes.count) Climbs")
                     .font(.headline)
-                Text(session.start.toString())
+                Text(session.startDate.toString())
                     .font(.subheadline)
             }
         }
@@ -125,30 +120,26 @@ struct StartSessionTile: View {
 }
 
 
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        let userProfile = UserProfile(from: nil)
-
-        // Create instances of ActiveSession as objects.
-        let sampleSession1 = ActiveSession()
-        sampleSession1.start = Date()
-        sampleSession1.routes = []
-
-        let sampleSession2 = ActiveSession()
-        sampleSession2.start = Date().addingTimeInterval(-86400)
-        sampleSession2.routes = []
-
-        let sampleSession3 = ActiveSession()
-        sampleSession3.start = Date().addingTimeInterval(-2 * 86400)
-        sampleSession3.routes = []
-
-        // If HomeView expects an array of sessions:
-        let sampleSessions: [ActiveSession] = [sampleSession1, sampleSession2, sampleSession3]
-        return HomeView(user: userProfile, sessions: sampleSessions)
-
-        // OR if HomeView expects an ObservableObject sessions (maybe a SessionsStore or similar):
-        // let sessionsStore = SessionsStore()  // If you have a store like this.
-        // sessionsStore.sessions = sampleSessions
-        // return HomeView(user: userProfile, sessions: sessionsStore)
-    }
-}
+//struct HomeView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let user = User()
+//
+//        // Create instances of ActiveSession as objects.
+//        let sampleSession1 = Session()
+//        sampleSession1.startDate = Date()
+//        sampleSession1.routes = []
+//
+//        let sampleSession2 = Session()
+//        sampleSession2.startDate = Date().addingTimeInterval(-86400)
+//        sampleSession2.routes = []
+//
+//        let sampleSession3 = Session()
+//        sampleSession3.startDate = Date().addingTimeInterval(-2 * 86400)
+//        sampleSession3.routes = []
+//
+//        
+//        let sessions = [sampleSession1, sampleSession2, sampleSession3]
+//        
+//        return HomeView(user: sessions)
+//    }
+//}

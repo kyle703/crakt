@@ -51,7 +51,7 @@ protocol GradeProtocol: Equatable {
 
 
 // MARK: FrenchGrade
-class FrenchGrade: GradeProtocol {
+struct FrenchGrade: GradeProtocol {
     static func == (lhs: FrenchGrade, rhs: FrenchGrade) -> Bool {
         lhs.system == rhs.system
     }

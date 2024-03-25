@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SessionActionBar: View {
-    @ObservedObject var session: ActiveSession
-    
+    @Bindable var session: Session
+
     var body: some View {
         HStack(spacing: 20) {
             
@@ -36,8 +37,8 @@ struct SessionActionBar: View {
     }
     
     private func performAction(_ action: ClimbStatus) {
-        if session.activeRoute != nil {
-            session.activeRoute!.addClimbAttempt(with: action)
+        if let activeRoute = session.activeRoute {
+            activeRoute.addAttempt(status: action)
         }
     }
 }

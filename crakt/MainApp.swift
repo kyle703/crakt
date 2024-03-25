@@ -6,19 +6,26 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct MainApp: App {
-    let persistenceController = PersistenceController.shared
-    let appState = AppState(context: PersistenceController.shared.container.viewContext)
-
+    
+    let modelContainer: ModelContainer
+        
+    init() {
+        do {
+            modelContainer = try ModelContainer(for: User.self, Session.self, Route.self, RouteAttempt.self)
+        } catch {
+            fatalError("Could not initialize ModelContainer")
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(appState)
-                
+                .modelContainer(modelContainer)
         }
+
     }
 }

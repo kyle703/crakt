@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct SessionView: View {
-    @ObservedObject var stopwatch = Stopwatch()
-    @ObservedObject var session: ActiveSession = ActiveSession()
+    @Environment(\.modelContext) private var modelContext
+
+    @StateObject var stopwatch = Stopwatch()
+    @State var session: Session
     
     @State var selectedGradeSystem: GradeSystem = .circuit
     @State var selectedClimbType: ClimbType = .boulder
@@ -18,14 +20,15 @@ struct SessionView: View {
     
     var routeLogActionButton: OutlineButton {
         if session.activeRoute?.attempts.count == 0 {
-            return OutlineButton(action: {session.clearRoute()}, systemImage: "trash.circle.fill", label: "Remove", color: .gray)
+            return OutlineButton(action: {session.clearRoute(context: modelContext)}, systemImage: "trash.circle.fill", label: "Remove", color: .gray)
         } else {
-            return OutlineButton(action: {session.moveActiveRouteToLogs()}, systemImage: "checkmark.circle.fill", label: "Log it", color: .green)
+            return OutlineButton(action: {session.logRoute(context: modelContext)}, systemImage: "checkmark.circle.fill", label: "Log it", color: .green)
         }
     }
     
     var body: some View {
         VStack {
+            Text("\(session.id.uuidString)")
             SessionHeader(session: session, stopwatch: stopwatch)
                 .frame(height: 150).onAppear {
                     stopwatch.start()
@@ -34,8 +37,8 @@ struct SessionView: View {
             GradeSystemSelectionView(selectedClimbType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
                 .padding(.horizontal)
                 .padding(.bottom)
-                .onChange(of: selectedClimbType, perform: {_ in session.clearRoute()})
-                .onChange(of: selectedGradeSystem, perform: {_ in session.clearRoute()})
+                .onChange(of: selectedClimbType, perform: {_ in session.clearRoute(context: modelContext)})
+                .onChange(of: selectedGradeSystem, perform: {_ in session.clearRoute(context: modelContext)})
 
             
             Spacer()
@@ -45,8 +48,8 @@ struct SessionView: View {
             } else {
                 ScrollViewReader { scrollView in
                     List {
-                        ForEach(session.routes, id: \.id) { entry in
-                            RouteLogRowItem(logEntry: entry)
+                        ForEach(session.routes, id: \.id) { route in
+                            RouteLogRowItem(route: route)
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -66,7 +69,7 @@ struct SessionView: View {
             VStack {
                 
                 if session.activeRoute != nil {
-                    SelectedRouteSummaryView(logEntry: session.activeRoute!, actionButton: AnyView(routeLogActionButton)).padding()
+                    SelectedRouteSummaryView(route: session.activeRoute!, actionButton: AnyView(routeLogActionButton)).padding()
                     
                     SessionActionBar(session: session)
                 } else {
@@ -74,9 +77,10 @@ struct SessionView: View {
                         HStack {
                             Spacer()
                             OutlineButton {
-                                session.activeRoute = RouteLogEntry(gradeSystem: GradeSystems.systems[selectedGradeSystem]!,
-                                                            grade: grade,
-                                                            attempts: [])
+                                let _route = Route(gradeSystem: selectedGradeSystem, grade: grade)
+                                modelContext.insert(_route)
+                                session.activeRoute = _route
+                                session.routes.append(_route)
                             }
                             Spacer()
                         }.padding(.horizontal)
@@ -111,6 +115,6 @@ struct RoutesList: View {
 
 struct SessionView_Previews: PreviewProvider {
     static var previews: some View {
-        SessionView()
+        SessionView(session: Session())
     }
 }

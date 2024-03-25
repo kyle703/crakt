@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-enum ClimbStatus: Int16, CaseIterable {
-    case fall = 0
-    case send = 1
-    case topped = 2
-    case flash = 3
+enum ClimbStatus: CaseIterable, Codable {
+    case fall
+    case send
+    case topped
+    case flash
     
     var description: String {
         switch self {

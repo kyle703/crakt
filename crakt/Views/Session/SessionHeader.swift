@@ -9,10 +9,10 @@ import SwiftUI
 
 struct SessionHeader: View {
 
-    @EnvironmentObject var appState: AppState
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.modelContext) private var modelContext
     
-    @ObservedObject var session: ActiveSession
+    var session: Session
     @ObservedObject var stopwatch: Stopwatch
     
     @State private var isPaused = false
@@ -59,8 +59,8 @@ struct SessionHeader: View {
                                 title: Text("End Session"),
                                 message: Text("Are you sure you want to end your sesh?"),
                                 primaryButton: .default(Text("Yes"), action: {
-                                    session.moveActiveRouteToLogs()
-                                    appState.saveSession(session: session)
+                                    session.logRoute(context: modelContext)
+                                    modelContext.insert(session)
                                     self.presentationMode.wrappedValue.dismiss()
                                 }),
                                 secondaryButton: .cancel(Text("Keep crushing"), action : {
