@@ -80,7 +80,6 @@ struct SessionView: View {
                                 let _route = Route(gradeSystem: selectedGradeSystem, grade: grade)
                                 modelContext.insert(_route)
                                 session.activeRoute = _route
-                                session.routes.append(_route)
                             }
                             Spacer()
                         }.padding(.horizontal)

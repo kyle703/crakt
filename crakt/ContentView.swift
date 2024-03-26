@@ -9,10 +9,26 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) private var modelContext
+        
+    
+    func clear_swift_data() {
+        do {
+            try modelContext.delete(model: User.self)
+            try modelContext.delete(model: Session.self)
+            try modelContext.delete(model: Route.self)
+            try modelContext.delete(model: RouteAttempt.self)
+        } catch {
+            print("Failed to clear")
+        }
+        
+    }
 
     var body: some View {
-        
-        HomeView()
+        VStack {
+            OutlineButton(action: clear_swift_data, label: "Delete db")
+            HomeView()
+        }
     }
 }
 

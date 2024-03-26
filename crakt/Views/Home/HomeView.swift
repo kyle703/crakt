@@ -14,7 +14,7 @@ let tileSize = (UIScreen.main.bounds.width - (3 * 15)) / 2
 struct HomeView: View {
 //    @Bindable var user: User
     
-    @Query 
+    @Query(sort: \Session.startDate, order: .reverse)
     var sessions: [Session] = []
         
     let columns = [
@@ -93,6 +93,7 @@ struct BaseTileView<Content: View>: View {
 
 struct SessionTile: View {
     var session: Session
+    let isDelete: Bool = false
 
     var body: some View {
         BaseTileView {
