@@ -25,4 +25,11 @@ import SwiftData
         self.status = status
     }
     
+    public init(date: Date, status: ClimbStatus) {
+        self.id = UUID()
+        
+        self.date = date
+        self.status = status
+    }
+    
 }

@@ -15,14 +15,22 @@ struct AnyGradeProtocol: GradeProtocol {
     
     private var _system: () -> GradeSystem
     private var _grades: () -> [String]
+    private var _colorMap: () -> [String: Color]
+
     private var _colorsForGrade: (String) -> [Color]
     private var _descriptionForGrade: (String) -> String
     
     init<GP: GradeProtocol>(_ gradeSystem: GP) {
         _system = { gradeSystem.system }
         _grades = { gradeSystem.grades }
+        _colorMap = { gradeSystem.colorMap }
+
         _colorsForGrade = gradeSystem.colors(for:)
         _descriptionForGrade = gradeSystem.description(for:)
+    }
+    
+    var colorMap: [String : Color]  {
+        return _colorMap()
     }
     
     var system: GradeSystem {
@@ -40,18 +48,77 @@ struct AnyGradeProtocol: GradeProtocol {
     func description(for grade: String) -> String {
         return _descriptionForGrade(grade)
     }
+    
+    
 }
 
 protocol GradeProtocol: Equatable {
     var system: GradeSystem { get }
     var grades: [String] { get }
+    var colorMap: [String: Color] { get }
     func colors(for grade: String) -> [Color]
     func description(for grade: String) -> String
+    func normalizedDifficulty(for grade: String) -> Double
+    func grade(forNormalizedDifficulty difficulty: Double) -> String
+
+}
+
+extension GradeProtocol {
+    // Provide a default implementation for exponential normalization
+    func normalizedDifficulty(for grade: String) -> Double {
+        guard let gradeIndex = grades.firstIndex(of: grade), grades.count > 1 else { return 0.0 }
+        
+        // Define the base difficulty factor (this could be adjusted for each grading system if needed)
+        let baseDifficultyFactor = 1.5
+        
+        // Calculate the exponent for the current grade based on its position
+        let gradeExponent = Double(gradeIndex)
+        
+        // Calculate the maximum exponent possible within this system for normalization
+        let maxExponent = Double(grades.count - 1)
+        
+        // Apply the exponential formula to get a normalized value between 0 and 1
+        return (pow(baseDifficultyFactor, gradeExponent) - 1) / (pow(baseDifficultyFactor, maxExponent) - 1)
+    }
+    
+    func grade(forNormalizedDifficulty difficulty: Double) -> String {
+            var closestGrade: String = grades.first ?? ""
+            var smallestDifference: Double = Double.infinity
+            
+            for grade in grades {
+                let normalizedDifficulty = self.normalizedDifficulty(for: grade)
+                let difference = abs(normalizedDifficulty - difficulty)
+                
+                if difference < smallestDifference {
+                    smallestDifference = difference
+                    closestGrade = grade
+                }
+            }
+            
+            return closestGrade
+        }
+    
+    func color(forNormalizedDifficulty difficulty: Double) -> Color {
+            // Use the reverse lookup function to get the closest grade for the normalized difficulty
+            let grade = grade(forNormalizedDifficulty: difficulty)
+            
+            // Use the existing method to get the color(s) for this grade.
+            // Assuming colors(for:) returns an array, but we'll take the first color for simplicity.
+            // You might need to adjust this logic depending on how colors are defined and used in your app.
+            return colors(for: grade).first ?? .gray // Default to gray if no color is found
+        }
 }
 
 
 // MARK: FrenchGrade
 struct FrenchGrade: GradeProtocol {
+    
+    func colors(for grade: String) -> [Color] {
+        return [colorMap[grade]!] ?? [Color.gray]  // default to gray color in case the grade is not found in the map
+    }
+    
+
+    
     static func == (lhs: FrenchGrade, rhs: FrenchGrade) -> Bool {
         lhs.system == rhs.system
     }
@@ -90,10 +157,6 @@ struct FrenchGrade: GradeProtocol {
         "9c": Color.black
     ]
     
-    func colors(for grade: String) -> [Color] {
-        return [colorMap[grade] ?? Color.gray]  // default to gray color in case the grade is not found in the map
-    }
-    
     func description(for grade: String) -> String {
         return grade
     }
@@ -101,30 +164,39 @@ struct FrenchGrade: GradeProtocol {
 
 //MARK: VGrade
 struct VGrade: GradeProtocol {
+    
+    
     let system: GradeSystem = .vscale
     let grades: [String] = ["B", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"]
+    
+    
 
-    let colorMap: [String: [Color]] = [
-        "B": [Color.blue],
-        "0": [Color.blue, Color.green],
-        "1": [Color.green],
-        "2": [Color.green, Color.yellow],
-        "3": [Color.yellow],
-        "4": [Color.yellow, Color.orange],
-        "5": [Color.orange],
-        "6": [Color.orange, Color.red],
-        "7": [Color.red],
-        "8": [Color.red, Color.purple],
-        "9": [Color.purple],
-        "10": [Color.purple, Color.black],
-        "11": [Color.black],
-        "12":  [Color.black],
-        "13":  [Color.black],
-        "14":  [Color.black],
+    let colorMap: [String: Color] = [
+        "B": Color.blue,
+        "0": Color.blue, // Previously [Color.blue, Color.green]
+        "1": Color.green,
+        "2": Color.green, // Previously [Color.green, Color.yellow]
+        "3": Color.yellow,
+        "4": Color.yellow, // Previously [Color.yellow, Color.orange]
+        "5": Color.orange,
+        "6": Color.orange, // Previously [Color.orange, Color.red]
+        "7": Color.red,
+        "8": Color.red, // Previously [Color.red, Color.purple]
+        "9": Color.purple,
+        "10": Color.purple, // Previously [Color.purple, Color.black]
+        "11": Color.black,
+        "12": Color.black,
+        "13": Color.black,
+        "14": Color.black,
     ]
 
+
     func colors(for grade: String) -> [Color] {
-        return colorMap[grade] ?? [Color.gray]  // default to gray color in case the grade is not found in the map
+        if let color = colorMap[grade] {
+                return [color]
+            } else {
+                return [Color.gray]
+            }
     }
     
     func description(for grade: String) -> String {
@@ -184,20 +256,23 @@ struct YDS: GradeProtocol {
                             "5.13a", "5.13b", "5.13c", "5.13d",
                             "5.14a", "5.14b", "5.14c", "5.14d"]
 
-    let colorMap: [String: [Color]] = [
-        "5.5": [Color.blue], "5.6": [Color.blue],
-        "5.7": [Color.green], "5.8": [Color.green],
-        "5.9": [Color.yellow], "5.10a": [Color.yellow], "5.10b": [Color.yellow],
-        "5.10c": [Color.orange], "5.10d": [Color.orange], "5.11a": [Color.orange],
-        "5.11b": [Color.orange], "5.11c": [Color.orange],
-        "5.11d": [Color.red], "5.12a": [Color.red], "5.12b": [Color.red],
-        "5.12c": [Color.red], "5.12d": [Color.red],
-        "5.13a": [Color.purple], "5.13b": [Color.purple], "5.13c": [Color.purple], "5.13d": [Color.purple],
-        "5.14a": [Color.black], "5.14b": [Color.black], "5.14c": [Color.black], "5.14d": [Color.black]
+    let colorMap: [String: Color] = [
+        "5.5": .blue, "5.6": .blue,
+        "5.7": .green, "5.8": .green,
+        "5.9": .yellow, "5.10a": .yellow, "5.10b": .yellow,
+        "5.10c": .orange, "5.10d": .orange, "5.11a": .orange,
+        "5.11b": .orange, "5.11c": .orange, "5.11d": .orange,
+        "5.12a": .red, "5.12b": .red, "5.12c": .red, "5.12d": .red,
+        "5.13a": .purple, "5.13b": .purple, "5.13c": .purple, "5.13d": .purple,
+        "5.14a": .black, "5.14b": .black, "5.14c": .black, "5.14d": .black
     ]
 
     func colors(for grade: String) -> [Color] {
-        return colorMap[grade] ?? [Color.gray] // default to gray color in case the grade is not found in the map
+        if let color = colorMap[grade] {
+                return [color]
+            } else {
+                return [Color.gray]
+            }
     }
     
     func description(for grade: String) -> String {
@@ -240,6 +315,15 @@ class UserConfiguredCircuitGrade: CircuitGradeProtocol {
         }
         return [Color.clear]  // Default if grade is not found
     }
+    
+    var colorMap: [String : Color] {
+            var map = [String: Color]()
+            for color in orderedColors {
+                let colorName = "\(color.description)" // Simplification
+                map[colorName] = color
+            }
+            return map
+        }
     
     func description(for grade: String) -> String {
         return ""

@@ -59,8 +59,7 @@ struct SessionHeader: View {
                                 title: Text("End Session"),
                                 message: Text("Are you sure you want to end your sesh?"),
                                 primaryButton: .default(Text("Yes"), action: {
-                                    session.logRoute(context: modelContext)
-                                    modelContext.insert(session)
+                                    session.completeSession(context: modelContext, elapsedTime: stopwatch.elapsed())
                                     self.presentationMode.wrappedValue.dismiss()
                                 }),
                                 secondaryButton: .cancel(Text("Keep crushing"), action : {

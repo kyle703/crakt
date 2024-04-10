@@ -40,6 +40,7 @@
 		0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12B2BAD07E000D31AD3 /* Session.swift */; };
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
 		0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12A2BAD07E000D31AD3 /* User.swift */; };
+		0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,6 +99,7 @@
 		0896B1292BAD07E000D31AD3 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0896B12B2BAD07E000D31AD3 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 		084FA4B32ABF57A300ADF994 /* Session */ = {
 			isa = PBXGroup;
 			children = (
+				0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */,
 				084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */,
 				084FDAED2AB7F5570015E8EE /* SessionView.swift */,
 				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
@@ -423,6 +426,7 @@
 				084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */,
 				084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */,
 				0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */,
+				0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */,
 				084FA4C72ABF592F00ADF994 /* ActionButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

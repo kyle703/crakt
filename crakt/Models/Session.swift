@@ -12,7 +12,8 @@ import SwiftData
 
 enum SessionStatus: Int, Codable {
     case active = 0
-    case inactive = 1
+    case complete = 1
+    case cancelled = 2
 }
 
 @Model 
@@ -78,16 +79,28 @@ extension Session {
             context.delete(activeRoute!)
         }
         activeRoute = nil
-                
         
     }
     
-    func logRoute(context: ModelContext) -> Void {
+    func completeSession(context: ModelContext, elapsedTime: TimeInterval) {
+        logRoute()
+        self.status = .complete
+        self.endDate = Date()
+        self.elapsedTime = elapsedTime
+        
+    }
+    
+    func cancelSession() {
+        logRoute()
+        self.status = .cancelled
+    }
+    
+    func logRoute() -> Void {
         // find active rotue
         // mark inactive
         if let route = activeRoute {
-            routes.append(route)
-            activeRoute = nil
+            self.routes.append(route)
+            self.activeRoute = nil
         }
     }
     

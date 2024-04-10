@@ -11,6 +11,17 @@ import SwiftData
 
 let tileSize = (UIScreen.main.bounds.width - (3 * 15)) / 2
 
+//struct SessionDetailView: View {
+//
+//    var session: Session
+//    
+//    var body: some View {
+//        VStack {
+//            RouteAttemptScrollView(routes: session.routes)
+//        }
+//    }
+//}
+
 struct HomeView: View {
 //    @Bindable var user: User
     
@@ -40,8 +51,11 @@ struct HomeView: View {
 
                         
                         ForEach(sessions, id: \.self) { session in
-                            SessionTile(session: session)
-
+                            NavigationLink {
+                                SessionDetailView(viewModel: SessionDetailViewModel(session: session))
+                            } label : {
+                                SessionTile(session: session)
+                            }
                         }
                     }
                     .padding()

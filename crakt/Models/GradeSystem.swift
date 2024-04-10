@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 import Combine
-
+import Charts
 
 
 enum ClimbType: Int16, CustomStringConvertible, Codable {
@@ -64,7 +64,7 @@ enum GradeSystem: Int16, CustomStringConvertible, Codable {
     
     static let allCases: [GradeSystem] = [.circuit, .vscale, .font, .french, .yds]
     
-    var _protocol : Any{
+    var _protocol : any GradeProtocol{
         switch self {
         case.circuit:
             return UserConfiguredCircuitGrade()

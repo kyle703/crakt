@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftData
+import Charts
 
 enum RouteStatus: Int, Codable {
     case active = 0
@@ -15,12 +16,10 @@ enum RouteStatus: Int, Codable {
 }
 
 
-@Model class Route {
+@Model class Route: Identifiable {
     
     var id: UUID
     
-    
-
     var climbType: ClimbType = ClimbType.boulder
     
     var grade: String?

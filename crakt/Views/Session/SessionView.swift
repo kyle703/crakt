@@ -7,6 +7,27 @@
 
 import SwiftUI
 
+struct RouteAttemptScrollView: View {
+    var routes: [Route]
+    var body: some View {
+        ScrollViewReader { scrollView in
+            List {
+                ForEach(routes, id: \.id) { route in
+                    RouteLogRowItem(route: route)
+                }
+            }
+            .listStyle(PlainListStyle())
+            .onChange(of: routes.count) { newValue in
+                if let lastItem = routes.last {
+                    withAnimation {
+                        scrollView.scrollTo(lastItem.id, anchor: .bottom)
+                    }
+                }
+            }
+        }
+    }
+}
+
 struct SessionView: View {
     @Environment(\.modelContext) private var modelContext
 
@@ -22,7 +43,7 @@ struct SessionView: View {
         if session.activeRoute?.attempts.count == 0 {
             return OutlineButton(action: {session.clearRoute(context: modelContext)}, systemImage: "trash.circle.fill", label: "Remove", color: .gray)
         } else {
-            return OutlineButton(action: {session.logRoute(context: modelContext)}, systemImage: "checkmark.circle.fill", label: "Log it", color: .green)
+            return OutlineButton(action: {session.logRoute()}, systemImage: "checkmark.circle.fill", label: "Log it", color: .green)
         }
     }
     
@@ -46,21 +67,7 @@ struct SessionView: View {
                 Text("No route logs yet!")
                     .foregroundColor(.gray)
             } else {
-                ScrollViewReader { scrollView in
-                    List {
-                        ForEach(session.routes, id: \.id) { route in
-                            RouteLogRowItem(route: route)
-                        }
-                    }
-                    .listStyle(PlainListStyle())
-                    .onChange(of: session.routes.count) { newValue in
-                        if let lastItem = session.routes.last {
-                            withAnimation {
-                                scrollView.scrollTo(lastItem.id, anchor: .bottom)
-                            }
-                        }
-                    }
-                }
+                RouteAttemptScrollView(routes: session.routes)
 
             }
             Spacer()

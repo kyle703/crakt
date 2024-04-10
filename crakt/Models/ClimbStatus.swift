@@ -6,12 +6,24 @@
 //
 
 import SwiftUI
+import Charts
 
-enum ClimbStatus: CaseIterable, Codable {
+enum ClimbStatus: CaseIterable, Codable, Plottable {
+    init?(primitivePlottable: String) {
+        return nil
+    }
+    
+    typealias PrimitivePlottable = String
+    
+    
     case fall
     case send
     case topped
     case flash
+    
+    var primitivePlottable: PrimitivePlottable {
+        return description
+    }
     
     var description: String {
         switch self {
