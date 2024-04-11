@@ -56,39 +56,7 @@ class SessionDetailViewModel: ObservableObject {
     }
 }
 
-import Charts
-struct RoutesOverTimeView: View {
-    var routes: [Route]
-    @State var gradeSystem: GradeSystem
-    
-    private var sortedRoutes: [Route] {
-            routes.sorted { route1, route2 in
-                let gradingProtocol1 = route1.gradeSystem._protocol
-                let gradingProtocol2 = route2.gradeSystem._protocol
-                
-                return gradingProtocol1.normalizedDifficulty(for: route1.grade!) < gradingProtocol2.normalizedDifficulty(for: route2.grade!)
-            }
-        }
 
-    var body: some View {
-        
-        VStack {
-            GradeSystemPicker(selectedGradeSystem: $gradeSystem, climbType: routes.first!.climbType)
-            
-            
-            Chart(sortedRoutes) {
-                
-                BarMark(x: .value("grade",gradeSystem._protocol.grade(forNormalizedDifficulty: $0.gradeSystem._protocol.normalizedDifficulty(for: $0.grade!))), y: .value("attempts", $0.attempts.count))
-                    .foregroundStyle(gradeSystem._protocol.color(forNormalizedDifficulty: $0.gradeSystem._protocol.normalizedDifficulty(for: $0.grade!)))
-                
-            }
-            .chartXAxis {
-                AxisMarks(preset: .extended, position: .bottom)
-            }
-        }
-
-    }
-}
 
 
 import SwiftUI
@@ -144,7 +112,7 @@ struct SessionDetailView: View {
         }
         .padding()
         
-        RoutesOverTimeView(routes: viewModel.session.routes, gradeSystem: viewModel.session.routes.first!.gradeSystem)
+        AttemptsByGradeBarChartView(session: viewModel.session, gradeSystem: viewModel.session.routes.first!.gradeSystem)
         viewModel.routesList
     }
 }

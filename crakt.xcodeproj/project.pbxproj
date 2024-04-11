@@ -41,6 +41,7 @@
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
 		0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12A2BAD07E000D31AD3 /* User.swift */; };
 		0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */; };
+		0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +101,7 @@
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0896B12B2BAD07E000D31AD3 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
+		0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptsByGradePieChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +132,7 @@
 		084FA4B22ABF577D00ADF994 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0896B1332BC77A0100D31AD3 /* Charts */,
 				084FA4CF2AC2644C00ADF994 /* Home */,
 				084FA4B32ABF57A300ADF994 /* Session */,
 				084FDAE92AB7E4D10015E8EE /* Selectors */,
@@ -269,6 +272,14 @@
 			path = ../SwiftData;
 			sourceTree = "<group>";
 		};
+		0896B1332BC77A0100D31AD3 /* Charts */ = {
+			isa = PBXGroup;
+			children = (
+				0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */,
+			);
+			path = Charts;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -400,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */,
+				0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */,
 				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,
 				084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */,
 				084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */,
