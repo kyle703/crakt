@@ -38,6 +38,24 @@ extension Session {
         }
     }
     
+    var attemptsByGradeAndStatus: [(grade: String, status: ClimbStatus, attempts: Int)] {
+        var aggregatedData = [(grade: String, status: ClimbStatus, attempts: Int)]()
+        
+        for route in routesSorted {
+            let grade = route.grade ?? "Unknown"  // Safely handle nil grades if any
+            for attempt in route.attempts {
+                let status = attempt.status
+                if let index = aggregatedData.firstIndex(where: { $0.grade == grade && $0.status == status }) {
+                    aggregatedData[index].attempts += 1
+                } else {
+                    aggregatedData.append((grade: grade, status: status, attempts: 1))
+                }
+            }
+        }
+        
+        return aggregatedData
+    }
+    
     func attemptsGroupedByGrade(routes: [Route]) -> [String: [Route]] {
         var attemptsByGrade: [String: [Route]] = [:]
         
@@ -73,44 +91,65 @@ extension Session {
     
 }
 
+struct AttemptData {
+    let grade: String
+    let status: ClimbStatus
+    var count: Int
+}
+
 
 struct AttemptsByGradePieChartView: View {
+    var session: Session
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Chart(session.totalAttemptsPerGrade, id: \.grade) { data in
+            SectorMark(
+                angle: .value("Attempts", data.attempts),
+                innerRadius: .ratio(0.618),
+                angularInset: 1.5
+            )
+            .cornerRadius(5.0)
+            .foregroundStyle(by: .value("Grade", data.grade))
+        }
+        .chartLegend(alignment: .center, spacing: 18)
+        .aspectRatio(1, contentMode: .fit)
     }
 }
+
+// For ChatGPT: Your goal is to make Stacked bar chart of grade vs attempts per status
+// first create the var with data in the extensions
+// apply data to stacked bar chart
 
 struct AttemptsByGradeBarChartView: View {
     var session: Session
     @State var gradeSystem: GradeSystem
     
+    let allColors: [Color] = [.red, .green, .orange, .yellow]
+    
     var body: some View {
         
         VStack {
+            
+            
             GradeSystemPicker(selectedGradeSystem: $gradeSystem, climbType: session.routes.first!.climbType)
+            AttemptsByGradePieChartView(session: session)
             
-            
-            Chart(session.totalAttemptsPerGrade, id: \.grade) { data in
-                SectorMark(
-                    angle: .value("Attempts", data.attempts),
-                    innerRadius: .ratio(0.618),
-                    angularInset: 1.5
+            Chart(session.attemptsByGradeAndStatus, id: \.grade) { data in
+                BarMark(
+                    x: .value("Grade", data.grade),
+                    y: .value("Count", data.attempts)
                 )
-                .cornerRadius(5.0)
-                .foregroundStyle(by: .value("Grade", data.grade))
-                
-                //                BarMark(x: .value("grade", data.grade), y: .value("attempts", data.attempts))
-                //                    .foregroundStyle(gradeSystem._protocol.color(forNormalizedDifficulty: $0.gradeSystem._protocol.normalizedDifficulty(for: $0.grade!)))
-                
+                .foregroundStyle(by: .value("Status", data.status.description))
+                .annotation(position: .overlay) {
+                    Text("\(data.attempts)")
+                        .foregroundStyle(Color.white)
+                    
+                }
             }
-            .chartLegend(alignment: .center, spacing: 18)
+            .chartForegroundStyleScale(domain: ClimbStatus.allCases, range: allColors)            
             .aspectRatio(1, contentMode: .fit)
             
         }
         
+        
     }
-}
-
-#Preview {
-    AttemptsByGradePieChartView()
 }

@@ -65,54 +65,57 @@ struct SessionDetailView: View {
     @ObservedObject var viewModel: SessionDetailViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Session Details")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+        ScrollView {
             
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Start Date")
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Session Details")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Start Date")
+                            .font(.headline)
+                        Text(viewModel.startDateText)
+                            .font(.body)
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("End Date")
+                            .font(.headline)
+                        Text(viewModel.endDateText)
+                            .font(.body)
+                    }
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("Elapsed Time")
                         .font(.headline)
-                    Text(viewModel.startDateText)
+                    Spacer()
+                    Text(viewModel.elapsedTimeText)
+                        .font(.body)
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("Status")
+                        .font(.headline)
+                    Spacer()
+                    Text(viewModel.statusText)
                         .font(.body)
                 }
                 
                 Spacer()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("End Date")
-                        .font(.headline)
-                    Text(viewModel.endDateText)
-                        .font(.body)
-                }
             }
+            .padding()
             
-            Divider()
-            
-            HStack {
-                Text("Elapsed Time")
-                    .font(.headline)
-                Spacer()
-                Text(viewModel.elapsedTimeText)
-                    .font(.body)
-            }
-            
-            Divider()
-            
-            HStack {
-                Text("Status")
-                    .font(.headline)
-                Spacer()
-                Text(viewModel.statusText)
-                    .font(.body)
-            }
-            
-            Spacer()
+            AttemptsByGradeBarChartView(session: viewModel.session, gradeSystem: viewModel.session.routes.first!.gradeSystem)
+            viewModel.routesList
         }
-        .padding()
-        
-        AttemptsByGradeBarChartView(session: viewModel.session, gradeSystem: viewModel.session.routes.first!.gradeSystem)
-        viewModel.routesList
     }
 }

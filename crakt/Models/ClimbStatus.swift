@@ -38,6 +38,7 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
         }
     }
     
+    
     var color: Color {
         switch self {
         case .fall:
