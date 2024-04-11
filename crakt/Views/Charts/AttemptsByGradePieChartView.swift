@@ -91,14 +91,9 @@ extension Session {
     
 }
 
-struct AttemptData {
-    let grade: String
-    let status: ClimbStatus
-    var count: Int
-}
-
 
 struct AttemptsByGradePieChartView: View {
+    // TODO add handling to tap on a slice to get more details in the middle
     var session: Session
     var body: some View {
         Chart(session.totalAttemptsPerGrade, id: \.grade) { data in
@@ -115,15 +110,36 @@ struct AttemptsByGradePieChartView: View {
     }
 }
 
-// For ChatGPT: Your goal is to make Stacked bar chart of grade vs attempts per status
-// first create the var with data in the extensions
-// apply data to stacked bar chart
+struct AttemptStatusByGradeStackedBarChartView: View {
+    // TODO order stacks by status
+    // TODO figure out where to put statusColors
+    var session: Session
+    let statusColors: [Color] = [.red, .green, .orange, .yellow]
+
+    var body: some View {
+        Chart(session.attemptsByGradeAndStatus, id: \.grade) { data in
+            BarMark(
+                x: .value("Grade", data.grade),
+                y: .value("Count", data.attempts)
+            )
+            .foregroundStyle(by: .value("Status", data.status.description))
+            .annotation(position: .overlay) {
+                Text("\(data.attempts)")
+                    .foregroundStyle(Color.white)
+                
+            }
+        }
+        .chartForegroundStyleScale(domain: ClimbStatus.allCases, range: statusColors)
+        .aspectRatio(1, contentMode: .fit)
+    }
+}
+
+
 
 struct AttemptsByGradeBarChartView: View {
     var session: Session
     @State var gradeSystem: GradeSystem
     
-    let allColors: [Color] = [.red, .green, .orange, .yellow]
     
     var body: some View {
         
@@ -132,21 +148,7 @@ struct AttemptsByGradeBarChartView: View {
             
             GradeSystemPicker(selectedGradeSystem: $gradeSystem, climbType: session.routes.first!.climbType)
             AttemptsByGradePieChartView(session: session)
-            
-            Chart(session.attemptsByGradeAndStatus, id: \.grade) { data in
-                BarMark(
-                    x: .value("Grade", data.grade),
-                    y: .value("Count", data.attempts)
-                )
-                .foregroundStyle(by: .value("Status", data.status.description))
-                .annotation(position: .overlay) {
-                    Text("\(data.attempts)")
-                        .foregroundStyle(Color.white)
-                    
-                }
-            }
-            .chartForegroundStyleScale(domain: ClimbStatus.allCases, range: allColors)            
-            .aspectRatio(1, contentMode: .fit)
+            AttemptStatusByGradeStackedBarChartView(session: session)
             
         }
         
