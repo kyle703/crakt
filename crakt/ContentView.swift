@@ -26,7 +26,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            OutlineButton(action: clear_swift_data, label: "Delete db")
+//            OutlineButton(action: clear_swift_data, label: "Delete db")
             HomeView()
         }
     }

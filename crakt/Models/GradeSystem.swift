@@ -80,7 +80,3 @@ enum GradeSystem: Int16, CustomStringConvertible, Codable {
     }
 }
 
-enum RouteAttemptStatus: Int16, Codable {
-    case fail = 0
-    case top = 1
-}

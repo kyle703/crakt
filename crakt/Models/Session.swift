@@ -33,6 +33,9 @@ class Session {
     
     var activeRoute: Route?
     
+    // ----
+    let sessionDescription = "Triangle Rock Club"
+    
     public init(user: User) {
         self.id = UUID()
         self.startDate = Date()
@@ -44,6 +47,42 @@ class Session {
         self.startDate = Date()
         self.routes = []
         self.user = User()
+    }
+    
+    public init(routes: [Route], startDate: Date) {
+        self.id = UUID()
+        self.startDate = startDate
+        self.routes = routes
+        self.user = User()
+    }
+    
+    static var preview: Session {
+
+        let sessionStart = Date()
+
+        // Manually create routes and attempts
+        let routes = [
+            Route(gradeSystem: .vscale, grade: "1", attempts: [
+                RouteAttempt(date: sessionStart.addingTimeInterval(5 * 60), status: .flash),
+                RouteAttempt(date: sessionStart.addingTimeInterval(10 * 60), status: .topped)
+            ]),
+            Route(gradeSystem: .vscale, grade: "2", attempts: [
+                RouteAttempt(date: sessionStart.addingTimeInterval(20 * 60), status: .flash),
+                RouteAttempt(date: sessionStart.addingTimeInterval(25 * 60), status: .fall),
+                RouteAttempt(date: sessionStart.addingTimeInterval(30 * 60), status: .topped)
+            ]),
+            Route(gradeSystem: .vscale, grade: "3", attempts: [
+                RouteAttempt(date: sessionStart.addingTimeInterval(40 * 60), status: .fall),
+                RouteAttempt(date: sessionStart.addingTimeInterval(45 * 60), status: .fall)
+            ]),
+            Route(gradeSystem: .vscale, grade: "4", attempts: [
+                RouteAttempt(date: sessionStart.addingTimeInterval(55 * 60), status: .fall),
+                RouteAttempt(date: sessionStart.addingTimeInterval(60 * 60), status: .fall),
+                RouteAttempt(date: sessionStart.addingTimeInterval(65 * 60), status: .topped)
+            ])
+        ]
+
+        return Session(routes: routes, startDate: sessionStart)
     }
     
 }

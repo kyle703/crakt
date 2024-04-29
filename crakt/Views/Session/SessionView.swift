@@ -39,11 +39,11 @@ struct SessionView: View {
     @State var selectedGrade: String?
 
     
-    var routeLogActionButton: OutlineButton {
+    var routeLogActionButton: ActionButton {
         if session.activeRoute?.attempts.count == 0 {
-            return OutlineButton(action: {session.clearRoute(context: modelContext)}, systemImage: "trash.circle.fill", label: "Remove", color: .gray)
+            return ActionButton(icon: "trash.circle.fill", label: nil, color: .gray) {session.clearRoute(context: modelContext)}
         } else {
-            return OutlineButton(action: {session.logRoute()}, systemImage: "checkmark.circle.fill", label: "Log it", color: .green)
+            return ActionButton(icon: "checkmark.circle.fill", label: "Log it", color: .green) {session.logRoute()}
         }
     }
     

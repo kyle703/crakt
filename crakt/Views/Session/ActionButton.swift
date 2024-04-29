@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ActionButton: View {
     let icon: String
-    let label: String
+    let label: String?
+    let size: CGFloat = 60
     let color: Color
     let action: () -> Void
     var disabled: Bool = false  // Default value
@@ -26,11 +27,13 @@ struct ActionButton: View {
                 Image(systemName: icon)
                     .font(.title)
                     .foregroundColor(disabled ? .gray : color)
-                Text(label)
-                    .foregroundColor(disabled ? .gray : color)
-                    .font(.caption)
+                if let label {
+                    Text(label)
+                        .foregroundColor(disabled ? .gray : color)
+                        .font(.caption)
+                }
             }
-            .frame(width: 60, height: 60)
+            .frame(width: size, height: size)
             .background(Color.white.opacity(disabled ? 0.7 : 1.0))  // Adjust opacity as needed
             .cornerRadius(10)
             .overlay(

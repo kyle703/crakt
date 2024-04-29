@@ -51,7 +51,7 @@ struct AnyGradeProtocol: GradeProtocol {
     
     
 }
-
+import Charts
 protocol GradeProtocol: Equatable {
     var system: GradeSystem { get }
     var grades: [String] { get }
@@ -64,6 +64,8 @@ protocol GradeProtocol: Equatable {
 }
 
 extension GradeProtocol {
+    
+    
     // Provide a default implementation for exponential normalization
     func normalizedDifficulty(for grade: String) -> Double {
         guard let gradeIndex = grades.firstIndex(of: grade), grades.count > 1 else { return 0.0 }
@@ -107,14 +109,23 @@ extension GradeProtocol {
             // You might need to adjust this logic depending on how colors are defined and used in your app.
             return colors(for: grade).first ?? .gray // Default to gray if no color is found
         }
+    
+    func gradeIndex(for grade: String?) -> Int {
+        if let grade = grade {
+            return grades.firstIndex(of: grade) ?? 0
+        }
+        return 0
+    }
 }
 
 
 // MARK: FrenchGrade
 struct FrenchGrade: GradeProtocol {
     
+    
+    
     func colors(for grade: String) -> [Color] {
-        return [colorMap[grade]!] ?? [Color.gray]  // default to gray color in case the grade is not found in the map
+        return [colorMap[grade] ?? .gray]  // default to gray color in case the grade is not found in the map
     }
     
 

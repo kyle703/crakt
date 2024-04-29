@@ -25,7 +25,7 @@ struct SessionHeader: View {
                     Text(stopwatch.elapsedDisplay)
                         .font(.system(size: 32, weight: .thin, design: .monospaced))
                         .frame(minWidth: 100, maxWidth: .infinity)
-                    Text("Elapsed Time")
+                    Text("Total Session Time")
                         .font(.caption)
                     
                     // Stop and Pause/Play buttons

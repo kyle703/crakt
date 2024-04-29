@@ -9,6 +9,8 @@
 import Foundation
 import SwiftData
 import Charts
+import SwiftUI
+
 
 enum RouteStatus: Int, Codable {
     case active = 0
@@ -24,6 +26,46 @@ enum RouteStatus: Int, Codable {
     
     var grade: String?
     var gradeSystem: GradeSystem = GradeSystem.circuit
+    
+    var gradeDescription: String? {
+        if let grade = grade {
+            return gradeSystem._protocol.description(for: grade)
+        }
+        return nil
+    }
+    
+    var gradeColor: Color {
+        if let grade = grade {
+            return gradeSystem._protocol.colorMap[grade] ?? Color.gray
+        } else {
+            return Color.gray
+        }
+    }
+    
+    var gradeIndex: Int {
+        gradeSystem._protocol.gradeIndex(for: grade)
+    }
+    
+    var firstAttemptDate: Date? {
+        if let _min = attempts.min(by: { $0.date < $1.date }) {
+            return _min.date
+        }
+        return nil
+    }
+    
+    var lastAttemptDate: Date? {
+        if let _max = attempts.max(by: { $0.date < $1.date }) {
+            return _max.date
+        }
+        return nil
+    }
+    
+    var attemptDateRange: ClosedRange<Date> {
+        return (firstAttemptDate!...lastAttemptDate!)
+    }
+    
+    
+
     
     var status: RouteStatus = RouteStatus.inactive
 
@@ -50,6 +92,14 @@ enum RouteStatus: Int, Codable {
         self.gradeSystem = gradeSystem
         self.attempts = attempts
         self.grade =  grade
+    }
+    
+    public init(gradeSystem: GradeSystem, grade: String, attempts: [RouteAttempt] = [], session: Session) {
+        self.id = UUID()
+        self.gradeSystem = gradeSystem
+        self.attempts = attempts
+        self.grade =  grade
+        self.session = session
     }
     
     public init(gradeSystem: GradeSystem, grade: String) {

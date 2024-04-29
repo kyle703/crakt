@@ -32,4 +32,12 @@ import SwiftData
         self.status = status
     }
     
+    public init(date: Date, status: ClimbStatus, route: Route) {
+        self.id = UUID()
+        
+        self.date = date
+        self.status = status
+        self.route = route
+    }
+    
 }

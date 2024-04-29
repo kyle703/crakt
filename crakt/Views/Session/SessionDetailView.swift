@@ -39,21 +39,6 @@ class SessionDetailViewModel: ObservableObject {
         return formatter.string(from: TimeInterval(session.elapsedTime)) ?? "N/A"
     }
     
-    var statusText: String {
-        switch session.status {
-        case .active:
-            return "Active"
-        case .complete:
-            return "Completed"
-        case .cancelled:
-            return "Cancelled"
-
-        }
-    }
-    
-    var routesList: RouteAttemptScrollView {
-        return RouteAttemptScrollView(routes: session.routes)
-    }
 }
 
 
@@ -93,29 +78,18 @@ struct SessionDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Elapsed Time")
+                    Text("Total Session Time")
                         .font(.headline)
                     Spacer()
                     Text(viewModel.elapsedTimeText)
                         .font(.body)
                 }
-                
-                Divider()
-                
-                HStack {
-                    Text("Status")
-                        .font(.headline)
-                    Spacer()
-                    Text(viewModel.statusText)
-                        .font(.body)
-                }
-                
-                Spacer()
+
             }
             .padding()
             
-            AttemptsByGradeBarChartView(session: viewModel.session, gradeSystem: viewModel.session.routes.first!.gradeSystem)
-            viewModel.routesList
+            SessionChartsControllerView(session: viewModel.session, gradeSystem: viewModel.session.routes.first!.gradeSystem)
+            RouteAttemptScrollView(routes: viewModel.session.routes)
         }
     }
 }

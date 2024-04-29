@@ -108,15 +108,23 @@ struct BaseTileView<Content: View>: View {
 struct SessionTile: View {
     var session: Session
     let isDelete: Bool = false
-
+    
     var body: some View {
         BaseTileView {
-            VStack(alignment: .leading) {
-                Text("\(session.routes.count) Climbs")
-                    .font(.headline)
+            VStack(alignment: .center) {
+                AttemptsHistogramView(session: session, preview: true)
+                
+                Text(session.sessionDescription)
+                HStack {
+                    Text("\(session.totalRoutes) Routes")
+                    Text("\(session.totalAttempts) Attempts")
+                }
+                .font(.caption).foregroundColor(.secondary)
                 Text(session.startDate.toString())
-                    .font(.subheadline)
-            }
+                    .font(.caption).foregroundColor(.secondary)
+                
+            }.padding(.vertical, 2)
+
         }
     }
 }

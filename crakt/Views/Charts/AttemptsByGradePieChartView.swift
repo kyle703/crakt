@@ -7,96 +7,81 @@
 
 import SwiftUI
 import Charts
+import SwiftData
 
-extension Route {
-    var normalizedGrade: Double {
-        self.gradeSystem._protocol.normalizedDifficulty(for: grade!)
-    }
-    
-    func getConvertedGrade(system: GradeSystem) -> String {
-        return system._protocol.grade(forNormalizedDifficulty: self.normalizedGrade)
-    }
-}
 
-extension Session {
-    var totalAttempts: Int {
-        routes.reduce(0) { $0 + $1.attempts.count }
-    }
+
+
+
+struct HighestGradeSuccessfullyClimbedView: View {
+    var session: Session
     
-    var totalAttemptsPerGrade: [(grade: String, attempts: Int)] {
-        let attemptsByGrade = attemptsGroupedByGrade(routes: routes)
-        let totalAttemptsPerGrade = totalAttemptsByGrade(attemptsByCategory: attemptsByGrade)
-        return totalAttemptsPerGrade.sorted { $0.attempts > $1.attempts }
-    }
-    
-    var routesSorted: [Route] {
-        routes.sorted { route1, route2 in
-            let gradingProtocol1 = route1.gradeSystem._protocol
-            let gradingProtocol2 = route2.gradeSystem._protocol
-            
-            return gradingProtocol1.normalizedDifficulty(for: route1.grade!) < gradingProtocol2.normalizedDifficulty(for: route2.grade!)
-        }
-    }
-    
-    var attemptsByGradeAndStatus: [(grade: String, status: ClimbStatus, attempts: Int)] {
-        var aggregatedData = [(grade: String, status: ClimbStatus, attempts: Int)]()
-        
-        for route in routesSorted {
-            let grade = route.grade ?? "Unknown"  // Safely handle nil grades if any
-            for attempt in route.attempts {
-                let status = attempt.status
-                if let index = aggregatedData.firstIndex(where: { $0.grade == grade && $0.status == status }) {
-                    aggregatedData[index].attempts += 1
-                } else {
-                    aggregatedData.append((grade: grade, status: status, attempts: 1))
-                }
-            }
-        }
-        
-        return aggregatedData
-    }
-    
-    func attemptsGroupedByGrade(routes: [Route]) -> [String: [Route]] {
-        var attemptsByGrade: [String: [Route]] = [:]
-        
-        for route in routes {
-            
-            let grade = route.grade!
-            if attemptsByGrade[grade] != nil && true{
-                attemptsByGrade[grade]!.append(route)
+    var body: some View {
+        VStack {
+            Text("Highest Grade Successfully Climbed")
+                .font(.title)
+                .fontWeight(.bold)
+                .padding()
+
+            // Displaying the highest grade or a default message
+            if let highestGrade = session.highestGradeSuccessfullyClimbed {
+                Text(highestGrade)
+                    .font(.largeTitle)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.green)
+                    .padding()
             } else {
-                attemptsByGrade[grade] = [route]
+                Text("No successful climbs recorded")
+                    .font(.headline)
+                    .foregroundColor(.gray)
             }
-            
-            
         }
-        
-        return attemptsByGrade
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(radius: 8)
+        .padding()
     }
-    
-    func totalAttemptsByGrade(attemptsByCategory: [String: [Route]]) -> [(grade: String, attempts: Int)] {
-        var totals: [(String, Int)] = []
-        
-        for (grade, routes) in attemptsByCategory {
-            // Sum the total attempts for routes of this grade
-            let totalAttempts = routes.reduce(0) { $0 + $1.attempts.count }
-            totals.append((grade, totalAttempts))
-        }
-        
-        // Sort the totals by grade if grades are numeric or alphabetically otherwise
-        // Assuming grades can be sorted in a meaningful way as strings
-        return totals.sorted(by: { $0.0 < $1.0 })
-    }
-    
-    
 }
+
+
+
+
 
 
 struct AttemptsByGradePieChartView: View {
     // TODO add handling to tap on a slice to get more details in the middle
     var session: Session
+
+    @State var selectedAngle: Int?
+    
+    
+    private var selectedSector: String {
+        if let angle = selectedAngle {
+            return findSelectedSector(value: Int(angle)) ?? ""
+        }
+        return ""
+    }
+    
+    // attemptsByGradeAndStatus
+    
+    private func findSelectedSector(value: Int) -> String? {
+     
+        var accumulatedCount = 0
+     
+        let entry = session.totalAttemptsPerGrade.first { (_, attempts) in
+            accumulatedCount += attempts
+            return value <= accumulatedCount
+        }
+     
+        return entry?.grade
+    }
+    
+    
     var body: some View {
+        
         Chart(session.totalAttemptsPerGrade, id: \.grade) { data in
+            
             SectorMark(
                 angle: .value("Attempts", data.attempts),
                 innerRadius: .ratio(0.618),
@@ -104,54 +89,26 @@ struct AttemptsByGradePieChartView: View {
             )
             .cornerRadius(5.0)
             .foregroundStyle(by: .value("Grade", data.grade))
+            .opacity(selectedSector == data.grade ? 1.0 : 0.5)
+            
+            
+            
         }
+        .chartAngleSelection(value: $selectedAngle)
         .chartLegend(alignment: .center, spacing: 18)
         .aspectRatio(1, contentMode: .fit)
-    }
-}
-
-struct AttemptStatusByGradeStackedBarChartView: View {
-    // TODO order stacks by status
-    // TODO figure out where to put statusColors
-    var session: Session
-    let statusColors: [Color] = [.red, .green, .orange, .yellow]
-
-    var body: some View {
-        Chart(session.attemptsByGradeAndStatus, id: \.grade) { data in
-            BarMark(
-                x: .value("Grade", data.grade),
-                y: .value("Count", data.attempts)
-            )
-            .foregroundStyle(by: .value("Status", data.status.description))
-            .annotation(position: .overlay) {
-                Text("\(data.attempts)")
-                    .foregroundStyle(Color.white)
+        .chartBackground { proxy in
+                Text(selectedSector)
+            
                 
-            }
-        }
-        .chartForegroundStyleScale(domain: ClimbStatus.allCases, range: statusColors)
-        .aspectRatio(1, contentMode: .fit)
-    }
-}
-
-
-
-struct AttemptsByGradeBarChartView: View {
-    var session: Session
-    @State var gradeSystem: GradeSystem
-    
-    
-    var body: some View {
-        
-        VStack {
-            
-            
-            GradeSystemPicker(selectedGradeSystem: $gradeSystem, climbType: session.routes.first!.climbType)
-            AttemptsByGradePieChartView(session: session)
-            AttemptStatusByGradeStackedBarChartView(session: session)
-            
         }
         
         
     }
 }
+
+
+
+
+
+
