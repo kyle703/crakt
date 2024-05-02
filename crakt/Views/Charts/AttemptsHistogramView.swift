@@ -34,8 +34,8 @@ struct AttemptsHistogramView: View {
                     // Preview mode: Use index as x-value and style differently
                     BarMark(
                         x: .value("Index", index),
-                        y: .value("Grade", route.gradeIndex.description),
-                        width: 6
+                        y: .value("Grade", route.gradeIndex),
+                        width: 4
                     )
                     .foregroundStyle(route.gradeColor)
                     .clipShape(RoundedRectangle(cornerRadius: 1))
@@ -48,14 +48,14 @@ struct AttemptsHistogramView: View {
                             y: .value("Grade", route.gradeIndex)
                         )
                         .foregroundStyle(route.gradeColor)
-    //                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                     }
                     
                     
                 }
             }
             
-            if let rawSelectedDate {
+            if !preview, let rawSelectedDate {
                 RuleMark(x: .value("selected date", rawSelectedDate, unit: .minute))
                     .foregroundStyle(.gray.opacity(0.3)).zIndex(-1)
                     .annotation(position: .top, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {

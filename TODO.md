@@ -10,29 +10,40 @@
  [X] Connect active climb to session header counts
  [X] Connect session state to core data on exit
  [X] Modify to show send icons if it's active
+ 
+ 
+ [] Change action button options for bouldering vs ropes (no topped on boulders, just fall, send, flash)
+    - standardize climb status enums
+ [] Update grade system selector to use abbr text
+ [] Undo/Redo
+ [] Update Active Route selection
+    - Add timer to each route with splits per attempt
+    - TAGS!!! Route style tags
+    - Level of effort 
+    - 
+
 
  
  [] Make session header collapsable
  [] Make climb on action button float on top 
- [] Update grade system selector to use abbr text
  
- [] Change action button options for bouldering vs ropes (no topped on boulders, just fall, send, flash)
  
- [] Undo/Redo
  
  
  
  ## Home/Session log 
  [X] Overview collection layout
- [] Session collection item
- [] Session details view
- [] Restart a session?
+ [X] Session collection item
+ [X] Session details view
  [] Metrics on sessions
+    - duration based: Avg time on route. Session time historical comparison
+    - difficulty based: success rate per grade, highest difficulty, avg difficulty
+ [] 
  
  
  # Database
- [] Convert data model to SwiftData
- [] Convert interface functions to SwiftData queries
+ [X] Convert data model to SwiftData
+ [X] Convert interface functions to SwiftData queries
  
  
 
