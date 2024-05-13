@@ -7,43 +7,60 @@
 
 import SwiftUI
 
-enum ChartType: String, CaseIterable, Identifiable {
-    case pie = "Pie Chart"
-    case stackedBar = "Stacked Bar Chart"
-    case sessionDetail = "Session Histogram"
-
-    var id: String { self.rawValue }
+struct ChartInfo: Identifiable {
+    let id = UUID()
+    let makeChartView: (_ preview: Bool) -> AnyView
+    let description: String
 }
 
 
 struct SessionChartsControllerView: View {
     var session: Session
-    @State private var selectedChartType: ChartType = .pie
-    @State var gradeSystem: GradeSystem
+
+    let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+
+    var chartInfos: [ChartInfo] {
+        [
+            ChartInfo(makeChartView: { preview in AnyView(AttemptsByGradePieChartView(session: session, preview: preview)) }, description: "Grades"),
+            ChartInfo(makeChartView: { preview in AnyView(AttemptStatusByGradeStackedBarChartView(session: session, preview: preview)) }, description: "Attempts"),
+            ChartInfo(makeChartView: { preview in AnyView(AttemptsHistogramView(session: session, preview: preview)) }, description: "Routes")
+        ]
+    }
     
     var body: some View {
         VStack {
-            // Grade system picker
-            GradeSystemPicker(selectedGradeSystem: $gradeSystem, climbType: session.routes.first!.climbType)
-            
-            // Segmented control to switch between chart views
-            Picker("Select Chart Type", selection: $selectedChartType) {
-                ForEach(ChartType.allCases) { type in
-                    Text(type.rawValue).tag(type)
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(chartInfos) { info in
+                    NavigationLink(destination: info.makeChartView(false)) {
+                        ChartTile(chart: { info.makeChartView(true) } , description: info.description)
+                    }
                 }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
-
-            // Dynamically display the selected chart view
-            switch selectedChartType {
-            case .pie:
-                AttemptsByGradePieChartView(session: session)
-            case .stackedBar:
-                AttemptStatusByGradeStackedBarChartView(session: session)
-            case .sessionDetail:
-                AttemptsHistogramView(session: session, preview: false)
             }
         }
     }
 }
+
+
+
+
+struct ChartTile: View {
+    let chart: () -> AnyView
+    let description: String
+    
+    var body: some View {
+        BaseTileView {
+            VStack {
+                chart()  // Render the chart preview
+                    .frame(height: 150) // Setting a fixed height for uniformity
+                Text(description)
+                    
+            }.padding()
+        }
+    }
+}
+
+
+

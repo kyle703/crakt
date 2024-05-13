@@ -18,6 +18,7 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
     
     case fall
     case send
+    case highpoint
     case topped
     case flash
     
@@ -35,6 +36,8 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return "Topped"
         case .flash:
             return "Flash"
+        case .highpoint:
+            return "High point"
         }
     }
     
@@ -49,6 +52,8 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return .orange
         case .flash:
             return .yellow
+        case .highpoint:
+            return .indigo
         }
     }
     
@@ -62,6 +67,8 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return "flag.circle.fill"
         case .flash:
             return "bolt.circle.fill"
+        case .highpoint:
+            return "figure.stairs"
         }
     }
 }

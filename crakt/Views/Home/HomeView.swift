@@ -52,7 +52,7 @@ struct HomeView: View {
                         
                         ForEach(sessions, id: \.self) { session in
                             NavigationLink {
-                                SessionDetailView(viewModel: SessionDetailViewModel(session: session))
+                                SessionDetailView(session: session)
                             } label : {
                                 SessionTile(session: session)
                             }

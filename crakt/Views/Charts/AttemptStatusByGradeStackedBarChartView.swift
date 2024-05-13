@@ -11,7 +11,9 @@ import Charts
 struct AttemptStatusByGradeStackedBarChartView: View {
     // TODO order stacks by status
     // TODO figure out where to put statusColors
+   
     var session: Session
+    var preview = false
     let statusColors: [Color] = [.red, .green, .orange, .yellow]
 
     var body: some View {
@@ -24,5 +26,8 @@ struct AttemptStatusByGradeStackedBarChartView: View {
         }
         .chartForegroundStyleScale(domain: ClimbStatus.allCases, range: statusColors)
         .aspectRatio(1, contentMode: .fit)
+        .chartLegend(preview ? .hidden : .automatic)  // Conditionally display chart legend
+        .chartXAxis(preview ? .hidden : .automatic)  // Conditionally display X axis
+        .chartYAxis(preview ? .hidden : .automatic)
     }
 }

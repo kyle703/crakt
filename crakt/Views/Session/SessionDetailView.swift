@@ -47,7 +47,21 @@ class SessionDetailViewModel: ObservableObject {
 import SwiftUI
 
 struct SessionDetailView: View {
-    @ObservedObject var viewModel: SessionDetailViewModel
+    var session: Session
+    
+    var dateFormatted: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d yyyy" // Abbreviated Month, Day, Year
+        return formatter.string(from: session.startDate)
+    }
+    
+    var elapsedTimeText: String {
+        // Assuming elapsedTime is in seconds
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: TimeInterval(session.elapsedTime)) ?? "N/A"
+    }
     
     var body: some View {
         ScrollView {
@@ -57,39 +71,35 @@ struct SessionDetailView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 
+                Text(dateFormatted)
+                    .font(.body)
+                
+                
+                Divider()
+                
                 HStack {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Start Date")
-                            .font(.headline)
-                        Text(viewModel.startDateText)
-                            .font(.body)
-                    }
-                    
+                    Text("Session Duration")
+                        .font(.headline)
                     Spacer()
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("End Date")
-                            .font(.headline)
-                        Text(viewModel.endDateText)
-                            .font(.body)
-                    }
+                    Text(elapsedTimeText)
+                        .font(.body)
                 }
                 
                 Divider()
                 
                 HStack {
-                    Text("Total Session Time")
+                    Text("Hardest grade sent")
                         .font(.headline)
                     Spacer()
-                    Text(viewModel.elapsedTimeText)
+                    Text(session.highestGradeSent ?? "N/A")
                         .font(.body)
                 }
-
+                
             }
             .padding()
+            SessionChartsControllerView(session: session)
+            RouteAttemptScrollView(routes: session.routesSortedByDate)
             
-            SessionChartsControllerView(session: viewModel.session, gradeSystem: viewModel.session.routes.first!.gradeSystem)
-            RouteAttemptScrollView(routes: viewModel.session.routes)
         }
     }
 }

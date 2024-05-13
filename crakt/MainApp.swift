@@ -24,7 +24,8 @@ struct MainApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(DataController.previewContainer)
+                .modelContainer(modelContainer)
+                //.modelContainer(DataController.previewContainer)
         }
 
     }
@@ -80,7 +81,7 @@ class DataController {
                     let attemptTime = TimeInterval(attemptIndex * 10 + Int.random(in: -10...10))
                     currentTime.addTimeInterval(attemptTime)
                     route.attempts.append(RouteAttempt(date: currentTime.addingTimeInterval(attemptTime), status: status))
-                    if status == .topped {
+                    if status == .send {
                         break  // End attempts if topped
                     }
                 }

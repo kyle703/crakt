@@ -24,7 +24,7 @@ struct HighestGradeSuccessfullyClimbedView: View {
                 .padding()
 
             // Displaying the highest grade or a default message
-            if let highestGrade = session.highestGradeSuccessfullyClimbed {
+            if let highestGrade = session.highestGradeSent {
                 Text(highestGrade)
                     .font(.largeTitle)
                     .fontWeight(.semibold)
@@ -52,6 +52,7 @@ struct HighestGradeSuccessfullyClimbedView: View {
 struct AttemptsByGradePieChartView: View {
     // TODO add handling to tap on a slice to get more details in the middle
     var session: Session
+    var preview = false
 
     @State var selectedAngle: Int?
     
@@ -95,7 +96,7 @@ struct AttemptsByGradePieChartView: View {
             
         }
         .chartAngleSelection(value: $selectedAngle)
-        .chartLegend(alignment: .center, spacing: 18)
+        .chartLegend(preview ? .hidden : .automatic)
         .aspectRatio(1, contentMode: .fit)
         .chartBackground { proxy in
                 Text(selectedSector)

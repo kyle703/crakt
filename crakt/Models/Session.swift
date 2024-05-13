@@ -34,7 +34,7 @@ class Session {
     var activeRoute: Route?
     
     // ----
-    let sessionDescription = "Triangle Rock Club"
+    let sessionDescription = "Peak RVA"
     
     public init(user: User) {
         self.id = UUID()
@@ -64,12 +64,12 @@ class Session {
         let routes = [
             Route(gradeSystem: .vscale, grade: "1", attempts: [
                 RouteAttempt(date: sessionStart.addingTimeInterval(5 * 60), status: .flash),
-                RouteAttempt(date: sessionStart.addingTimeInterval(10 * 60), status: .topped)
+                RouteAttempt(date: sessionStart.addingTimeInterval(10 * 60), status: .send)
             ]),
             Route(gradeSystem: .vscale, grade: "2", attempts: [
                 RouteAttempt(date: sessionStart.addingTimeInterval(20 * 60), status: .flash),
                 RouteAttempt(date: sessionStart.addingTimeInterval(25 * 60), status: .fall),
-                RouteAttempt(date: sessionStart.addingTimeInterval(30 * 60), status: .topped)
+                RouteAttempt(date: sessionStart.addingTimeInterval(30 * 60), status: .send)
             ]),
             Route(gradeSystem: .vscale, grade: "3", attempts: [
                 RouteAttempt(date: sessionStart.addingTimeInterval(40 * 60), status: .fall),
@@ -78,7 +78,7 @@ class Session {
             Route(gradeSystem: .vscale, grade: "4", attempts: [
                 RouteAttempt(date: sessionStart.addingTimeInterval(55 * 60), status: .fall),
                 RouteAttempt(date: sessionStart.addingTimeInterval(60 * 60), status: .fall),
-                RouteAttempt(date: sessionStart.addingTimeInterval(65 * 60), status: .topped)
+                RouteAttempt(date: sessionStart.addingTimeInterval(65 * 60), status: .send)
             ])
         ]
 
@@ -98,7 +98,7 @@ extension Session {
     
     var tops: Int {
         let filteredAttempts = allAttempts.filter {
-            $0.status == .topped || $0.status == .send || $0.status == .flash
+            $0.status == .send || $0.status == .send || $0.status == .flash
         }
         return filteredAttempts.count
     }
@@ -138,6 +138,7 @@ extension Session {
         // find active rotue
         // mark inactive
         if let route = activeRoute {
+            route.status = .inactive
             self.routes.append(route)
             self.activeRoute = nil
         }

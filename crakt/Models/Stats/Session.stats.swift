@@ -19,7 +19,7 @@ extension Session {
     var successfulClimbs: Int {
             routes.filter { route in
                 route.attempts.contains { attempt in
-                    attempt.status == .topped
+                    attempt.status == .send
                 }
             }.count
         }
@@ -40,14 +40,34 @@ extension Session {
             return totalGrades.reduce(0, +) / Double(totalGrades.count)
         }
     
-    var highestGradeSuccessfullyClimbed: String? {
-            routes.filter { route in
+    var highestGradeSent: String? {
+            let _max_route = routes.filter { route in
                 route.attempts.contains { attempt in
-                    attempt.status == .topped || attempt.status == .flash // Assuming 'top' status indicates a successful climb
+                    attempt.status == .send || attempt.status == .flash || attempt.status == .topped
                 }
             }.max(by: { a, b in
                 a.normalizedGrade < b.normalizedGrade
-            })?.grade
+            })
+        
+            if let _max_route {
+                return _max_route.gradeDescription!
+            }
+            return nil
+        }
+    
+    var highestGradeFlashedClimbed: String? {
+            let _max_route = routes.filter { route in
+                route.attempts.contains { attempt in
+                    attempt.status == .flash
+                }
+            }.max(by: { a, b in
+                a.normalizedGrade < b.normalizedGrade
+            })
+        
+            if let _max_route {
+                return _max_route.gradeDescription!
+            }
+            return nil
         }
     
     var totalAttemptsPerGrade: [(grade: String, attempts: Int)] {
