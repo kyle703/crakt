@@ -12,11 +12,26 @@ struct RouteLogRowItem: View {
     @State private var isExpanded: Bool = false
     
     var body: some View {
-        ExpandableSection(isExpanded: $isExpanded, label: {
+        // Derive the background color from route’s grade
+        let gradeSystem = GradeSystems.systems[route.gradeSystem]!
+        let gradeColor = gradeSystem.colors(for: route.grade!).first ?? .purple
+        
+        // Use the ExpandableSection as before, but place
+        // the background around it so everything is in one card.
+        ExpandableSection(isExpanded: $isExpanded,
+                          label: {
             RouteSummaryView(route: route)
         }, content: {
-            AttemptsList(attempts: route.attempts)
+            AttemptsList(route: route)
+                .padding([.horizontal, .bottom]) // Padding inside the card
         })
+        // The entire ExpandableSection (label + content) is inside a rounded rectangle
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(gradeColor)
+        )
+        .padding(.horizontal)
+        .padding(.vertical, 4)
     }
 }
 

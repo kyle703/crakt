@@ -12,10 +12,27 @@ import SwiftData
 struct MainApp: App {
     
     let modelContainer: ModelContainer
+    
+    /// Helper function to guarantee exactly one `User` in the local store.
+    private func ensureSingleUserExists(in context: ModelContext) throws {
+        let fetchRequest = FetchDescriptor<User>()
+        let existingUsers = try context.fetch(fetchRequest)
+
+        // No users found -> create one
+        if existingUsers.isEmpty {
+            let newUser = User()
+            context.insert(newUser)
+            try context.save()
+            print("Inserted new user: \(newUser.name)")
+        }
+        
+        // If exactly one user exists, do nothing
+    }
         
     init() {
         do {
             modelContainer = try ModelContainer(for: User.self, Session.self, Route.self, RouteAttempt.self)
+            try ensureSingleUserExists(in: modelContainer.mainContext)
         } catch {
             fatalError("Could not initialize ModelContainer")
         }

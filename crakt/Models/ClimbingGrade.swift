@@ -66,7 +66,6 @@ protocol GradeProtocol: Equatable {
 extension GradeProtocol {
     
     
-    // Provide a default implementation for exponential normalization
     func normalizedDifficulty(for grade: String) -> Double {
         guard let gradeIndex = grades.firstIndex(of: grade), grades.count > 1 else { return 0.0 }
         
@@ -102,12 +101,8 @@ extension GradeProtocol {
     
     func color(forNormalizedDifficulty difficulty: Double) -> Color {
             // Use the reverse lookup function to get the closest grade for the normalized difficulty
-            let grade = grade(forNormalizedDifficulty: difficulty)
-            
-            // Use the existing method to get the color(s) for this grade.
-            // Assuming colors(for:) returns an array, but we'll take the first color for simplicity.
-            // You might need to adjust this logic depending on how colors are defined and used in your app.
-            return colors(for: grade).first ?? .gray // Default to gray if no color is found
+            // Default to gray if no color is found
+            return colors(for: grade(forNormalizedDifficulty: difficulty)).first ?? .gray
         }
     
     func gradeIndex(for grade: String?) -> Int {

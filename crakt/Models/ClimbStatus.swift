@@ -18,13 +18,16 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
     
     case fall
     case send
-    case highpoint
+//    case highpoint
     case topped
     case flash
     
     var primitivePlottable: PrimitivePlottable {
         return description
     }
+    
+
+    var boulderTypes: Set<ClimbStatus> { [.fall, .send, .flash] }
     
     var description: String {
         switch self {
@@ -36,8 +39,8 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return "Topped"
         case .flash:
             return "Flash"
-        case .highpoint:
-            return "High point"
+//        case .highpoint:
+//            return "High point"
         }
     }
     
@@ -52,8 +55,8 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return .orange
         case .flash:
             return .yellow
-        case .highpoint:
-            return .indigo
+//        case .highpoint:
+//            return .indigo
         }
     }
     
@@ -67,8 +70,8 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return "flag.circle.fill"
         case .flash:
             return "bolt.circle.fill"
-        case .highpoint:
-            return "figure.stairs"
+//        case .highpoint:
+//            return "figure.stairs"
         }
     }
 }

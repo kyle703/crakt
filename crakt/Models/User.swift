@@ -10,6 +10,8 @@ import Foundation
 import SwiftData
 
 
+
+
 @Model 
 class User {
     var id: UUID
@@ -17,11 +19,19 @@ class User {
 
     var name: String
     
-    public init(name: String = "Test user") {
+    var climbType: ClimbType
+    var gradeSystem: GradeSystem
+    
+    init(name: String = "Test User",
+         climbStyle: ClimbType = .boulder,
+         gradeSystem: GradeSystem = .vscale) {
         self.id = UUID()
         self.createdAt = Date()
 
         self.name = name
+        self.climbType = climbStyle
+        self.gradeSystem = gradeSystem
     }
-    
 }
+
+

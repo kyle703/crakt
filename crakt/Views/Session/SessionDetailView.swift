@@ -41,11 +41,6 @@ class SessionDetailViewModel: ObservableObject {
     
 }
 
-
-
-
-import SwiftUI
-
 struct SessionDetailView: View {
     var session: Session
     

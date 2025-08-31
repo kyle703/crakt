@@ -28,6 +28,15 @@ enum ClimbType: Int16, CustomStringConvertible, Codable {
         }
     }
     
+    var isRopes: Bool {
+        switch self {
+        case .toprope, .lead:
+            return true
+        default:
+            return false
+        }
+    }
+    
     static let allCases: [ClimbType] = [.boulder, .toprope, .lead]
 }
 

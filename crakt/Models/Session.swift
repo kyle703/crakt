@@ -16,6 +16,16 @@ enum SessionStatus: Int, Codable {
     case cancelled = 2
 }
 
+extension SessionStatus: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .active: return "Active"
+        case .complete: return "Complete"
+        case .cancelled: return "Cancelled"
+        }
+    }
+}
+
 @Model 
 class Session {
     
@@ -34,7 +44,7 @@ class Session {
     var activeRoute: Route?
     
     // ----
-    let sessionDescription = "Peak RVA"
+    var sessionDescription = "Peak RVA"
     
     public init(user: User) {
         self.id = UUID()
@@ -60,7 +70,6 @@ class Session {
 
         let sessionStart = Date()
 
-        // Manually create routes and attempts
         let routes = [
             Route(gradeSystem: .vscale, grade: "1", attempts: [
                 RouteAttempt(date: sessionStart.addingTimeInterval(5 * 60), status: .flash),
@@ -85,6 +94,12 @@ class Session {
         return Session(routes: routes, startDate: sessionStart)
     }
     
+    static var active_preview: Session {
+        let session = Session.preview
+        session.activeRoute = session.routes.first!
+        return session
+    }
+    
 }
 
 extension Session {
@@ -98,7 +113,7 @@ extension Session {
     
     var tops: Int {
         let filteredAttempts = allAttempts.filter {
-            $0.status == .send || $0.status == .send || $0.status == .flash
+            $0.status == .topped || $0.status == .send || $0.status == .flash
         }
         return filteredAttempts.count
     }
@@ -142,6 +157,14 @@ extension Session {
             self.routes.append(route)
             self.activeRoute = nil
         }
+    }
+    
+    var highestGrade : String {
+        let filteredAttempts = allAttempts.filter {
+            $0.status == .topped || $0.status == .send || $0.status == .flash
+        }
+        return filteredAttempts.max { $0.route!.gradeIndex < $1.route!.gradeIndex }?.route?.grade ?? "NA"
+        
     }
     
 }

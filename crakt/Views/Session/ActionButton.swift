@@ -10,10 +10,12 @@ import SwiftUI
 struct ActionButton: View {
     let icon: String
     let label: String?
-    let size: CGFloat = 60
+    var size: CGFloat = 60
     let color: Color
     let action: () -> Void
     var disabled: Bool = false  // Default value
+    var width: CGFloat = 60
+    var height: CGFloat = 60
     
     var body: some View {
         Button(action: {
@@ -33,7 +35,7 @@ struct ActionButton: View {
                         .font(.caption)
                 }
             }
-            .frame(width: size, height: size)
+            .frame(minWidth: 20, maxWidth: .infinity, minHeight: 20, maxHeight: .infinity)
             .background(Color.white.opacity(disabled ? 0.7 : 1.0))  // Adjust opacity as needed
             .cornerRadius(10)
             .overlay(
@@ -50,6 +52,6 @@ struct ActionButton: View {
 
 struct ActionButton_Previews: PreviewProvider {
     static var previews: some View {
-        ActionButton(icon: "xmark", label: ClimbStatus.fall.description, color: .red, action: {})
+        ActionButton(icon: "xmark", label: ClimbStatus.fall.description, color: .red, action: {}).frame(width: 100, height: 100)
     }
 }

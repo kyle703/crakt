@@ -8,26 +8,41 @@
 import SwiftUI
 import SwiftData
 
+struct MainTabView: View {
+
+    var body: some View {
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+
+            ActivityHistoryView()
+                .tabItem {
+                    Label("Activity", systemImage: "clock")
+                }
+
+            Text("adf")
+                .tabItem {
+                    Label("Stats", systemImage: "chart.bar")
+                }
+
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
+        }
+    }
+}
+
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-        
-    
-    func clear_swift_data() {
-        do {
-            try modelContext.delete(model: User.self)
-            try modelContext.delete(model: Session.self)
-            try modelContext.delete(model: Route.self)
-            try modelContext.delete(model: RouteAttempt.self)
-        } catch {
-            print("Failed to clear")
-        }
-        
-    }
 
     var body: some View {
         VStack {
 //            OutlineButton(action: clear_swift_data, label: "Delete db")
-            HomeView()
+            MainTabView()
         }
     }
 }

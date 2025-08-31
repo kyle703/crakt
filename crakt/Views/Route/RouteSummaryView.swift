@@ -10,45 +10,44 @@ import SwiftUI
 struct RouteSummaryView: View {
     var route: Route
     
-    
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                
-                let height: CGFloat = route.status == .active ? 50 : 20
-                let _system = GradeSystems.systems[route.gradeSystem]!
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(_system.colors(for: route.grade!).first ?? Color.purple)
-                    .frame(width: 50, height: height)
-                    .overlay(
-                        Text(_system.description(for: route.grade!))
-                            .font(.headline)
-                            .foregroundColor(Color.white)
-                    )
-                
-                
+        // (Assumes you have logic to get the system, color, and text from route.gradeSystem and route.grade)
+        let gradeSystem = GradeSystems.systems[route.gradeSystem]!
+        let gradeLabel = gradeSystem.description(for: route.grade!)
+        
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                // Grade label in a white pill
+                Text(gradeLabel)
+                    .font(.headline)
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.white)
+                    .cornerRadius(8)
                 
                 Spacer()
                 
+                // Action counts in white pills
                 ForEach(ClimbStatus.allCases, id: \.self) { action in
                     if let count = route.actionCounts[action], count > 0 {
-                        HStack {
+                        HStack(spacing: 4) {
                             Image(systemName: action.iconName)
                                 .foregroundColor(action.color)
-                            
                             Text("\(count)")
                                 .font(.caption)
                                 .foregroundColor(.black)
                         }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Color.white)
+                        .cornerRadius(8)
                     }
                 }
-                
-                
             }
-            
-            
-            
-            
         }
+        // Add some padding inside
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
     }
 }

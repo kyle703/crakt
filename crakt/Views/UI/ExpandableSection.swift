@@ -17,11 +17,20 @@ struct ExpandableSection<Label: View, Content: View>: View {
             HStack {
                 label()
                 Spacer()
-                Image(systemName: "chevron.up")
-                    .aspectRatio(contentMode: .fit)
-                    .frame(height: 10)
-                    .rotationEffect(Angle(degrees: isExpanded ? 0 : 180))
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                    
+                    Image(systemName: "chevron.up")
+                        .foregroundColor(.black)
+                        .rotationEffect(.degrees(isExpanded ? 0 : 180))
+                        // Adjust icon size relative to circle
+                        .font(.system(size: 14, weight: .semibold))
+                }
+                .frame(width: 24, height: 24)
+                    
             }
+            .padding(.trailing)
             .frame(maxWidth: .infinity) // Ensures the HStack occupies the full width
             .contentShape(Rectangle()) // ensures the entire area is tappable
             .onTapGesture {
@@ -32,7 +41,10 @@ struct ExpandableSection<Label: View, Content: View>: View {
             
             if isExpanded {
                 content()
+//                    .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
+        .animation(.interactiveSpring(response: 0.4, dampingFraction: 0.9, blendDuration: 0), value: isExpanded)
+
     }
 }

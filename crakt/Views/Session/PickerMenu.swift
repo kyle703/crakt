@@ -13,30 +13,64 @@ struct PickerMenu<T: Hashable & CustomStringConvertible>: View {
     let systemImageName: String
     let color: Color
     
+    @State private var isPressed = false
+    
     var body: some View {
         Menu {
             ForEach(options, id: \.self) { option in
                 Button(action: {
                     selectedItem = option
                 }) {
-                    Text(option.description)
+                    HStack {
+                        Text(option.description)
+                        if option == selectedItem {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
                 }
             }
         } label: {
-            ZStack {
-                Label("\(selectedItem.description)", systemImage: systemImageName)
+            HStack(spacing: 2) {
+                Image(systemName: systemImageName)
+                    .font(.title3)
+                    .foregroundColor(selectedItem == nil ? .secondary : color)
+                
+                Text(selectedItem.description)
                     .font(.headline)
-                    .padding(10)
-                    .foregroundColor(color)
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(color, lineWidth: 2)
-                    )
+                    .fontWeight(.medium)
+                    .foregroundColor(selectedItem == nil ? .secondary : .primary)
+                
+                Image(systemName: "chevron.down")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .rotationEffect(.degrees(isPressed ? 180 : 0))
+                    .animation(.easeInOut(duration: 0.2), value: isPressed)
             }
-            .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
-            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+            .frame(minWidth: 44, minHeight: 44)
+            .padding(2)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(color)
+                    )
+            )
+            .shadow(color: Color.black.opacity(isPressed ? 0.15 : 0.05), radius: isPressed ? 4 : 2, x: 0, y: isPressed ? 2 : 1)
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.1)) {
+                isPressed = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    isPressed = false
+                }
+            }
         }
     }
 }

@@ -36,6 +36,11 @@
 		084FDAF32ABF1E560015E8EE /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF22ABF1E560015E8EE /* Color.swift */; };
 		084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */; };
 		084FDAF72ABF20C90015E8EE /* ClimbingGrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */; };
+		0852BD862D34ACE300CBF36D /* BaseTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD852D34ACD600CBF36D /* BaseTileView.swift */; };
+		0852BD892D34B18400CBF36D /* ActivityHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD882D34B18400CBF36D /* ActivityHistoryView.swift */; };
+		0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */; };
+		0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */; };
+		0852BD932D45489300CBF36D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD922D45489300CBF36D /* SettingsView.swift */; };
 		0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1292BAD07E000D31AD3 /* Route.swift */; };
 		0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12B2BAD07E000D31AD3 /* Session.swift */; };
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
@@ -104,6 +109,11 @@
 		084FDAF22ABF1E560015E8EE /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGradeSelector.swift; sourceTree = "<group>"; };
 		084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGrade.swift; sourceTree = "<group>"; };
+		0852BD852D34ACD600CBF36D /* BaseTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTileView.swift; sourceTree = "<group>"; };
+		0852BD882D34B18400CBF36D /* ActivityHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHistoryView.swift; sourceTree = "<group>"; };
+		0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRouteCard.swift; sourceTree = "<group>"; };
+		0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToConfirmView.swift; sourceTree = "<group>"; };
+		0852BD922D45489300CBF36D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteAttempt.swift; sourceTree = "<group>"; };
 		0896B1292BAD07E000D31AD3 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -148,12 +158,14 @@
 		084FA4B22ABF577D00ADF994 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0852BD872D34AD2500CBF36D /* ActivityLog */,
 				08C7F49E2BF1B45A0063827E /* Route */,
 				08C7F49B2BF1B41C0063827E /* UI */,
 				0896B1332BC77A0100D31AD3 /* Charts */,
 				084FA4CF2AC2644C00ADF994 /* Home */,
 				084FA4B32ABF57A300ADF994 /* Session */,
 				084FDAE92AB7E4D10015E8EE /* Selectors */,
+				0852BD922D45489300CBF36D /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -164,11 +176,10 @@
 				0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */,
 				084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */,
 				084FDAED2AB7F5570015E8EE /* SessionView.swift */,
+				0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */,
 				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
 				084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */,
 				084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */,
-				084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */,
-				084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */,
 				084FA4B82ABF581B00ADF994 /* PickerMenu.swift */,
 				084FA4B62ABF57E900ADF994 /* OutlineButton.swift */,
 				084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */,
@@ -180,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				084FA4D02AC2645A00ADF994 /* HomeView.swift */,
+				0852BD882D34B18400CBF36D /* ActivityHistoryView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -253,6 +265,8 @@
 			children = (
 				084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */,
 				084FDAE32AB7E3430015E8EE /* ScrollingSectionView.swift */,
+				084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */,
+				084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */,
 			);
 			path = Selectors;
 			sourceTree = "<group>";
@@ -281,6 +295,13 @@
 				084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		0852BD872D34AD2500CBF36D /* ActivityLog */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ActivityLog;
 			sourceTree = "<group>";
 		};
 		0896B12C2BAD086200D31AD3 /* SwiftData */ = {
@@ -314,7 +335,9 @@
 		08C7F49B2BF1B41C0063827E /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				0852BD852D34ACD600CBF36D /* BaseTileView.swift */,
 				08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */,
+				0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -461,16 +484,20 @@
 				084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */,
 				0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */,
 				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,
+				0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */,
 				084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */,
 				084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */,
 				084FDADC2AB75C3C0015E8EE /* GradeSystem.swift in Sources */,
 				084FDAEE2AB7F5570015E8EE /* SessionView.swift in Sources */,
 				084FDAAE2AB6590B0015E8EE /* Persistence.swift in Sources */,
+				0852BD862D34ACE300CBF36D /* BaseTileView.swift in Sources */,
 				084FDAF32ABF1E560015E8EE /* Color.swift in Sources */,
 				0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */,
+				0852BD932D45489300CBF36D /* SettingsView.swift in Sources */,
 				084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */,
 				084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */,
 				08C7F4962BDDAF280063827E /* SessionChartsControllerView.swift in Sources */,
+				0852BD892D34B18400CBF36D /* ActivityHistoryView.swift in Sources */,
 				084FA4D32AC5B90300ADF994 /* LoadingView.swift in Sources */,
 				084FDAEC2AB7EEC60015E8EE /* Date+String.swift in Sources */,
 				08C7F49D2BF1B42F0063827E /* ExpandableSection.swift in Sources */,
@@ -490,6 +517,7 @@
 				084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */,
 				08C7F4952BDDACDC0063827E /* Session.stats.swift in Sources */,
 				084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */,
+				0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */,
 				08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */,
 				0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */,
 				0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */,

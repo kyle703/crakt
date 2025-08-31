@@ -11,7 +11,9 @@ import SwiftData
 struct SessionActionBar: View {
     @Bindable var session: Session
     var actionButton: AnyView?
-    
+
+    @State private var showToppedButton: Bool = false
+    @State private var flashButtonDisabled: Bool = false
 
     var body: some View {
         HStack(spacing: 20) {
@@ -30,21 +32,21 @@ struct SessionActionBar: View {
                 performAction(.send)
             })
             
-            // Topped
-            if session.activeRoute?.gradeSystem.climbType != .boulder {
-                ActionButton(icon: ClimbStatus.topped.iconName,
-                             label: ClimbStatus.topped.description,
-                             color: ClimbStatus.topped.color, action: {
-                    performAction(.highpoint)
-                })
+                        // Topped -- only for ropes
+            if showToppedButton {
+            //                ActionButton(icon: ClimbStatus.topped.iconName,
+            //                             label: ClimbStatus.topped.description,
+            //                             color: ClimbStatus.topped.color, action: {
+            //                    performAction(.highpoint)
+            //                })
             }
-            
+
             // Flash
-            ActionButton(icon: ClimbStatus.flash.iconName, 
+            ActionButton(icon: ClimbStatus.flash.iconName,
                          label: ClimbStatus.flash.description,
                          color: ClimbStatus.flash.color, action: {
                 performAction(.flash)
-            }, disabled: session.activeRoute?.attempts.count ?? 0 > 0)
+            }, disabled: flashButtonDisabled)
             
             Divider()
             
@@ -52,6 +54,23 @@ struct SessionActionBar: View {
                 actionButton
             }
         }.frame(height: 50)
+        .onAppear {
+            updateButtonStates()
+        }
+        .onChange(of: session.activeRoute?.gradeSystem) { _, _ in
+            updateButtonStates()
+        }
+        .onChange(of: session.activeRoute?.attempts.count) { _, _ in
+            updateButtonStates()
+        }
+        .onChange(of: session.activeRoute?.id) { _, _ in
+            updateButtonStates()
+        }
+    }
+
+    private func updateButtonStates() {
+        showToppedButton = session.activeRoute?.gradeSystem.climbType != .boulder
+        flashButtonDisabled = (session.activeRoute?.attempts.count ?? 0) > 0
     }
     
     private func performAction(_ action: ClimbStatus) {
