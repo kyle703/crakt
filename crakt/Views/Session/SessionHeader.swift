@@ -22,7 +22,7 @@ struct SessionHeader: View {
     @State private var showExitAlert = false
     
     private var collapsedHeaderView: some View {
-        HStack {
+        HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(stopwatch.totalTime.formatted)
                     .font(.system(size: 24, weight: .bold, design: .monospaced))

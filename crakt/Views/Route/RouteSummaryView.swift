@@ -18,7 +18,7 @@ struct RouteSummaryView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 // Grade label in a white pill
-                Text(gradeLabel)
+                Text(gradeLabel ?? "Unknown")
                     .font(.headline)
                     .foregroundColor(.black)
                     .padding(.horizontal, 12)

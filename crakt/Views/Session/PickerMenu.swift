@@ -31,24 +31,26 @@ struct PickerMenu<T: Hashable & CustomStringConvertible>: View {
                 }
             }
         } label: {
-            HStack(spacing: 2) {
+            HStack(spacing: 8) {
                 Image(systemName: systemImageName)
                     .font(.title3)
-                    .foregroundColor(selectedItem == nil ? .secondary : color)
+                    .foregroundColor(color)
                 
                 Text(selectedItem.description)
                     .font(.headline)
                     .fontWeight(.medium)
-                    .foregroundColor(selectedItem == nil ? .secondary : .primary)
+                    .foregroundColor(.primary)
                 
                 Image(systemName: "chevron.down")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .rotationEffect(.degrees(isPressed ? 180 : 0))
                     .animation(.easeInOut(duration: 0.2), value: isPressed)
+                    .padding(4)
             }
             .frame(minWidth: 44, minHeight: 44)
-            .padding(2)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 2)
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color.white)

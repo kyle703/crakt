@@ -18,7 +18,7 @@ struct AnyGradeProtocol: GradeProtocol {
     private var _colorMap: () -> [String: Color]
 
     private var _colorsForGrade: (String) -> [Color]
-    private var _descriptionForGrade: (String) -> String
+    private var _descriptionForGrade: (String) -> String?
     
     init<GP: GradeProtocol>(_ gradeSystem: GP) {
         _system = { gradeSystem.system }
@@ -45,7 +45,7 @@ struct AnyGradeProtocol: GradeProtocol {
         return _colorsForGrade(grade)
     }
 
-    func description(for grade: String) -> String {
+    func description(for grade: String) -> String? {
         return _descriptionForGrade(grade)
     }
     
@@ -57,7 +57,7 @@ protocol GradeProtocol: Equatable {
     var grades: [String] { get }
     var colorMap: [String: Color] { get }
     func colors(for grade: String) -> [Color]
-    func description(for grade: String) -> String
+    func description(for grade: String) -> String?
     func normalizedDifficulty(for grade: String) -> Double
     func grade(forNormalizedDifficulty difficulty: Double) -> String
 
@@ -163,7 +163,7 @@ struct FrenchGrade: GradeProtocol {
         "9c": Color.black
     ]
     
-    func description(for grade: String) -> String {
+    func description(for grade: String) -> String? {
         return grade
     }
 }
@@ -205,7 +205,7 @@ struct VGrade: GradeProtocol {
             }
     }
     
-    func description(for grade: String) -> String {
+    func description(for grade: String) -> String? {
         return "v\(grade)"
     }
     
@@ -243,7 +243,7 @@ struct FontGrade: GradeProtocol {
         return [colorMap[grade] ?? Color.gray]
     }
     
-    func description(for grade: String) -> String {
+    func description(for grade: String) -> String? {
         return grade
     }
     
@@ -281,7 +281,7 @@ struct YDS: GradeProtocol {
             }
     }
     
-    func description(for grade: String) -> String {
+    func description(for grade: String) -> String? {
         return grade
     }
     
@@ -331,7 +331,7 @@ class UserConfiguredCircuitGrade: CircuitGradeProtocol {
             return map
         }
     
-    func description(for grade: String) -> String {
-        return ""
+    func description(for grade: String) -> String? {
+        return nil
     }
 }

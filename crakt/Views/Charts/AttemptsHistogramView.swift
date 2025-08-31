@@ -73,7 +73,7 @@ struct AttemptsHistogramView: View {
                     if let rawGrade = value.as(Int.self) {
                         let grade = gradeSystem._protocol.grades[rawGrade];
                         let desc = gradeSystem._protocol.description(for: grade)
-                        Text(desc)
+                        Text(desc ?? rawGrade.description)
                     }
                 }
             }

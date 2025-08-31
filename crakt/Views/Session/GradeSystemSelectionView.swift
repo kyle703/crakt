@@ -57,3 +57,19 @@ struct GradeSystemSelectionView: View {
         }
     }
 }
+
+#Preview {
+
+    @Previewable @State var selectedClimbType: ClimbType = .boulder
+    @Previewable @State var selectedGradeSystem: GradeSystem = .vscale
+
+    VStack(spacing: 0) {
+        GradeSystemSelectionView(selectedClimbType: $selectedClimbType,
+                                             selectedGradeSystem: $selectedGradeSystem)
+                        .padding(.horizontal)
+                        .padding(.bottom)
+    }
+    .background(Color.gray.opacity(0.1))
+    .cornerRadius(12)
+    .padding()
+} 

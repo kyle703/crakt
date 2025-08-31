@@ -46,7 +46,7 @@ struct ClimbingGradeSelector<GS: GradeProtocol>: View {
                             .frame(width: 60, height: 60)
                     }
                 }.overlay(
-                    Text(gradeSystem.description(for: grade))
+                    Text(gradeSystem.description(for: grade) ?? "")
                         .foregroundColor(.white)
                 ))
             }

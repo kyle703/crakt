@@ -82,16 +82,6 @@ struct ActiveRouteCard: View {
                     .padding(.vertical, 6)
                     .background(Color.white.opacity(0.2))
                     .cornerRadius(16)
-            } else {
-                Text("N/A")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .fontDesign(.rounded)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(16)
             }
 
             Spacer()
