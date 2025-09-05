@@ -7,11 +7,13 @@
 
 
 import SwiftUI
+import SwiftData
 
 struct ActiveRouteCard: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var session: Session
     @ObservedObject var stopwatch: Stopwatch
+    @ObservedObject var workoutOrchestrator: WorkoutOrchestrator
 
     @State private var availableStatuses: [ClimbStatus] = []
 
@@ -165,11 +167,18 @@ struct ActiveRouteCard: View {
                     size: 80,
                     color: status.color,
                     action: {
-                        session.activeRoute?.addAttempt(status: status)
+                        // Just add the attempt to the route - don't process workout yet
+                        if let activeRoute = session.activeRoute {
+                            let attempt = RouteAttempt(status: status)
+                            activeRoute.attempts.append(attempt)
+                            // Update workout progress to reflect the new attempt
+                            workoutOrchestrator.updateWorkoutProgress()
+                        }
                         stopwatch.lap()
                     },
                     width: 120,
-                    height: 80
+                    height: 80,
+                    hapticType: status == .send || status == .flash ? .success : .attempt
                 )
             }
         }
@@ -178,6 +187,9 @@ struct ActiveRouteCard: View {
     
     private var logItButton: some View {
         Button(action: {
+            // Advance workout to next set since route is completed
+            workoutOrchestrator.advanceWorkoutOnRouteCompletion()
+
             session.logRoute()
             stopwatch.lap()
         }) {
@@ -203,5 +215,7 @@ struct ActiveRouteCard: View {
 }
 
 #Preview {
-    ActiveRouteCard(session: Session.active_preview, stopwatch: Stopwatch())
+    let tempContext = (try! ModelContainer(for: Route.self, RouteAttempt.self).mainContext)
+    let workoutOrchestrator = WorkoutOrchestrator(session: Session.active_preview, modelContext: tempContext)
+    ActiveRouteCard(session: Session.active_preview, stopwatch: Stopwatch(), workoutOrchestrator: workoutOrchestrator)
 }

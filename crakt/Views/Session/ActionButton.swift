@@ -10,43 +10,79 @@ import SwiftUI
 struct ActionButton: View {
     let icon: String
     let label: String?
-    var size: CGFloat = 60
+    var size: CGFloat = 60  // Standard mobile size
     let color: Color
     let action: () -> Void
-    var disabled: Bool = false  // Default value
-    var width: CGFloat = 60
-    var height: CGFloat = 60
-    
+    var disabled: Bool = false
+    var width: CGFloat = 100  // Full-width but mobile-appropriate
+    var height: CGFloat = 60   // Meets 60pt requirement without being excessive
+    var hapticType: HapticType = .attempt
+
+    enum HapticType {
+        case success
+        case attempt
+        case error
+    }
+
     var body: some View {
         Button(action: {
             if !disabled {
+                // Play haptic feedback
+                playHapticFeedback()
+
                 withAnimation(.easeInOut(duration: 0.3)) {
                     action()
                 }
             }
         }) {
-            VStack {
+            VStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.title)
+                    .font(.system(size: 20, weight: .bold))  // Appropriate mobile icon size
                     .foregroundColor(disabled ? .gray : color)
+                    .frame(height: 24)  // Appropriate mobile icon height
+
                 if let label {
                     Text(label)
                         .foregroundColor(disabled ? .gray : color)
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .semibold))  // Standard mobile text size
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
                 }
             }
-            .frame(minWidth: 20, maxWidth: .infinity, minHeight: 20, maxHeight: .infinity)
-            .background(Color.white.opacity(disabled ? 0.7 : 1.0))  // Adjust opacity as needed
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(disabled ? .gray : color, lineWidth: 2)
+            .frame(minWidth: width, maxWidth: .infinity, minHeight: height, maxHeight: .infinity)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(disabled ? 0.7 : 1.0))
+                    .shadow(color: Color.black.opacity(disabled ? 0.05 : 0.15), radius: 2, x: 0, y: 1)
+                    .shadow(color: Color.black.opacity(disabled ? 0.1 : 0.3), radius: 12, x: 0, y: 6)
             )
-            .shadow(color: Color.black.opacity(disabled ? 0.05 : 0.1), radius: 1, x: 0, y: 1)
-            .shadow(color: Color.black.opacity(disabled ? 0.1 : 0.2), radius: 10, x: 0, y: 10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(disabled ? .gray : color, lineWidth: disabled ? 1 : 3)
+            )
+            .contentShape(Rectangle())  // Ensure entire area is tappable
         }
-        .buttonStyle(PlainButtonStyle())  // Ensure no built-in styles are applied
-        .disabled(disabled)  // Disable the button action
+        .buttonStyle(PlainButtonStyle())
+        .disabled(disabled)
+    }
+
+    private func playHapticFeedback() {
+        // TODO: Implement haptic feedback
+        // For now, using simple system feedback
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+
+        /*
+        switch hapticType {
+        case .success:
+            HapticManager.shared.playSuccess()
+        case .attempt:
+            HapticManager.shared.playAttempt()
+        case .error:
+            HapticManager.shared.playError()
+        }
+        */
     }
 }
 

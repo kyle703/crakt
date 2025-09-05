@@ -27,7 +27,7 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
     }
     
 
-    var boulderTypes: Set<ClimbStatus> { [.fall, .send, .flash] }
+    var boulderTypes: Set<ClimbStatus> { [.fall, .send] }
     
     var description: String {
         switch self {

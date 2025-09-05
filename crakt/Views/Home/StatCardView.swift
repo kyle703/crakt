@@ -12,43 +12,36 @@ struct StatCardView: View {
     var title: String
     var subtitle: String
     var color: Color
-    var onTap: (() -> Void)?
 
     var body: some View {
-        Button(action: {
-            onTap?()
-        }) {
-            VStack(spacing: 12) {
-                Image(systemName: icon)
+        VStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(color)
+                .padding(12)
+                .background(
+                    Circle()
+                        .fill(color.opacity(0.1))
+                )
+            
+            VStack(spacing: 4) {
+                Text(title)
                     .font(.title2)
-                    .foregroundColor(color)
-                    .padding(12)
-                    .background(
-                        Circle()
-                            .fill(color.opacity(0.1))
-                    )
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
                 
-                VStack(spacing: 4) {
-                    Text(title)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                    
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.white)
-                    .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-            )
         }
-        .buttonStyle(PlainButtonStyle())
-        .disabled(onTap == nil)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        )
     }
 }
 

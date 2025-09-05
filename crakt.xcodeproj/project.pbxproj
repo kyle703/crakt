@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		084EAC7C2E669C0A0011DD3F /* WorkoutOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC7B2E669C0A0011DD3F /* WorkoutOrchestrator.swift */; };
+		084EAC7E2E669C140011DD3F /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC7D2E669C140011DD3F /* Workout.swift */; };
+		084EAC802E6726F50011DD3F /* WorkoutSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */; };
+		084EAC822E6726FD0011DD3F /* WorkoutSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC812E6726FD0011DD3F /* WorkoutSummaryCard.swift */; };
+		084EAC842E6729F40011DD3F /* SessionConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC832E6729F40011DD3F /* SessionConfigView.swift */; };
+		084EAC862E672A0F0011DD3F /* ActivityHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC852E672A0F0011DD3F /* ActivityHistoryView.swift */; };
+		084EAC882E672A440011DD3F /* ProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC872E672A440011DD3F /* ProfileHeaderView.swift */; };
+		084EAC8A2E672A490011DD3F /* StatCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC892E672A490011DD3F /* StatCardView.swift */; };
+		084EAC8C2E672A520011DD3F /* ActivityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC8B2E672A520011DD3F /* ActivityRowView.swift */; };
+		084EAC8E2E6932F30011DD3F /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC8D2E6932F30011DD3F /* SessionManager.swift */; };
+		084EAC922E6933000011DD3F /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC912E6933000011DD3F /* HapticManager.swift */; };
+		084EAC942E69330D0011DD3F /* SessionTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC932E69330D0011DD3F /* SessionTabView.swift */; };
 		084FA4B52ABF57CE00ADF994 /* SessionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */; };
 		084FA4B72ABF57E900ADF994 /* OutlineButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B62ABF57E900ADF994 /* OutlineButton.swift */; };
 		084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B82ABF581B00ADF994 /* PickerMenu.swift */; };
@@ -37,7 +49,6 @@
 		084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */; };
 		084FDAF72ABF20C90015E8EE /* ClimbingGrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */; };
 		0852BD862D34ACE300CBF36D /* BaseTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD852D34ACD600CBF36D /* BaseTileView.swift */; };
-		0852BD892D34B18400CBF36D /* ActivityHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD882D34B18400CBF36D /* ActivityHistoryView.swift */; };
 		0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */; };
 		0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */; };
 		0852BD932D45489300CBF36D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD922D45489300CBF36D /* SettingsView.swift */; };
@@ -75,6 +86,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		084EAC7B2E669C0A0011DD3F /* WorkoutOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutOrchestrator.swift; sourceTree = "<group>"; };
+		084EAC7D2E669C140011DD3F /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
+		084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSelectorView.swift; sourceTree = "<group>"; };
+		084EAC812E6726FD0011DD3F /* WorkoutSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryCard.swift; sourceTree = "<group>"; };
+		084EAC832E6729F40011DD3F /* SessionConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionConfigView.swift; sourceTree = "<group>"; };
+		084EAC852E672A0F0011DD3F /* ActivityHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHistoryView.swift; sourceTree = "<group>"; };
+		084EAC872E672A440011DD3F /* ProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderView.swift; sourceTree = "<group>"; };
+		084EAC892E672A490011DD3F /* StatCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatCardView.swift; sourceTree = "<group>"; };
+		084EAC8B2E672A520011DD3F /* ActivityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRowView.swift; sourceTree = "<group>"; };
+		084EAC8D2E6932F30011DD3F /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		084EAC912E6933000011DD3F /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		084EAC932E69330D0011DD3F /* SessionTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTabView.swift; sourceTree = "<group>"; };
 		084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHeader.swift; sourceTree = "<group>"; };
 		084FA4B62ABF57E900ADF994 /* OutlineButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineButton.swift; sourceTree = "<group>"; };
 		084FA4B82ABF581B00ADF994 /* PickerMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerMenu.swift; sourceTree = "<group>"; };
@@ -110,7 +133,6 @@
 		084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGradeSelector.swift; sourceTree = "<group>"; };
 		084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGrade.swift; sourceTree = "<group>"; };
 		0852BD852D34ACD600CBF36D /* BaseTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTileView.swift; sourceTree = "<group>"; };
-		0852BD882D34B18400CBF36D /* ActivityHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHistoryView.swift; sourceTree = "<group>"; };
 		0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRouteCard.swift; sourceTree = "<group>"; };
 		0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToConfirmView.swift; sourceTree = "<group>"; };
 		0852BD922D45489300CBF36D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -176,13 +198,18 @@
 				0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */,
 				084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */,
 				084FDAED2AB7F5570015E8EE /* SessionView.swift */,
+				084EAC912E6933000011DD3F /* HapticManager.swift */,
 				0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */,
 				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
 				084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */,
+				084EAC8D2E6932F30011DD3F /* SessionManager.swift */,
+				084EAC932E69330D0011DD3F /* SessionTabView.swift */,
 				084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */,
 				084FA4B82ABF581B00ADF994 /* PickerMenu.swift */,
 				084FA4B62ABF57E900ADF994 /* OutlineButton.swift */,
 				084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */,
+				084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */,
+				084EAC812E6726FD0011DD3F /* WorkoutSummaryCard.swift */,
 			);
 			path = Session;
 			sourceTree = "<group>";
@@ -191,7 +218,11 @@
 			isa = PBXGroup;
 			children = (
 				084FA4D02AC2645A00ADF994 /* HomeView.swift */,
-				0852BD882D34B18400CBF36D /* ActivityHistoryView.swift */,
+				084EAC832E6729F40011DD3F /* SessionConfigView.swift */,
+				084EAC8B2E672A520011DD3F /* ActivityRowView.swift */,
+				084EAC872E672A440011DD3F /* ProfileHeaderView.swift */,
+				084EAC892E672A490011DD3F /* StatCardView.swift */,
+				084EAC852E672A0F0011DD3F /* ActivityHistoryView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -293,6 +324,8 @@
 				084FDADB2AB75C3C0015E8EE /* GradeSystem.swift */,
 				084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */,
 				084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */,
+				084EAC7D2E669C140011DD3F /* Workout.swift */,
+				084EAC7B2E669C0A0011DD3F /* WorkoutOrchestrator.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -481,9 +514,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				084EAC862E672A0F0011DD3F /* ActivityHistoryView.swift in Sources */,
 				084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */,
 				0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */,
+				084EAC942E69330D0011DD3F /* SessionTabView.swift in Sources */,
 				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,
+				084EAC7C2E669C0A0011DD3F /* WorkoutOrchestrator.swift in Sources */,
 				0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */,
 				084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */,
 				084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */,
@@ -494,15 +530,18 @@
 				084FDAF32ABF1E560015E8EE /* Color.swift in Sources */,
 				0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */,
 				0852BD932D45489300CBF36D /* SettingsView.swift in Sources */,
+				084EAC922E6933000011DD3F /* HapticManager.swift in Sources */,
+				084EAC8C2E672A520011DD3F /* ActivityRowView.swift in Sources */,
 				084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */,
 				084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */,
 				08C7F4962BDDAF280063827E /* SessionChartsControllerView.swift in Sources */,
-				0852BD892D34B18400CBF36D /* ActivityHistoryView.swift in Sources */,
+				084EAC802E6726F50011DD3F /* WorkoutSelectorView.swift in Sources */,
 				084FA4D32AC5B90300ADF994 /* LoadingView.swift in Sources */,
 				084FDAEC2AB7EEC60015E8EE /* Date+String.swift in Sources */,
 				08C7F49D2BF1B42F0063827E /* ExpandableSection.swift in Sources */,
 				084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */,
 				084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */,
+				084EAC7E2E669C140011DD3F /* Workout.swift in Sources */,
 				084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */,
 				08C7F4A22BF1B4900063827E /* RouteSummaryView.swift in Sources */,
 				08C7F4982BDDAF2D0063827E /* AttemptStatusByGradeStackedBarChartView.swift in Sources */,
@@ -510,19 +549,24 @@
 				084FA4B72ABF57E900ADF994 /* OutlineButton.swift in Sources */,
 				084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */,
 				084FDAE42AB7E3430015E8EE /* ScrollingSectionView.swift in Sources */,
+				084EAC8A2E672A490011DD3F /* StatCardView.swift in Sources */,
 				0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */,
 				084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */,
 				0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */,
 				084FDAF72ABF20C90015E8EE /* ClimbingGrade.swift in Sources */,
+				084EAC8E2E6932F30011DD3F /* SessionManager.swift in Sources */,
 				084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */,
 				08C7F4952BDDACDC0063827E /* Session.stats.swift in Sources */,
 				084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */,
+				084EAC842E6729F40011DD3F /* SessionConfigView.swift in Sources */,
 				0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */,
 				08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */,
 				0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */,
 				0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */,
 				084FA4C72ABF592F00ADF994 /* ActionButton.swift in Sources */,
 				08C7F4972BDDAF2B0063827E /* AttemptsHistogramView.swift in Sources */,
+				084EAC882E672A440011DD3F /* ProfileHeaderView.swift in Sources */,
+				084EAC822E6726FD0011DD3F /* WorkoutSummaryCard.swift in Sources */,
 				08C7F49A2BDDAFF90063827E /* Route.stats.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -665,6 +709,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";

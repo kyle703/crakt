@@ -37,9 +37,7 @@ struct HomeView: View {
                         
                         // Start a New Session Section
                         NavigationLink {
-                            Text("Start a New Session")
-                                .font(.title)
-                                .padding()
+                            SessionConfigView()
                         } label: {
                             StartSessionTile()
                         }
@@ -122,9 +120,7 @@ struct HomeView: View {
             }
             
             NavigationLink {
-                Text("Start a New Session")
-                    .font(.title)
-                    .padding()
+                SessionConfigView()
             } label: {
                 HStack {
                     Image(systemName: "plus.circle.fill")
@@ -257,147 +253,16 @@ struct HomeView: View {
 }
 
 // Components
-struct ActivityRowView: View {
-    var session: Session
 
-    var body: some View {
-        HStack(spacing: 16) {
-            // Session icon/indicator
-            VStack(spacing: 4) {
-                Circle()
-                    .fill(session.totalRoutes > 0 ? Color.blue : Color.gray.opacity(0.3))
-                    .frame(width: 8, height: 8)
-                
-                if session.totalRoutes > 0 {
-                    Circle()
-                        .fill(Color.blue.opacity(0.3))
-                        .frame(width: 4, height: 4)
-                }
-            }
-            
-            VStack(alignment: .leading, spacing: 6) {
-                Text(session.sessionDescription)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                HStack(spacing: 12) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "calendar")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        Text(formatDate(session.startDate))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    if session.totalRoutes > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "mountain.2")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            
-                            if session.totalAttempts > 0 {
-                                Text("\(session.totalRoutes) routes, \(session.totalAttempts) attempts")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            } else {
-                                Text("\(session.totalRoutes) routes")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    } else {
-                        HStack(spacing: 4) {
-                            Image(systemName: "exclamationmark.triangle")
-                                .font(.caption2)
-                                .foregroundColor(.orange)
-                            Text("No routes logged")
-                                .font(.caption)
-                                .foregroundColor(.orange)
-                        }
-                    }
-                }
-            }
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(.trailing, 8)
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        if calendar.isDateInToday(date) {
-            return "Today"
-        } else if calendar.isDateInYesterday(date) {
-            return "Yesterday"
-        } else if calendar.isDate(date, equalTo: now, toGranularity: .weekOfYear) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "EEEE" // Full weekday name
-            return formatter.string(from: date)
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d" // Jan 15
-            return formatter.string(from: date)
-        }
-    }
-}
 
-struct StatCardView: View {
-    var icon: String
-    var title: String
-    var subtitle: String
-    var color: Color
 
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-                .padding(12)
-                .background(
-                    Circle()
-                        .fill(color.opacity(0.1))
-                )
-            
-            VStack(spacing: 4) {
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-        )
-    }
-}
 
 struct StartSessionTile: View {
     @Query private var user: [User]
     
     var body: some View {
         NavigationLink {
-            SessionView(session: Session(), selectedGradeSystem: user.first!.gradeSystem, selectedClimbType: user.first!.climbType)
-                .navigationBarHidden(true)
-                .interactiveDismissDisabled(true)
+            SessionConfigView()
         } label: {
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
@@ -432,76 +297,7 @@ struct StartSessionTile: View {
     }
 }
 
-struct ProfileHeaderView: View {
-    var user: User
-    var sessions: [Session]
-    var onTrackEvent: (String) -> Void
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Hi, \(user.name)!")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-
-                    if sessions.isEmpty {
-                        Text("Ready for your next climb?")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    } else {
-                        let recentStat = getRecentStat()
-                        Text(recentStat)
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                }
-
-                Spacer()
-
-                Button(action: {
-                    // Navigate to profile or settings
-                    onTrackEvent("profile_header_profile_button_tapped")
-                }) {
-                    Image(systemName: "person.circle.fill")
-                        .font(.system(size: 44))
-                        .foregroundColor(.blue)
-                        .background(
-                            Circle()
-                                .fill(Color.blue.opacity(0.1))
-                                .frame(width: 60, height: 60)
-                        )
-                }
-            }
-        }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 2)
-        )
-    }
-    
-    private func getRecentStat() -> String {
-        guard let lastSession = sessions.first else {
-            return "Ready for your next climb?"
-        }
-        
-        let totalRoutes = lastSession.totalRoutes
-        let totalAttempts = lastSession.totalAttempts
-        
-        if totalRoutes > 0 {
-            if totalAttempts > 0 {
-                return "Last session: \(totalRoutes) routes, \(totalAttempts) attempts"
-            } else {
-                return "Last session: \(totalRoutes) routes"
-            }
-        } else {
-            return "Ready for your next climb?"
-        }
-    }
-}
 
 
 

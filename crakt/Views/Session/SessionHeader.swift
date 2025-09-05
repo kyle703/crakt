@@ -9,11 +9,12 @@ import SwiftUI
 
 struct SessionHeader: View {
 
-    @Environment(\.presentationMode) var presentationMode
     @Environment(\.modelContext) private var modelContext
 
     var session: Session
     @ObservedObject var stopwatch: Stopwatch
+    var workoutOrchestrator: WorkoutOrchestrator?
+    var onSessionEnd: (() -> Void)?
 
     @Binding var selectedClimbType: ClimbType
     @Binding var selectedGradeSystem: GradeSystem
@@ -22,32 +23,63 @@ struct SessionHeader: View {
     @State private var showExitAlert = false
     
     private var collapsedHeaderView: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(stopwatch.totalTime.formatted)
-                    .font(.system(size: 24, weight: .bold, design: .monospaced))
-                    .foregroundColor(.primary)
+        VStack(spacing: 8) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(stopwatch.totalTime.formatted)
+                        .font(.system(size: 24, weight: .bold, design: .monospaced))
+                        .foregroundColor(.primary)
 
-                HStack(spacing: 8) {
-                    Text(selectedClimbType.description)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Color.secondary.opacity(0.1))
-                        .cornerRadius(8)
+                    HStack(spacing: 8) {
+                        Text(selectedClimbType.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.1))
+                            .cornerRadius(8)
 
-                    Text(selectedGradeSystem.description)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Color.secondary.opacity(0.1))
-                        .cornerRadius(8)
+                        Text(selectedGradeSystem.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.1))
+                            .cornerRadius(8)
+
+                        // Workout status chip
+                        if let orchestrator = workoutOrchestrator, orchestrator.isWorkoutActive {
+                            Text(orchestrator.activeWorkout?.type.shortDescription ?? "Workout")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(8)
+                        }
+                    }
                 }
+
+                Spacer()
             }
 
-            Spacer()
+            // Workout progress bar (shown when workout is active)
+            if let orchestrator = workoutOrchestrator, orchestrator.isWorkoutActive {
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(height: 4)
+                            .cornerRadius(2)
+
+                        Rectangle()
+                            .fill(Color.blue)
+                            .frame(width: geometry.size.width * (orchestrator.activeWorkout?.completionPercentage ?? 0), height: 4)
+                            .cornerRadius(2)
+                    }
+                }
+                .frame(height: 4)
+            }
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
@@ -63,16 +95,8 @@ struct SessionHeader: View {
         } else {
             // Full expanded view when no active route
             VStack(spacing: 16) {
-                // Main timer and controls card
+                // Main timer card
                 VStack(spacing: 16) {
-
-                    GradeSystemSelectionView(selectedClimbType: $selectedClimbType,
-                                             selectedGradeSystem: $selectedGradeSystem)
-                        .padding(.horizontal)
-                        .padding(.bottom)
-
-
-
                     // Timer display - bold and central
                     VStack(spacing: 8) {
                         Text(stopwatch.totalTime.formatted)
@@ -86,73 +110,16 @@ struct SessionHeader: View {
                             .fontWeight(.medium)
                     }
 
-
-
-                    // Control buttons with consistent sizing
-                    HStack(spacing: 20) {
-                        Button(action: {
-                            if isPaused {
-                                stopwatch.start()
-                            } else {
-                                stopwatch.stop()
-                            }
-                            isPaused.toggle()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: isPaused ? "play.circle.fill" : "pause.circle.fill")
-                                    .font(.title2)
-                                Text(isPaused ? "Resume" : "Pause")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                            }
-                            .foregroundColor(.blue)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.blue.opacity(0.1))
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-
-                        Button(action: {
-                            self.showExitAlert = true
-                            stopwatch.stop()
-                            isPaused.toggle()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "stop.circle.fill")
-                                    .font(.title2)
-                                Text("End Session")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.red)
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .alert(isPresented: $showExitAlert) {
-                            Alert(
-                                title: Text("End Session"),
-                                message: Text("Are you sure you want to end your sesh?"),
-                                primaryButton: .default(Text("Yes"), action: {
-                                    session.completeSession(context: modelContext, elapsedTime: stopwatch.totalTime)
-                                    self.presentationMode.wrappedValue.dismiss()
-                                }),
-                                secondaryButton: .cancel(Text("Just one more"), action : {
-                                    stopwatch.start()
-                                    isPaused.toggle()
-                                })
-                            )
-                        }
-                    }
-
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 20)
+                .background(Color(.systemBackground))
+                .cornerRadius(16)
+                .shadow(color: Color.black.opacity(0.1), radius: 4)
             }
             .padding(.horizontal, 16)
         }

@@ -54,7 +54,7 @@ struct ProfileHeaderView: View {
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.white)
+                .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 2)
         )
     }

@@ -40,9 +40,18 @@ class Session {
     
     @Relationship(deleteRule: .cascade, inverse: \Route.session)
     var routes: [Route] = []
-    
+
+    @Relationship(deleteRule: .cascade, inverse: \Workout.session)
+    var workouts: [Workout] = []
+
     var activeRoute: Route?
-    
+    var activeWorkout: Workout?
+
+    // Session configuration
+    var climbType: ClimbType?
+    var gradeSystem: GradeSystem?
+    var gymName: String?
+
     // ----
     var sessionDescription = "Peak RVA"
     

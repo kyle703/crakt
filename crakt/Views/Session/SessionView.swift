@@ -44,7 +44,7 @@ struct RouteAttemptScrollView: View {
                 ForEach(routes, id: \.id) { route in
                     RouteLogRowItem(route: route)
                 }
-                .onChange(of: routes.count) { _ in
+                .onChange(of: routes.count) {
                     // Scroll to last item whenever a new route is added
                     if let lastItem = routes.last {
                         withAnimation {
@@ -102,6 +102,7 @@ extension View {
 struct SessionView_Previews: PreviewProvider {
     static var previews: some View {
         SessionView(session: Session())
+            .modelContainer(for: [Route.self, RouteAttempt.self, Session.self, User.self])
     }
 }
 
@@ -111,65 +112,54 @@ struct SessionView: View {
 
     @StateObject var stopwatch = Stopwatch()
     @State var session: Session
+    @StateObject private var workoutOrchestrator: WorkoutOrchestrator
+    @StateObject private var sessionManager = SessionManager.shared
 
-    @State var selectedGradeSystem: GradeSystem = .circuit
-    @State var selectedClimbType: ClimbType = .boulder
+    @State var selectedGradeSystem: GradeSystem
+    @State var selectedClimbType: ClimbType
     @State var selectedGrade: String?
 
+    private var initialWorkoutType: WorkoutType?
+    private var initialSelectedGrades: [String]?
+    private var defaultClimbType: ClimbType
+    private var defaultGradeSystem: GradeSystem
+    private var onSessionEnd: (() -> Void)?
+
+    init(session: Session, initialWorkoutType: WorkoutType? = nil, initialSelectedGrades: [String]? = nil, defaultClimbType: ClimbType = .boulder, defaultGradeSystem: GradeSystem = .vscale, onSessionEnd: (() -> Void)? = nil) {
+        self.session = session
+        self.initialWorkoutType = initialWorkoutType
+        self.initialSelectedGrades = initialSelectedGrades
+        self.defaultClimbType = defaultClimbType
+        self.defaultGradeSystem = defaultGradeSystem
+        self.onSessionEnd = onSessionEnd
+        self._selectedGradeSystem = State(initialValue: session.gradeSystem ?? defaultGradeSystem)
+        self._selectedClimbType = State(initialValue: session.climbType ?? defaultClimbType)
+        // Initialize with a placeholder context - will be properly set up in onAppear
+        let tempContext = (try? ModelContainer(for: Workout.self, WorkoutSet.self, WorkoutRep.self))?.mainContext ?? (try! ModelContainer(for: Route.self, RouteAttempt.self).mainContext)
+        self._workoutOrchestrator = StateObject(wrappedValue: WorkoutOrchestrator(session: session, modelContext: tempContext))
+    }
+
     var body: some View {
-        VStack {
-            
-                        
-            SessionHeader(session: session, stopwatch: stopwatch, selectedClimbType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
-                .onAppear {
-                    stopwatch.start()
-                }.onChange(of: selectedClimbType) { _ in
-                    session.clearRoute(context: modelContext)
-                }
-                .onChange(of: selectedGradeSystem) { _ in
-                    session.clearRoute(context: modelContext)
-                }
-
-            
-            
-            // ScrollView with a transition-based animation on the active route card
-            ScrollView {
-                // Animate changes to session.activeRoute
-                if let route = session.activeRoute {
-                    ActiveRouteCard(session: session, stopwatch: stopwatch)
-                        // A scale transition that starts slightly smaller/larger
-                        .transition(.scale(scale: 0.9).combined(with: .opacity))
-                }
-                
-                RouteAttemptScrollView(routes: session.routesSortedByDate)
-            }
-            .animation(.spring(), value: session.activeRoute)
-            // ^ Ties any changes to session.activeRoute to a spring animation
-            
-            // If there's no active route, show the "add new route" UI
-            if session.activeRoute == nil {
-                Spacer()
-                if let grade = selectedGrade {
-                    HStack {
-                        Spacer()
-                        OutlineButton {
-                            withAnimation {
-                                let newRoute = Route(gradeSystem: selectedGradeSystem,
-                                                     grade: grade)
-                                newRoute.status = .active
-                                modelContext.insert(newRoute)
-                                session.activeRoute = newRoute
-                            }
-                        } 
-                        Spacer()
-                    }
-                    .padding(.horizontal)
-                }
-
-                ClimbingGradeSelector(gradeSystem: GradeSystems.systems[selectedGradeSystem]!,
-                                      selectedGrade: $selectedGrade)
-                    .frame(height: 90)
-            }
+        // Use the actual SessionTabView component which includes everything
+        SessionTabView(
+            workoutOrchestrator: workoutOrchestrator,
+            session: session,
+            initialWorkoutType: initialWorkoutType,
+            initialSelectedGrades: initialSelectedGrades,
+            defaultClimbType: defaultClimbType,
+            defaultGradeSystem: defaultGradeSystem,
+            onSessionEnd: onSessionEnd
+        )
+        .environment(\.modelContext, modelContext)
+        .onAppear {
+            // Update workout orchestrator with the correct model context
+            workoutOrchestrator.updateModelContext(modelContext)
+            // Activate auto-lock prevention for active climbing sessions
+            sessionManager.isSessionActive = true
+        }
+        .onDisappear {
+            // Deactivate auto-lock prevention when leaving session
+            sessionManager.isSessionActive = false
         }
     }
 }

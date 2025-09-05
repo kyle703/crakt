@@ -11,7 +11,6 @@ import SwiftData
 
 struct ActivityRowView: View {
     var session: Session
-    var showChevron: Bool = true
 
     var body: some View {
         HStack(spacing: 16) {
@@ -75,16 +74,14 @@ struct ActivityRowView: View {
             
             Spacer()
             
-            if showChevron {
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.trailing, 8)
-            }
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.trailing, 8)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(Color(.systemBackground))
     }
     
     private func formatDate(_ date: Date) -> String {

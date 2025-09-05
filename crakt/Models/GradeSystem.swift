@@ -54,11 +54,11 @@ enum GradeSystem: Int16, CustomStringConvertible, Codable {
         case .vscale:
             return "V-Scale"
         case .font:
-            return "Font grade"
+            return "Font."
         case .french:
-            return "French grade"
+            return "French"
         case .yds:
-            return "Yosemite Decimal System"
+            return "YDS"
         }
     }
     
