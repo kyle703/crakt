@@ -169,45 +169,13 @@ struct SessionTabView: View {
     }
 
     private var routesTabContent: some View {
-        VStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Active Route Card (if exists)
-                    if session.activeRoute != nil {
-                        ActiveRouteCard(session: session, stopwatch: stopwatch, workoutOrchestrator: workoutOrchestrator)
-                    }
-
-                    // Route list
-                    RouteAttemptScrollView(routes: session.routesSortedByDate)
-                }
-                .padding(.vertical, 8)
-            }
-            // Add new route UI (if no active route)
-            if session.activeRoute == nil {
-                VStack(spacing: 16) {
-                    if let grade = selectedGrade {
-                        HStack {
-                            Spacer()
-                            OutlineButton {
-                                withAnimation {
-                                    let newRoute = Route(gradeSystem: selectedGradeSystem,
-                                                        grade: grade)
-                                    newRoute.status = .active
-                                    modelContext.insert(newRoute)
-                                    session.activeRoute = newRoute
-                                }
-                            }
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    ClimbingGradeSelector(gradeSystem: GradeSystems.systems[selectedGradeSystem]!,
-                                        selectedGrade: $selectedGrade)
-                        .frame(height: 90)
-                }
-            }
-        }
+        ActiveRouteCardView(
+            session: session,
+            stopwatch: stopwatch,
+            workoutOrchestrator: workoutOrchestrator,
+            selectedGrade: $selectedGrade,
+            selectedGradeSystem: $selectedGradeSystem
+        )
     }
 
     private var progressTabContent: some View {

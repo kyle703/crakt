@@ -19,6 +19,11 @@ class WorkoutOrchestrator: ObservableObject {
     private var session: Session
     private var modelContext: ModelContext
 
+    // Public getter for session
+    var publicSession: Session {
+        session
+    }
+
     init(session: Session, modelContext: ModelContext) {
         self.session = session
         self.modelContext = modelContext

@@ -6,11 +6,186 @@ This document outlines the implementation plan for transforming the active climb
 
 ## Table of Contents
 
+- [UX Critique of Current Active Session](#ux-critique-of-current-active-session)
+- [Interaction Model & Flows](#interaction-model--flows)
+- [Card-Only Routes Tab](#card-only-routes-tab)
+- [Metrics & Instrumentation](#metrics--instrumentation)
+- [Revised P0 Acceptance Criteria](#revised-p0-acceptance-criteria)
 - [P0: Gym Viability](#p0-gym-viability)
 - [P1: Enhanced Experience](#p1-enhanced-experience)
 - [Technical Infrastructure](#technical-infrastructure)
 - [Testing Strategy](#testing-strategy)
 - [Risk Mitigation](#risk-mitigation)
+
+---
+
+## UX Critique of Current Active Session
+
+Observed from current screenshots of the session view:
+
+- Problem: Too many steps to log. Selecting result (Fall/Send) and then tapping "Log It!" adds an extra confirmation. In a gym, this increases time-to-log and cognitive load when pumped.
+- Problem: Route switching friction. The active route card is visually dense; switching between v0/v1 lists requires precise taps on small chips or disclosure controls. No single-gesture next/previous.
+- Problem: Fragmented focus. The timer, active workout card, and bottom grade chips compete for attention. Primary action is not consistently top-of-hierarchy.
+- Problem: Redundant affordances. Big Fall/Send buttons plus a separate Log button creates ambiguity about state vs action. Users may tap Fall/Send expecting immediate logging.
+- Problem: Progress visibility. Percent bar lacks immediate meaning during climbing; set/rep text is small relative to distance and lighting conditions.
+- Problem: Undo discoverability. No clear, low-cost undo immediately after logging, which discourages aggressive one-gesture logging.
+- Problem: One-handed ergonomics. Primary actions sit mid-screen or require reach. The thumb zone (bottom half) should host most interactions.
+- Problem: Mode switching. "Climb On" as a central CTA suggests a mode shift, but its relationship to logging, rest timers, and routing is unclear.
+
+Opportunities:
+
+- Replace "select then confirm" with single-gesture logging plus haptic confirmation and a brief undo snackbar.
+- Introduce horizontal paging for routes with edge swipes and large next/previous targets; support auto-advance for structured workouts.
+- Elevate a persistent HUD: grade, route name, attempt count, rest timer when applicable. Keep it legible from 6+ feet.
+- Consolidate primary actions into a single bottom action bar with gesture shortcuts.
+- Clarify workout context (set/rep) with large tokens and progress rings rather than small text.
+
+---
+
+## Interaction Model & Flows
+
+Design principles:
+
+- One gesture to log; one gesture to switch routes. No required confirmations.
+- Every action gives immediate haptic/audio feedback and a 3–5s undo affordance.
+- Keep hands-in-chalk usability: large targets, high contrast, minimal text.
+
+Primary interactions:
+
+- Swipe up anywhere on the active route card: Log Send.
+- Swipe down anywhere on the active route card: Log Fall.
+- Long-press (700ms) on card: Start/stop Rest (toggles rest timer overlay).
+- Double-tap card: Quick Repeat same outcome as previous attempt (with haptic).
+- Edge swipe left/right (or horizontal pager): Previous/Next route.
+- Long-press-and-drag on grade rail: Scrub to route; release to select.
+
+Bottom action bar (thumb zone):
+
+- Left button: Undo last attempt (visible for 5s after log, then moves to overflow).
+- Center pill: Displays current route grade/name; tap to open Route Picker; swipe left/right to switch routes.
+- Right button: Toggle Rest Timer.
+
+Flow constraints and microcopy:
+
+- After logging, show lightweight toast: "Send logged — v1 (Attempt 3)" with Undo.
+- Auto-advance: If in a structured workout, auto-advance on successful completion of the set/rep for the route; otherwise stay and increment attempt.
+- Error handling: If auto-advance target is unavailable, vibrate with warning haptic and keep user on current route with toast guidance.
+
+Tap/gesture budgets (targets for usability):
+
+- Log attempt: ≤1 gesture, median time-to-log ≤1.0s from screen wake.
+- Switch route: ≤1 gesture, median ≤0.8s.
+- Start/stop rest: ≤1 gesture.
+
+### Grade Change & Attempt Status Details
+
+Grade change interactions:
+
+- Long-press on HUD grade chip → haptic tick → horizontal scrub to change; release to commit; Undo toast appears.
+- Center route pill → tap → Route Picker sheet; grade rail at top; drag to filter; select route/grade.
+- API impact: persists to current route instance within the session context; updates orchestrator if part of a structured workout.
+
+Attempt status visibility:
+
+- HUD attempt token shows A:N with S:x and F:y sublabels; tap opens Attempt History.
+- Attempt History sheet: paginated list of attempts with time, outcome, route time, rest preceding; supports swipe-to-delete to correct mistakes.
+- Quick Repeat: double-tap card logs the same outcome as previous attempt; counters update instantly with haptic.
+
+---
+
+## Card-Only Routes Tab
+
+Single, full-screen card is the only element on the Routes tab during an active session. It "pages" horizontally to complete the route card and move onto the next active route (if free climbing keep the same grade) and vertically supports logging.
+
+Layout:
+
+- Top HUD: large grade chip, attempt count (A:N/S:F), small set/rep/token, compact progress ring. Tappable area opens Route Details sheet.
+- Body: the swipeable card (Tinder-like). Visual states: neutral, success (green flash), fall (red flash). Shows last outcome icon subtly.
+- Bottom action bar (thumb zone): Undo, Large rounded square center route pill (also route picker), Rest toggle.
+
+Grade changes:
+
+- Long-press the grade chip in the bottom action bar open a grade scrubber. Drag horizontally to adjust grade; release to confirm. Haptic ticks at each grade step. Undo appears for 5s.
+- While active session has route attempts, lock the button (indicate it's locked with a lock icon badge) You can only change grade on a fresh route, if a user taps this button too many times, trigger the suggestion wizard helper animation for the card swipe.
+
+Attempt status visibility:
+
+- Attempt counter in HUD shows total attempts and send/fall split (e.g., A:3/S:1/F:2). Tap to open Attempt History sheet with a compact list (timestamp, outcome, route time, rest between attempts).
+- Swipe up/down gesture feedback animates an outcome icon and increments counters immediately with haptic; Undo reverts the counter and event.
+
+Empty/edge states:
+
+- Choose the p25 grade difficulty to auto-populate the current route by default
+- Structured workout: next route token appears ghosted on the right edge; auto-advance animates card to next on completion.
+
+Accessibility:
+
+- All interactive targets ≥60pt; supports VoiceOver labels for gestures via actions menu; high-contrast color tokens.
+
+---
+
+## Revised P0 Acceptance Criteria
+
+- One-gesture logging for Send/Fall with immediate haptic feedback and 3–5s Undo.
+- Route switching achievable with a single horizontal swipe; large on-screen next/prev targets available.
+- Median time-to-log ≤1.0s; median time-to-switch ≤0.8s measured in-gym.
+- Primary controls occupy thumb zone; minimum target size 60pt; contrast ratio ≥7:1.
+- Auto-advance for structured workouts with clear toast and haptic confirmation.
+- Rest timer accessible via one gesture (long-press or dedicated button), visible overlay with progress.
+
+---
+
+## Feature TODOs & Dev Criteria
+
+1. Implement swipe logging on `ActiveRouteCard`
+
+- Dev: Add `DragGesture` vertical detection with thresholds; map to send/fall; trigger haptic; fire `attempt_logged` event; show Undo.
+- Criteria: p50 time-to-log ≤1.0s; zero-confirm logging; Undo functional within 5s; no dropped frames during animation.
+
+2. Add horizontal pager for route switching
+
+- Dev: Wrap card in `TabView(.page)` or custom pager; add edge-swipe areas and accessibility next/prev buttons.
+- Criteria: p50 time-to-switch ≤0.8s; swipe recognition ≥95% success in testing; auto-advance integration.
+
+3. Build top HUD with grade chip, route name, attempt token, set/rep ring
+
+- Dev: New `RouteHUDView`; large typography; long-press on grade chip to open grade scrubber.
+- Criteria: 6+ ft readability; long-press-to-scrub works with haptic ticks; updates session model immediately.
+
+4. Grade scrubber and Route Picker
+
+- Dev: Grade rail component with `DragGesture` snapping to grades; sheet-based Route Picker with search and rail filter.
+- Criteria: Grade change in ≤2s; persistence to session; Undo available; analytics events emitted.
+
+5. Attempt History sheet
+
+- Dev: Lightweight list of attempts with outcome, times, and delete.
+- Criteria: Opens in ≤200ms; delete updates counters and emits correction event.
+
+6. Rest timer overlay and toggle
+
+- Dev: Long-press to toggle; overlay with progress ring and countdown; integrates with orchestrator for rest durations.
+- Criteria: Timer drift <100ms/min; auto-advance upon rest completion when configured.
+
+7. Undo system
+
+- Dev: Global `UndoManager`-like helper for last N actions (attempt, grade change, delete); snackbar UI.
+- Criteria: Undo latency ≤150ms; correct state rollback including metrics emission.
+
+8. Analytics wiring
+
+- Dev: Implement event emitter and queue; add events defined in Metrics section; unit tests for payload.
+- Criteria: 100% event schema conformance; sampling guards; privacy review.
+
+9. Performance & haptics tuning
+
+- Dev: Measure haptic start latency; optimize animations; Instruments for dropped frames and energy.
+- Criteria: Haptic ≤40ms from gesture; ≤1 dropped frame per log/switch.
+
+10. Accessibility pass
+
+- Dev: VoiceOver actions for send/fall/switch; large targets; color-contrast checks.
+- Criteria: WCAG AA contrast; full operability without gestures via actions.
 
 ---
 
@@ -81,13 +256,6 @@ This document outlines the implementation plan for transforming the active climb
 **US-PO-2.3:** As a climber, I want to swipe between routes without tapping small buttons
 
 #### Technical Tasks
-
-**TT-PO-2.1:** Create route picker component
-
-- Implement `RoutePickerView` with `LazyVGrid` layout
-- Create route cards showing grade, name, attempt status
-- Add search and filter capabilities
-- Testing: Grid performance with 100+ routes
 
 **TT-PO-2.2:** Implement auto-advance logic
 
@@ -249,6 +417,51 @@ This document outlines the implementation plan for transforming the active climb
 - Create personalized recommendations
 - Implement goal progress tracking
 - Testing: Insight relevance and accuracy
+
+## Metrics & Instrumentation
+
+Goals: Quantify friction, learning curve, and workout effectiveness. All events include `sessionId`, `routeId`, `workoutId?`, `timestamp`, `appVersion`, `device`.
+
+Core events:
+
+- session_start, session_end
+- route_viewed, route_switched {fromRouteId, toRouteId, method: swipe|picker|auto}
+- attempt_logged {outcome: send|fall, attemptIndex, timeToLogMs, gesture: swipeUp|swipeDown|tap, autoAdvance: bool}
+- undo_used {eventIdUndone, timeSinceEventMs}
+- rest_started {source: auto|manual}, rest_ended {durationMs}
+- workout_auto_advanced {reason: setComplete|timerComplete|rule}, auto_advance_blocked {reason}
+
+Friction metrics (computed):
+
+- TTR (time-to-record): From attempt outcome decision to confirmed log; target p50 ≤1.0s, p95 ≤2.0s.
+- TTS (time-to-switch): From intent (first gesture) to next route visible; target p50 ≤0.8s.
+- Taps/Gestures per Attempt: target mean ≤1.2.
+- Undo rate: healthy range 3–10%; spikes suggest gesture confusion.
+- Navigation method mix: swipe dominance ≥70% for mature users; lower implies discoverability issues.
+
+Performance & reliability:
+
+- Haptic latency: time from gesture recognition to haptic begin; target ≤40ms.
+- UI frame drops during log/switch: target ≤1 dropped frame (60Hz baseline).
+- Battery per hour during active session: ≤5%.
+
+Payload shape examples:
+
+```json
+{
+  "type": "attempt_logged",
+  "sessionId": "s_123",
+  "routeId": "r_456",
+  "workoutId": "w_789",
+  "attemptIndex": 3,
+  "outcome": "send",
+  "gesture": "swipeUp",
+  "timeToLogMs": 620,
+  "autoAdvance": true
+}
+```
+
+---
 
 #### Acceptance Criteria
 

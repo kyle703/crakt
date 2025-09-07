@@ -61,19 +61,16 @@ struct ActionButton: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(disabled ? .gray : color, lineWidth: disabled ? 1 : 3)
             )
-            .contentShape(Rectangle())  // Ensure entire area is tappable
-        }
+        .contentShape(Rectangle())  // Ensure entire area is tappable
+        .accessibilityLabel(label ?? icon)
+        .accessibilityHint("Tap to \(label?.lowercased() ?? "perform action")")
+        .accessibilityAddTraits(.isButton)
+    }
         .buttonStyle(PlainButtonStyle())
         .disabled(disabled)
     }
 
     private func playHapticFeedback() {
-        // TODO: Implement haptic feedback
-        // For now, using simple system feedback
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
-
-        /*
         switch hapticType {
         case .success:
             HapticManager.shared.playSuccess()
@@ -82,7 +79,6 @@ struct ActionButton: View {
         case .error:
             HapticManager.shared.playError()
         }
-        */
     }
 }
 
