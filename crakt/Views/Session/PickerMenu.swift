@@ -53,7 +53,7 @@ struct PickerMenu<T: Hashable & CustomStringConvertible>: View {
             .padding(.vertical, 2)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white)
+                    .fill(Color(.systemBackground))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(color)

@@ -48,9 +48,9 @@ extension Session {
             }.max(by: { a, b in
                 a.normalizedGrade < b.normalizedGrade
             })
-        
+
             if let _max_route {
-                return _max_route.gradeDescription!
+                return _max_route.gradeDescription ?? "Unknown"
             }
             return nil
         }
@@ -63,9 +63,9 @@ extension Session {
             }.max(by: { a, b in
                 a.normalizedGrade < b.normalizedGrade
             })
-        
+
             if let _max_route {
-                return _max_route.gradeDescription!
+                return _max_route.gradeDescription ?? "Unknown"
             }
             return nil
         }
@@ -80,8 +80,11 @@ extension Session {
         routes.sorted { route1, route2 in
             let gradingProtocol1 = route1.gradeSystem._protocol
             let gradingProtocol2 = route2.gradeSystem._protocol
-            
-            return gradingProtocol1.normalizedDifficulty(for: route1.grade!) < gradingProtocol2.normalizedDifficulty(for: route2.grade!)
+
+            let grade1Difficulty = route1.grade.map { gradingProtocol1.normalizedDifficulty(for: $0) } ?? 0.0
+            let grade2Difficulty = route2.grade.map { gradingProtocol2.normalizedDifficulty(for: $0) } ?? 0.0
+
+            return grade1Difficulty < grade2Difficulty
         }
     }
     
@@ -99,7 +102,7 @@ extension Session {
                 if let index = aggregatedData.firstIndex(where: { $0.grade == grade && $0.status == status }) {
                     aggregatedData[index].attempts += 1
                 } else {
-                    aggregatedData.append((grade: route.gradeDescription!, status: status, attempts: 1))
+                    aggregatedData.append((grade: route.gradeDescription ?? "Unknown", status: status, attempts: 1))
                 }
             }
         }
@@ -111,9 +114,9 @@ extension Session {
         var attemptsByGrade: [String: [Route]] = [:]
         
         for route in routes {
-            
-            let grade = route.grade!
-            if attemptsByGrade[grade] != nil && true{
+            guard let grade = route.grade else { continue }
+
+            if attemptsByGrade[grade] != nil {
                 attemptsByGrade[grade]!.append(route)
             } else {
                 attemptsByGrade[grade] = [route]

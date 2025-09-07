@@ -110,14 +110,8 @@ struct SessionView_Previews: PreviewProvider {
 struct SessionView: View {
     @Environment(\.modelContext) private var modelContext
 
-    @StateObject var stopwatch = Stopwatch()
     @State var session: Session
-    @StateObject private var workoutOrchestrator: WorkoutOrchestrator
     @StateObject private var sessionManager = SessionManager.shared
-
-    @State var selectedGradeSystem: GradeSystem
-    @State var selectedClimbType: ClimbType
-    @State var selectedGrade: String?
 
     private var initialWorkoutType: WorkoutType?
     private var initialSelectedGrades: [String]?
@@ -132,17 +126,11 @@ struct SessionView: View {
         self.defaultClimbType = defaultClimbType
         self.defaultGradeSystem = defaultGradeSystem
         self.onSessionEnd = onSessionEnd
-        self._selectedGradeSystem = State(initialValue: session.gradeSystem ?? defaultGradeSystem)
-        self._selectedClimbType = State(initialValue: session.climbType ?? defaultClimbType)
-        // Initialize with a placeholder context - will be properly set up in onAppear
-        let tempContext = (try? ModelContainer(for: Workout.self, WorkoutSet.self, WorkoutRep.self))?.mainContext ?? (try! ModelContainer(for: Route.self, RouteAttempt.self).mainContext)
-        self._workoutOrchestrator = StateObject(wrappedValue: WorkoutOrchestrator(session: session, modelContext: tempContext))
     }
 
     var body: some View {
-        // Use the actual SessionTabView component which includes everything
+        // Use the consolidated SessionTabView which handles all session functionality
         SessionTabView(
-            workoutOrchestrator: workoutOrchestrator,
             session: session,
             initialWorkoutType: initialWorkoutType,
             initialSelectedGrades: initialSelectedGrades,
@@ -152,8 +140,6 @@ struct SessionView: View {
         )
         .environment(\.modelContext, modelContext)
         .onAppear {
-            // Update workout orchestrator with the correct model context
-            workoutOrchestrator.updateModelContext(modelContext)
             // Activate auto-lock prevention for active climbing sessions
             sessionManager.isSessionActive = true
         }

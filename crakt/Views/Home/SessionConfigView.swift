@@ -222,6 +222,21 @@ struct SessionConfigView: View {
             session.gymName = gymName
         }
 
+        // Debug logging
+        print("📝 SessionConfigView - Creating session with:")
+        print("  - Climb Type: \(selectedClimbType)")
+        print("  - Grade System: \(selectedGradeSystem)")
+        print("  - Session climbType: \(session.climbType ?? .boulder)")
+        print("  - Session gradeSystem: \(session.gradeSystem ?? .vscale)")
+
+        // Save the session to ensure it's properly persisted
+        do {
+            try modelContext.save()
+            print("💾 Session saved successfully")
+        } catch {
+            print("❌ Failed to save session: \(error)")
+        }
+
         // Create the session view with defaults for nil values
         let sessionView = SessionView(
             session: session,

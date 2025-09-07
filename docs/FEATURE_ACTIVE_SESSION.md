@@ -149,7 +149,7 @@ Accessibility:
 
 3. Build top HUD with grade chip, route name, attempt token, set/rep ring
 
-- Dev: New `RouteHUDView`; large typography; long-press on grade chip to open grade scrubber.
+- Dev: Route HUD functionality consolidated into `UnifiedSessionHeader`; large typography; long-press on grade chip to open grade scrubber.
 - Criteria: 6+ ft readability; long-press-to-scrub works with haptic ticks; updates session model immediately.
 
 4. Grade scrubber and Route Picker

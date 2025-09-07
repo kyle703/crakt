@@ -6,6 +6,10 @@
 //
 
 import SwiftUI
+import SwiftData
+
+// Explicitly import the models to ensure GradeSystem is available
+import Foundation
 
 
 
@@ -33,15 +37,20 @@ struct GradeSystemSelectionView: View {
     var validGradeSystems: [GradeSystem] {
         switch selectedClimbType {
         case .boulder:
-            return [.circuit, .vscale, .font]
+            return [GradeSystem.circuit, GradeSystem.vscale, GradeSystem.font]
         case .toprope, .lead:
-            return [.yds, .french]
+            return [GradeSystem.yds, GradeSystem.french]
         }
     }
 
     func validateGradeSystem() {
         if !validGradeSystems.contains(selectedGradeSystem) {
-            selectedGradeSystem = selectedClimbType == .boulder ? .vscale : .yds
+            let newGradeSystem = selectedClimbType == .boulder ? GradeSystem.vscale : GradeSystem.yds
+            print("🔄 GradeSystemSelectionView - Invalid grade system detected:")
+            print("  - Current: \(selectedGradeSystem)")
+            print("  - Valid options: \(validGradeSystems)")
+            print("  - Switching to: \(newGradeSystem)")
+            selectedGradeSystem = newGradeSystem
         }
     }
 
@@ -49,11 +58,20 @@ struct GradeSystemSelectionView: View {
     var body: some View {
         HStack {
             ClimbTypePicker(selectedClimbType: $selectedClimbType)
-                .onChange(of: selectedClimbType) { _ in
+                .onChange(of: selectedClimbType) { oldValue, newValue in
+                    print("🔄 GradeSystemSelectionView - Climb type changed from \(oldValue) to \(newValue)")
                     validateGradeSystem()
                 }
             Spacer()
             GradeSystemPicker(selectedGradeSystem: $selectedGradeSystem, climbType: selectedClimbType)
+                .onChange(of: selectedGradeSystem) { oldValue, newValue in
+                    print("🔄 GradeSystemSelectionView - Grade system changed from \(oldValue) to \(newValue)")
+                    // Validate that the new grade system is compatible with current climb type
+                    if !validGradeSystems.contains(newValue) {
+                        print("❌ GradeSystemSelectionView - Invalid grade system selected for current climb type")
+                        validateGradeSystem()
+                    }
+                }
         }
     }
 }

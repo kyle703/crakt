@@ -11,7 +11,7 @@ import SwiftData
 struct ActiveRouteCardView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.undoManager) private var undoManager
-    @Bindable var session: Session
+    var session: Session
     @ObservedObject var stopwatch: Stopwatch
     @ObservedObject var workoutOrchestrator: WorkoutOrchestrator
 
@@ -24,10 +24,9 @@ struct ActiveRouteCardView: View {
     @State private var showRoutePicker = false
     @State private var showRestTimer = false
 
-    // Timer state
-    @State private var routeStartTime: Date?
-    @State private var lastAttemptTime: Date?
-    @State private var currentTime = Date()
+    // Timer state - use stopwatch timing instead of separate dates
+    @State private var routeStartElapsed: TimeInterval?
+    @State private var lastAttemptElapsed: TimeInterval?
 
     // Gesture State
     @State private var dragOffset: CGSize = .zero
@@ -37,36 +36,37 @@ struct ActiveRouteCardView: View {
     // Rest timer state
     @State private var restDuration: TimeInterval = 180 // 3 minutes default
 
+    // Animation state for attempt logging
+    @State private var animateNewAttempt = false
+    @State private var animateOldAttempt = false
+    @State private var routeChangeTrigger: UUID = UUID() // Force view refresh on route changes
+
 
 
     private var cardContent: some View {
         VStack(spacing: 20) {
             // Timer section
-            if let route = session.activeRoute {
-                VStack(spacing: 8) {
+            if session.activeRoute != nil {
+                VStack(spacing: 12) {
                     // 1. TOTAL TIME ON ROUTE (from route initialization)
-                    if let startTime = routeStartTime {
-                        VStack(spacing: 2) {
-                            let routeTime = currentTime.timeIntervalSince(startTime)
-                            Text(timeString(from: routeTime))
-                                .font(.system(size: 32, weight: .bold, design: .monospaced))
-                                .foregroundColor(.primary)
-                            Text("Total on route")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                    if let startElapsed = routeStartElapsed {
+                        let routeTime = stopwatch.totalTime - startElapsed
+                        Text(timeString(from: max(0, routeTime))) // Ensure no negative times
+                            .font(.system(size: 36, weight: .bold, design: .monospaced))
+                            .foregroundColor(.primary)
                     }
 
-                    // 2. TIME SINCE LAST ATTEMPT (for pacing)
-                    if let lastTime = lastAttemptTime {
+                    // 2. TIME SINCE LAST ATTEMPT (for pacing) - more subtle
+                    if let lastElapsed = lastAttemptElapsed {
+                        let timeSinceLast = stopwatch.totalTime - lastElapsed
                         VStack(spacing: 2) {
-                            let timeSinceLast = currentTime.timeIntervalSince(lastTime)
-                            Text(timeString(from: timeSinceLast))
-                                .font(.system(size: 24, weight: .bold, design: .monospaced))
-                                .foregroundColor(.blue)
-                            Text("Since last attempt")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            Text(timeString(from: max(0, timeSinceLast))) // Ensure no negative times
+                                .font(.system(size: 18, weight: .medium, design: .monospaced))
+                                .foregroundColor(.secondary.opacity(0.7))
+                            Text("since last attempt")
+                                .font(.system(size: 10, weight: .regular))
+                                .foregroundColor(.secondary.opacity(0.5))
+                                .textCase(.uppercase)
                         }
                     }
 
@@ -76,57 +76,77 @@ struct ActiveRouteCardView: View {
                             Text(timeString(from: TimeInterval(restDuration)))
                                 .font(.system(size: 48, weight: .bold, design: .monospaced))
                                 .foregroundColor(.orange)
-                            Text("Rest timer")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            Text("rest timer")
+                                .font(.system(size: 10, weight: .regular))
+                                .foregroundColor(.secondary.opacity(0.7))
+                                .textCase(.uppercase)
                         }
                     }
                 }
             }
 
-            // Default text when no attempts
+            // Call to action when no attempts
             if let route = session.activeRoute, route.attempts.isEmpty {
-                Text("Start climbing to begin timing")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.top, 8)
+                VStack(spacing: 8) {
+                    Text("🏔️")
+                        .font(.system(size: 40))
+                        .foregroundColor(.primary)
+                    Text("Ready to climb?")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    Text("Swipe up to send, down to fall")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, 16)
             }
 
 
-            // Last 5 attempts
+            // Last 3 attempts - constrained height
             if let route = session.activeRoute, !route.attempts.isEmpty {
                 VStack(spacing: 4) {
                     Text("Recent Attempts")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
 
-                    let recentAttempts = route.attempts.sorted(by: { $0.date > $1.date }).prefix(5)
-                    ForEach(Array(recentAttempts.enumerated()), id: \.element.id) { index, attempt in
-                        HStack {
-                            // Attempt status
-                            Image(systemName: attempt.status.iconName)
-                                .foregroundColor(attempt.status.color)
-                                .frame(width: 20)
+                    VStack(spacing: 2) {
+                        let recentAttempts = route.attempts.sorted(by: { $0.date > $1.date }).prefix(3)
+                        ForEach(Array(recentAttempts.enumerated()), id: \.element.id) { index, attempt in
+                            VStack { // Wrapper to use routeChangeTrigger for view identity
+                            HStack {
+                                // Attempt status
+                                Image(systemName: attempt.status.iconName)
+                                    .foregroundColor(attempt.status.color)
+                                    .frame(width: 20)
 
-                            // Time (hh:mm)
-                            Text(formatTime(attempt.date))
-                                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                                .foregroundColor(.primary)
-                                .frame(width: 50, alignment: .leading)
+                                // Time (hh:mm)
+                                Text(formatTime(attempt.date))
+                                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                    .foregroundColor(.primary)
+                                    .frame(width: 50, alignment: .leading)
 
-                            Spacer()
+                                Spacer()
 
-                            // Relative time
-                            Text(relativeTime(from: attempt.date))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .frame(width: 60, alignment: .trailing)
+                                // Relative time
+                                Text(relativeTime(from: attempt.date))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .frame(width: 60, alignment: .trailing)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                            .opacity(animateOldAttempt && index == 0 ? 0.3 : 1.0) // Fade out oldest attempt
+                            .scaleEffect(animateNewAttempt && index == 0 ? 0.95 : 1.0) // Slight scale down for old attempt
+                            .animation(.easeInOut(duration: 0.2), value: animateOldAttempt)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: animateNewAttempt)
+                            }.id(routeChangeTrigger) // Force refresh when route changes
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.gray.opacity(0.05))
-                        .cornerRadius(8)
                     }
+                    .frame(maxHeight: 120) // Constrain attempts list height
                 }
             }
 
@@ -228,7 +248,7 @@ struct ActiveRouteCardView: View {
                 // Horizontal feedback
                 if dragOffset.width > 50 {
                     HStack {
-                        Text("RESET")
+                        Text("Next Route")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.orange)
@@ -241,7 +261,7 @@ struct ActiveRouteCardView: View {
                         Image(systemName: "arrow.left.circle.fill")
                             .font(.largeTitle)
                             .foregroundColor(.orange)
-                        Text("RESET")
+                        Text("Next Route")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.orange)
@@ -298,7 +318,7 @@ struct ActiveRouteCardView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
-        .background(Color.white.opacity(0.9))
+        .background(Color(.systemBackground).opacity(0.9))
     }
 
     // MARK: - Gesture Handlers
@@ -320,53 +340,44 @@ struct ActiveRouteCardView: View {
     }
 
     init(session: Session, stopwatch: Stopwatch, workoutOrchestrator: WorkoutOrchestrator) {
-        self._session = Bindable(wrappedValue: session)
+        self.session = session
         self.stopwatch = stopwatch
         self.workoutOrchestrator = workoutOrchestrator
         self._selectedGrade = .constant(nil)
         self._selectedGradeSystem = .constant(.vscale)
 
-        // Set initial route start time
-        if session.activeRoute != nil {
-            // If route exists, use its creation time or first attempt time
-            routeStartTime = session.activeRoute?.attempts.min(by: { $0.date < $1.date })?.date ?? Date()
-            // Set last attempt time to most recent attempt
-            lastAttemptTime = session.activeRoute?.attempts.max(by: { $0.date < $1.date })?.date
-        } else {
-            // No active route, start fresh
-            routeStartTime = Date()
-            lastAttemptTime = nil
-        }
+        // Timer initialization is now handled in .onAppear using stopwatch timing
     }
 
     init(session: Session, stopwatch: Stopwatch, workoutOrchestrator: WorkoutOrchestrator, selectedGrade: Binding<String?>, selectedGradeSystem: Binding<GradeSystem>) {
-        self._session = Bindable(wrappedValue: session)
+        self.session = session
         self.stopwatch = stopwatch
         self.workoutOrchestrator = workoutOrchestrator
         self._selectedGrade = selectedGrade
         self._selectedGradeSystem = selectedGradeSystem
 
-        // Set initial route start time
-        if session.activeRoute != nil {
-            // If route exists, use its creation time or first attempt time
-            routeStartTime = session.activeRoute?.attempts.min(by: { $0.date < $1.date })?.date ?? Date()
-            // Set last attempt time to most recent attempt
-            lastAttemptTime = session.activeRoute?.attempts.max(by: { $0.date < $1.date })?.date
-        } else {
-            // No active route, start fresh
-            routeStartTime = Date()
-            lastAttemptTime = nil
-        }
+        // Timer initialization is now handled in .onAppear using stopwatch timing
     }
-
-    // Timer publisher for updating every second
-    private let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
 
     var body: some View {
         mainView
-            .onReceive(timer) { date in
-                currentTime = date
+            .onAppear {
+                // Start route timer immediately on init
+                if routeStartElapsed == nil {
+                    routeStartElapsed = stopwatch.totalTime
+                }
+
+                // Initialize timer state based on existing attempts
+                if let route = session.activeRoute {
+                    if !route.attempts.isEmpty {
+                        // Route has attempts - use the session stopwatch time as baseline
+                        // We'll calculate times relative to the session start
+                        routeStartElapsed = 0 // Route timing starts when session starts
+                        lastAttemptElapsed = stopwatch.totalTime // Last attempt was at current session time
+                    }
+                }
             }
+            
             .sheet(isPresented: $showAttemptHistory) {
                 if let route = session.activeRoute {
                     AttemptHistoryView(
@@ -402,122 +413,53 @@ struct ActiveRouteCardView: View {
 
     private var mainView: some View {
         ZStack(alignment: .bottom) {
-            if session.activeRoute != nil {
-                // Active route exists - show the full ActiveRouteCardView
-                VStack(spacing: 16) {
-                    // Top HUD
-                    RouteHUDView(route: session.activeRoute) {
-                        showAttemptHistory = true
+            // Always show the climbing interface (route will be auto-created if needed)
+            VStack(spacing: 16) {
+                // Main card area with gestures
+                ZStack {
+                    cardContent
+                        .background(Color(.systemBackground))
+                        .cornerRadius(16)
+                        .shadow(color: Color(.systemBackground).opacity(0.1), radius: 8, x: 0, y: 4)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(session.activeRoute?.gradeColor ?? .gray, lineWidth: 2)
+                        )
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .offset(dragOffset)
+                        .gesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    handleDragChanged(value)
+                                }
+                                .onEnded { value in
+                                    handleDragEnded(value)
+                                }
+                        )
+                        .gesture(
+                            LongPressGesture(minimumDuration: 0.7)
+                                .onEnded { _ in
+                                    handleLongPress()
+                                }
+                        )
+                        .gesture(
+                            TapGesture(count: 2)
+                                .onEnded {
+                                    handleDoubleTap()
+                                }
+                        )
+
+                    // Visual feedback during drag
+                    if isDragging {
+                        dragFeedbackOverlay
                     }
-
-                    // Main card area with gestures
-                    ZStack {
-                        cardContent
-                            .background(Color.white)
-                            .cornerRadius(16)
-                            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(session.activeRoute?.gradeColor ?? .gray, lineWidth: 2)
-                            )
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .offset(dragOffset)
-                            .gesture(
-                                DragGesture()
-                                    .onChanged { value in
-                                        handleDragChanged(value)
-                                    }
-                                    .onEnded { value in
-                                        handleDragEnded(value)
-                                    }
-                            )
-                            .gesture(
-                                LongPressGesture(minimumDuration: 0.7)
-                                    .onEnded { _ in
-                                        handleLongPress()
-                                    }
-                            )
-                            .gesture(
-                                TapGesture(count: 2)
-                                    .onEnded {
-                                        handleDoubleTap()
-                                    }
-                            )
-
-                        // Visual feedback during drag
-                        if isDragging {
-                            dragFeedbackOverlay
-                        }
-                    }
-
-                    // Bottom action bar
-                    bottomActionBar
                 }
-                .padding(.vertical, 16)
-            } else {
-                // No active route - show route list and new route creation
-                VStack(spacing: 0) {
-                    // Route list
-                    if !session.routesSortedByDate.isEmpty {
-                        RouteAttemptScrollView(routes: session.routesSortedByDate)
-                    } else {
-                        // Empty state
-                        VStack(spacing: 24) {
-                            Image(systemName: "mountain.2.fill")
-                                .font(.system(size: 48))
-                                .foregroundColor(.blue.opacity(0.7))
 
-                            VStack(spacing: 12) {
-                                Text("No routes logged yet!")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-
-                                Text("Start your climbing session by logging your first route")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                                    .lineLimit(nil)
-                            }
-                        }
-                        .padding(.vertical, 40)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity)
-                    }
-
-                    // Add new route UI
-                    VStack(spacing: 16) {
-                        if let grade = selectedGrade {
-                            HStack {
-                                Spacer()
-                                OutlineButton(
-                                    action: {
-                                        withAnimation {
-                                            let newRoute = Route(gradeSystem: selectedGradeSystem,
-                                                                grade: grade)
-                                            newRoute.status = .active
-                                            modelContext.insert(newRoute)
-                                            session.activeRoute = newRoute
-                                        }
-                                    },
-                                    systemImage: "play.circle.fill",
-                                    label: "Start Route",
-                                    color: .blue
-                                )
-                                Spacer()
-                            }
-                            .padding(.horizontal)
-                        }
-
-                        ClimbingGradeSelector(gradeSystem: GradeSystems.systems[selectedGradeSystem]!,
-                                            selectedGrade: $selectedGrade)
-                            .frame(height: 90)
-                    }
-                    .padding(.vertical, 16)
-                    .padding(.horizontal, 16)
-                }
-        }
+                // Bottom action bar
+                bottomActionBar
+            }
+            .padding(.vertical, 16)
         }
         .overlay(
             Group {
@@ -589,22 +531,41 @@ struct ActiveRouteCardView: View {
             }
         })
 
-        let attempt = RouteAttempt(status: status)
-        activeRoute.attempts.append(attempt)
-
-        // Set route start time on first attempt
-        if routeStartTime == nil {
-            routeStartTime = attempt.date
+        // Start animation sequence
+        withAnimation(.easeOut(duration: 0.2)) {
+            animateOldAttempt = true
         }
 
-        // Update last attempt time
-        lastAttemptTime = attempt.date
+        // Add new attempt after a brief delay for staggered effect
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            let attempt = RouteAttempt(status: status)
+            activeRoute.attempts.append(attempt)
 
-        // Update workout progress
-        workoutOrchestrator.updateWorkoutProgress()
+            // Set route start time on first attempt
+            if routeStartElapsed == nil {
+                routeStartElapsed = stopwatch.totalTime
+            }
 
-        // Update stopwatch
-        stopwatch.lap()
+            // Update last attempt time
+            lastAttemptElapsed = stopwatch.totalTime
+
+            // Update workout progress
+            workoutOrchestrator.updateWorkoutProgress()
+
+            // Update stopwatch
+            stopwatch.lap()
+
+            // Trigger new attempt animation
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                animateNewAttempt = true
+            }
+
+            // Reset animation states
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                animateOldAttempt = false
+                animateNewAttempt = false
+            }
+        }
 
         // Play haptic feedback
         if status == .send {
@@ -625,7 +586,7 @@ struct ActiveRouteCardView: View {
         route.grade = newGrade
 
         // Reset timer for new route
-        routeStartTime = Date()
+        routeStartElapsed = stopwatch.totalTime
 
         HapticManager.shared.playSuccess()
     }
@@ -639,6 +600,11 @@ struct ActiveRouteCardView: View {
     }
 
     private func resetRoute() {
+        // Reset animation state before creating new route
+        animateNewAttempt = false
+        animateOldAttempt = false
+        // Don't reset attemptAnimationId here - only when animating attempts
+
         // Advance workout if active, otherwise create new route with current grade
         if workoutOrchestrator.isWorkoutActive {
             // Advance to next rep in workout
@@ -656,8 +622,8 @@ struct ActiveRouteCardView: View {
         }
 
         // Reset timers for new route
-        routeStartTime = Date()
-        lastAttemptTime = nil
+        routeStartElapsed = stopwatch.totalTime
+        lastAttemptElapsed = nil
         HapticManager.shared.playSuccess()
     }
 
@@ -705,11 +671,18 @@ struct ActiveRouteCardView: View {
 
         // Add to session
         session.routes.append(newRoute)
+
+        // Reset animation state before changing route
+        animateNewAttempt = false
+        animateOldAttempt = false
+        // Don't reset attemptAnimationId here - only when animating attempts
+
+        // Set new active route
         session.activeRoute = newRoute
 
         // Initialize timers for new route
-        routeStartTime = Date()
-        lastAttemptTime = nil
+        routeStartElapsed = stopwatch.totalTime
+        lastAttemptElapsed = nil
 
         // Save context
         do {
@@ -730,7 +703,8 @@ struct ActiveRouteCardView: View {
     private func timeString(from timeInterval: TimeInterval) -> String {
         let minutes = Int(timeInterval) / 60
         let seconds = Int(timeInterval) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+        let tenths = Int((timeInterval * 10).truncatingRemainder(dividingBy: 10))
+        return String(format: "%02d:%02d.%01d", minutes, seconds, tenths)
     }
 
     private func formatTime(_ date: Date) -> String {

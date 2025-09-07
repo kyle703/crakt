@@ -9,9 +9,12 @@ import SwiftUI
 
 extension Route {
     var normalizedGrade: Double {
-        self.gradeSystem._protocol.normalizedDifficulty(for: grade!)
+        guard let grade = grade else {
+            return 0.0 // Return default normalized value when grade is nil
+        }
+        return self.gradeSystem._protocol.normalizedDifficulty(for: grade)
     }
-    
+
     func getConvertedGrade(system: GradeSystem) -> String {
         return system._protocol.grade(forNormalizedDifficulty: self.normalizedGrade)
     }

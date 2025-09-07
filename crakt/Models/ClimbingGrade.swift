@@ -7,6 +7,116 @@
 
 import SwiftUI
 
+// MARK: - Difficulty Index (DI) System
+
+/// Difficulty Index (DI) - A unified scale for cross-grade-system conversions
+/// French grades serve as the canonical axis with DI = index × 10
+struct DifficultyIndex {
+    /// Canonical French grade sequence (ordered list for DI calculation)
+    static let canonicalFrenchGrades: [String] = [
+        "4a", "4b", "4c",
+        "5a", "5b", "5c",
+        "6a", "6a+", "6b", "6b+", "6c", "6c+",
+        "7a", "7a+", "7b", "7b+", "7c", "7c+",
+        "8a", "8a+", "8b", "8b+", "8c", "8c+",
+        "9a", "9a+", "9b", "9b+", "9c"
+    ]
+
+    /// Table A: YDS ↔ French conversions
+    static let ydsToFrench: [String: String] = [
+        "5.6": "4c", "5.7": "5a", "5.8": "5b", "5.9": "5c",
+        "5.10a": "6a", "5.10b": "6a+", "5.10c": "6b", "5.10d": "6b+",
+        "5.11a": "6c", "5.11b": "6c+", "5.11c": "7a", "5.11d": "7a+",
+        "5.12a": "7b", "5.12b": "7b+", "5.12c": "7c", "5.12d": "7c+",
+        "5.13a": "8a", "5.13b": "8a+", "5.13c": "8b", "5.13d": "8b+",
+        "5.14a": "8c", "5.14b": "8c+", "5.14c": "9a", "5.14d": "9a+",
+        "5.15a": "9b", "5.15b": "9b+", "5.15c": "9c"
+    ]
+
+    /// Table B: V-scale ↔ Font conversions
+    static let vToFont: [String: String] = [
+        "VB": "3–4", "V0": "5", "V1": "5+", "V2": "6A", "V3": "6A+",
+        "V4": "6B", "V5": "6C", "V6": "7A", "V7": "7A+", "V8": "7B",
+        "V9": "7B+", "V10": "7C+", "V11": "8A", "V12": "8A+", "V13": "8B",
+        "V14": "8B+", "V15": "8C", "V16": "8C+", "V17": "9A"
+    ]
+
+    /// Table C: V-scale ↔ French anchor points for boulder-route bridge
+    static let vToFrenchAnchors: [String: String] = [
+        "V0": "6a", "V1": "6a+", "V2": "6b", "V3": "6b+", "V4": "6c",
+        "V5": "7a", "V6": "7a+", "V7": "7b", "V8": "7b+", "V9": "7c",
+        "V10": "7c+", "V11": "8a", "V12": "8a+", "V13": "8b", "V14": "8b+",
+        "V15": "8c", "V16": "8c+", "V17": "9a"
+    ]
+
+    /// Get DI for a French grade
+    static func diForFrenchGrade(_ grade: String) -> Int? {
+        guard let index = canonicalFrenchGrades.firstIndex(of: grade) else { return nil }
+        return index * 10
+    }
+
+    /// Get French grade for a DI value
+    static func frenchGradeForDI(_ di: Int) -> String {
+        let index = max(0, min(canonicalFrenchGrades.count - 1, di / 10))
+        return canonicalFrenchGrades[index]
+    }
+
+    /// Normalize any grade to DI
+    static func normalizeToDI(grade: String, system: GradeSystem, climbType: ClimbType) -> Int? {
+        switch system {
+        case .french:
+            return diForFrenchGrade(grade)
+        case .yds:
+            if let frenchGrade = ydsToFrench[grade] {
+                return diForFrenchGrade(frenchGrade)
+            }
+        case .vscale:
+            if let frenchGrade = vToFrenchAnchors[grade] {
+                return diForFrenchGrade(frenchGrade)
+            }
+        case .font:
+            if let vGrade = vToFont.first(where: { $0.value == grade })?.key {
+                if let frenchGrade = vToFrenchAnchors[vGrade] {
+                    return diForFrenchGrade(frenchGrade)
+                }
+            }
+        case .circuit:
+            // Circuit grades don't have DI conversion
+            return nil
+        }
+        return nil
+    }
+
+    /// Convert from DI to target system
+    static func gradeForDI(_ di: Int, system: GradeSystem, climbType: ClimbType) -> String? {
+        let frenchGrade = frenchGradeForDI(di)
+
+        switch system {
+        case .french:
+            return frenchGrade
+        case .yds:
+            return ydsToFrench.first(where: { $0.value == frenchGrade })?.key
+        case .vscale:
+            return vToFrenchAnchors.first(where: { $0.value == frenchGrade })?.key
+        case .font:
+            if let vGrade = vToFrenchAnchors.first(where: { $0.value == frenchGrade })?.key {
+                return vToFont[vGrade]
+            }
+        case .circuit:
+            return nil
+        }
+        return nil
+    }
+
+    /// Convert between any two grade systems
+    static func convertGrade(fromGrade: String, fromSystem: GradeSystem, fromType: ClimbType,
+                           toSystem: GradeSystem, toType: ClimbType) -> String? {
+        guard let di = normalizeToDI(grade: fromGrade, system: fromSystem, climbType: fromType) else {
+            return nil
+        }
+        return gradeForDI(di, system: toSystem, climbType: toType)
+    }
+}
 
 struct AnyGradeProtocol: GradeProtocol {
     static func == (lhs: AnyGradeProtocol, rhs: AnyGradeProtocol) -> Bool {
@@ -64,40 +174,33 @@ protocol GradeProtocol: Equatable {
 }
 
 extension GradeProtocol {
-    
-    
+
     func normalizedDifficulty(for grade: String) -> Double {
-        guard let gradeIndex = grades.firstIndex(of: grade), grades.count > 1 else { return 0.0 }
-        
-        // Define the base difficulty factor (this could be adjusted for each grading system if needed)
-        let baseDifficultyFactor = 1.5
-        
-        // Calculate the exponent for the current grade based on its position
-        let gradeExponent = Double(gradeIndex)
-        
-        // Calculate the maximum exponent possible within this system for normalization
-        let maxExponent = Double(grades.count - 1)
-        
-        // Apply the exponential formula to get a normalized value between 0 and 1
-        return (pow(baseDifficultyFactor, gradeExponent) - 1) / (pow(baseDifficultyFactor, maxExponent) - 1)
-    }
-    
-    func grade(forNormalizedDifficulty difficulty: Double) -> String {
-            var closestGrade: String = grades.first ?? ""
-            var smallestDifference: Double = Double.infinity
-            
-            for grade in grades {
-                let normalizedDifficulty = self.normalizedDifficulty(for: grade)
-                let difference = abs(normalizedDifficulty - difficulty)
-                
-                if difference < smallestDifference {
-                    smallestDifference = difference
-                    closestGrade = grade
-                }
-            }
-            
-            return closestGrade
+        // Use DI system for proper cross-grade-system normalization
+        guard let di = DifficultyIndex.normalizeToDI(grade: grade, system: system, climbType: system.climbType) else {
+            // Fallback to simple index-based normalization if DI conversion fails
+            guard let gradeIndex = grades.firstIndex(of: grade), grades.count > 1 else { return 0.0 }
+            return Double(gradeIndex) / Double(grades.count - 1)
         }
+
+        // Normalize DI to 0-1 range (DI range is roughly 0-280)
+        return Double(di) / 280.0
+    }
+
+    func grade(forNormalizedDifficulty difficulty: Double) -> String {
+        // Convert normalized difficulty back to DI
+        let di = Int(difficulty * 280.0)
+
+        // Try to get grade using DI system
+        if let grade = DifficultyIndex.gradeForDI(di, system: system, climbType: system.climbType) {
+            return grade
+        }
+
+        // Fallback to simple index-based lookup if DI conversion fails
+        let gradeIndex = Int(difficulty * Double(grades.count - 1))
+        let clampedIndex = max(0, min(grades.count - 1, gradeIndex))
+        return grades[clampedIndex]
+    }
     
     func color(forNormalizedDifficulty difficulty: Double) -> Color {
             // Use the reverse lookup function to get the closest grade for the normalized difficulty

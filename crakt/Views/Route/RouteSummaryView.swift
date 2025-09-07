@@ -13,7 +13,7 @@ struct RouteSummaryView: View {
     var body: some View {
         // (Assumes you have logic to get the system, color, and text from route.gradeSystem and route.grade)
         let gradeSystem = GradeSystems.systems[route.gradeSystem]!
-        let gradeLabel = gradeSystem.description(for: route.grade!)
+        let gradeLabel = route.grade.flatMap { gradeSystem.description(for: $0) }
         
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {

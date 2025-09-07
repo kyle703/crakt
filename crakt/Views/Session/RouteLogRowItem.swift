@@ -14,7 +14,7 @@ struct RouteLogRowItem: View {
     var body: some View {
         // Derive the background color from route’s grade
         let gradeSystem = GradeSystems.systems[route.gradeSystem]!
-        let gradeColor = gradeSystem.colors(for: route.grade!).first ?? .purple
+        let gradeColor = route.grade.flatMap { gradeSystem.colors(for: $0).first } ?? .purple
         
         // Use the ExpandableSection as before, but place
         // the background around it so everything is in one card.

@@ -23,11 +23,9 @@
 		084EACA62E6CE3A60011DD3F /* ActiveRouteCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACA52E6CE3A60011DD3F /* ActiveRouteCardView.swift */; };
 		084EACA82E6CE3B60011DD3F /* AttemptHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACA72E6CE3B60011DD3F /* AttemptHistoryView.swift */; };
 		084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */; };
-		084EACAC2E6CE3BF0011DD3F /* RouteHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACAB2E6CE3BF0011DD3F /* RouteHUDView.swift */; };
 		084EACAE2E6CE3C20011DD3F /* RoutePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */; };
 		084EACB02E6CE3C60011DD3F /* UndoSnackbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACAF2E6CE3C60011DD3F /* UndoSnackbarView.swift */; };
 		084EACB22E6CE7910011DD3F /* CompactGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */; };
-		084FA4B52ABF57CE00ADF994 /* SessionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */; };
 		084FA4B72ABF57E900ADF994 /* OutlineButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B62ABF57E900ADF994 /* OutlineButton.swift */; };
 		084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B82ABF581B00ADF994 /* PickerMenu.swift */; };
 		084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */; };
@@ -66,6 +64,7 @@
 		0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12A2BAD07E000D31AD3 /* User.swift */; };
 		0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */; };
 		0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */; };
+		08C3EF2A2E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C3EF292E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift */; };
 		08C7F4952BDDACDC0063827E /* Session.stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4942BDDACDC0063827E /* Session.stats.swift */; };
 		08C7F4962BDDAF280063827E /* SessionChartsControllerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4902BDDABC50063827E /* SessionChartsControllerView.swift */; };
 		08C7F4972BDDAF2B0063827E /* AttemptsHistogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4912BDDAC1A0063827E /* AttemptsHistogramView.swift */; };
@@ -110,11 +109,9 @@
 		084EACA52E6CE3A60011DD3F /* ActiveRouteCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRouteCardView.swift; sourceTree = "<group>"; };
 		084EACA72E6CE3B60011DD3F /* AttemptHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptHistoryView.swift; sourceTree = "<group>"; };
 		084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerView.swift; sourceTree = "<group>"; };
-		084EACAB2E6CE3BF0011DD3F /* RouteHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteHUDView.swift; sourceTree = "<group>"; };
 		084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutePickerView.swift; sourceTree = "<group>"; };
 		084EACAF2E6CE3C60011DD3F /* UndoSnackbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoSnackbarView.swift; sourceTree = "<group>"; };
 		084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactGradeSelector.swift; sourceTree = "<group>"; };
-		084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHeader.swift; sourceTree = "<group>"; };
 		084FA4B62ABF57E900ADF994 /* OutlineButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineButton.swift; sourceTree = "<group>"; };
 		084FA4B82ABF581B00ADF994 /* PickerMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerMenu.swift; sourceTree = "<group>"; };
 		084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbTypePicker.swift; sourceTree = "<group>"; };
@@ -158,6 +155,7 @@
 		0896B12B2BAD07E000D31AD3 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptsByGradePieChartView.swift; sourceTree = "<group>"; };
+		08C3EF292E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedSessionHeader.swift; sourceTree = "<group>"; };
 		08C7F4902BDDABC50063827E /* SessionChartsControllerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionChartsControllerView.swift; sourceTree = "<group>"; };
 		08C7F4912BDDAC1A0063827E /* AttemptsHistogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptsHistogramView.swift; sourceTree = "<group>"; };
 		08C7F4922BDDAC490063827E /* AttemptStatusByGradeStackedBarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptStatusByGradeStackedBarChartView.swift; sourceTree = "<group>"; };
@@ -223,7 +221,6 @@
 				084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */,
 				084FA4B82ABF581B00ADF994 /* PickerMenu.swift */,
 				084FA4B62ABF57E900ADF994 /* OutlineButton.swift */,
-				084FA4B42ABF57CE00ADF994 /* SessionHeader.swift */,
 				084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */,
 				084EAC812E6726FD0011DD3F /* WorkoutSummaryCard.swift */,
 			);
@@ -389,7 +386,7 @@
 				08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */,
 				084EACA32E6CE3A00011DD3F /* GradeScrubberView.swift */,
 				084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */,
-				084EACAB2E6CE3BF0011DD3F /* RouteHUDView.swift */,
+				08C3EF292E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift */,
 				084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */,
 				084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */,
 				084EACAF2E6CE3C60011DD3F /* UndoSnackbarView.swift */,
@@ -571,7 +568,6 @@
 				084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */,
 				08C7F4A22BF1B4900063827E /* RouteSummaryView.swift in Sources */,
 				08C7F4982BDDAF2D0063827E /* AttemptStatusByGradeStackedBarChartView.swift in Sources */,
-				084FA4B52ABF57CE00ADF994 /* SessionHeader.swift in Sources */,
 				084FA4B72ABF57E900ADF994 /* OutlineButton.swift in Sources */,
 				084EACA82E6CE3B60011DD3F /* AttemptHistoryView.swift in Sources */,
 				084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */,
@@ -580,7 +576,7 @@
 				084EAC8A2E672A490011DD3F /* StatCardView.swift in Sources */,
 				0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */,
 				084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */,
-				084EACAC2E6CE3BF0011DD3F /* RouteHUDView.swift in Sources */,
+				08C3EF2A2E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift in Sources */,
 				0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */,
 				084FDAF72ABF20C90015E8EE /* ClimbingGrade.swift in Sources */,
 				084EAC8E2E6932F30011DD3F /* SessionManager.swift in Sources */,

@@ -59,8 +59,9 @@ The Workouts feature has been successfully implemented as structured protocols w
   - Workout selector sheet integration
   - Modified `performAction()` to route attempts through workout orchestrator
 
-- [x] **SessionHeader** (`SessionHeader.swift`):
+- [x] **UnifiedSessionHeader** (`UnifiedSessionHeader.swift`):
 
+  - Unified header component with navigation tabs and route HUD functionality
   - Workout status chip in collapsed view
   - Progress bar visualization
   - Minimal overhead design
@@ -100,7 +101,7 @@ The Workouts feature has been successfully implemented as structured protocols w
 
 - `crakt/Models/Session.swift` - Added workout relationships
 - `crakt/Views/Session/SessionActionBar.swift` - Added workout integration
-- `crakt/Views/Session/SessionHeader.swift` - Added workout status display
+- `crakt/Views/Session/UnifiedSessionHeader.swift` - Unified header with navigation and route HUD
 - `crakt/Views/Session/SessionDetailView.swift` - Added workout summaries
 - `crakt/Views/Session/SessionView.swift` - Wired up workout orchestrator
 
