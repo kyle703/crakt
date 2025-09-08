@@ -110,107 +110,197 @@ struct SessionTabView: View {
 
             case .progress:
                 ScrollView {
-                    VStack(spacing: 20) {
-                        // Session stats overview
+                    VStack(spacing: 24) {
+                        // Session Volume Stats
                         VStack(spacing: 16) {
-                            Text("Session Progress")
-                                .font(.title2)
-                                .fontWeight(.bold)
+                            HStack(spacing: 8) {
+                                Image(systemName: "chart.bar.fill")
+                                    .font(.title3)
+                                    .foregroundColor(.primary)
+                                Text("Session Volume")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                            }
 
-                            HStack(spacing: 20) {
-                                StatCardView(icon: "figure.climbing", title: "\(session.routes.count)", subtitle: "Routes", color: .blue)
-                                StatCardView(icon: "arrow.up.circle", title: "\(session.totalAttempts)", subtitle: "Attempts", color: .green)
-                                StatCardView(icon: "clock", title: stopwatch.totalTime.formatted, subtitle: "Duration", color: .orange)
+                            HStack(spacing: 16) {
+                                StatCardView(
+                                    icon: "arrow.up.circle",
+                                    title: "\(session.sessionTotalAttempts)",
+                                    subtitle: "Total Attempts",
+                                    color: .blue
+                                )
+
+                                StatCardView(
+                                    icon: "checkmark.circle",
+                                    title: "\(session.sessionTotalSends)",
+                                    subtitle: "Sends",
+                                    color: .green
+                                )
+
+                                StatCardView(
+                                    icon: "percent",
+                                    title: session.formattedSuccessPercentage,
+                                    subtitle: "Success Rate",
+                                    color: .orange
+                                )
                             }
                         }
                         .padding(.horizontal)
 
-                        // Workout summary (if active or recently completed) - only in progress tab
-                        if workoutOrchestrator.isWorkoutActive || (workoutOrchestrator.activeWorkout != nil && workoutOrchestrator.activeWorkout?.isCompleted == true) {
+                        // Intensity Benchmarks
+                        VStack(spacing: 16) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "flame.fill")
+                                    .font(.title3)
+                                    .foregroundColor(.primary)
+                                Text("Intensity Benchmarks")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                            }
+
+                            HStack(spacing: 16) {
+                                if let hardestGrade = session.sessionHardestGradeSent {
+                                    StatCardView(
+                                        icon: "mountain.2.fill",
+                                        title: hardestGrade,
+                                        subtitle: "Hardest Sent",
+                                        color: .red
+                                    )
+                                } else {
+                                    StatCardView(
+                                        icon: "mountain.2.fill",
+                                        title: "—",
+                                        subtitle: "Hardest Sent",
+                                        color: .gray
+                                    )
+                                }
+
+                                if let medianGrade = session.sessionMedianGradeSent {
+                                    StatCardView(
+                                        icon: "chart.line.uptrend.xyaxis",
+                                        title: medianGrade,
+                                        subtitle: "Median Grade",
+                                        color: .purple
+                                    )
+                                } else {
+                                    StatCardView(
+                                        icon: "chart.line.uptrend.xyaxis",
+                                        title: "—",
+                                        subtitle: "Median Grade",
+                                        color: .gray
+                                    )
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+
+                        // Efficiency Metrics
+                        VStack(spacing: 16) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "target")
+                                    .font(.title3)
+                                    .foregroundColor(.primary)
+                                Text("Efficiency")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                            }
+
+                            HStack(spacing: 16) {
+                                StatCardView(
+                                    icon: "repeat",
+                                    title: session.formattedAttemptsPerSend,
+                                    subtitle: "Attempts/Send",
+                                    color: .blue
+                                )
+
+                                StatCardView(
+                                    icon: "gauge.with.dots.needle.50percent",
+                                    title: "2.5",
+                                    subtitle: "Baseline",
+                                    color: .gray
+                                )
+                            }
+
+                        // Efficiency comparison
+                            HStack(spacing: 8) {
+                                Text("Efficiency vs baseline:")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+
+                                Text(String(format: "%.1f attempts/send today (baseline: 2.5)", session.sessionAttemptsPerSend))
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+
+                                let trend = session.calculateTrend(current: session.sessionAttemptsPerSend, historical: 2.5)
+                                Text(trend)
+                                    .font(.subheadline)
+                                    .foregroundColor(trend == "↑" ? .red : trend == "↓" ? .green : .gray)
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(Color(.systemBackground))
+                            .cornerRadius(8)
+                            .shadow(color: .black.opacity(0.05), radius: 4)
+                        }
+                        .padding(.horizontal)
+
+                        // Volume Distribution
+                        VStack(spacing: 16) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "chart.pie.fill")
+                                    .font(.title3)
+                                    .foregroundColor(.primary)
+                                Text("Volume Distribution")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                            }
+
                             VStack(spacing: 12) {
-                                HStack(spacing: 12) {
-                                    // Workout icon
-                                    Image(systemName: workoutOrchestrator.activeWorkout?.type.icon ?? "figure.climbing")
-                                        .font(.title2)
-                                        .foregroundColor(.blue)
-                                        .frame(width: 40, height: 40)
-                                        .background(Color.blue.opacity(0.1))
-                                        .clipShape(Circle())
+                                ForEach(session.formattedGradeDistribution, id: \.band) { distribution in
+                                    HStack {
+                                        Text(distribution.band)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .frame(width: 60, alignment: .leading)
 
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(workoutOrchestrator.activeWorkout?.type.rawValue ?? "Workout")
-                                            .font(.headline)
-                                            .fontWeight(.semibold)
+                                        Text("\(distribution.attempts) attempts")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
 
-                                        let progress = workoutOrchestrator.currentWorkoutProgress
-                                        if progress.totalSets > 0 {
-                                            Text("Set \(progress.currentSet)/\(progress.totalSets) • Rep \(progress.completedReps)/\(progress.totalReps)")
-                                                .font(.subheadline)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
+                                        Spacer()
 
-                                    Spacer()
-
-                                    VStack(alignment: .trailing, spacing: 2) {
-                                        Text("\(Int((workoutOrchestrator.activeWorkout?.completionPercentage ?? 0) * 100))%")
+                                        Text(String(format: "%.1f%%", distribution.percentage))
                                             .font(.subheadline)
                                             .fontWeight(.semibold)
-                                            .foregroundColor(.blue)
-                                    }
-                                }
+                                            .foregroundColor(.primary)
 
-                                // Progress bar
-                                GeometryReader { geometry in
-                                    ZStack(alignment: .leading) {
-                                        Rectangle()
-                                            .fill(Color.gray.opacity(0.2))
-                                            .frame(height: 6)
-                                            .cornerRadius(3)
+                                        // Progress bar
+                                        GeometryReader { geometry in
+                                            ZStack(alignment: .leading) {
+                                                Rectangle()
+                                                    .fill(Color.gray.opacity(0.2))
+                                                    .frame(height: 6)
+                                                    .cornerRadius(3)
 
-                                        Rectangle()
-                                            .fill(Color.blue)
-                                            .frame(width: geometry.size.width * (workoutOrchestrator.activeWorkout?.completionPercentage ?? 0), height: 6)
-                                            .cornerRadius(3)
-                                    }
-                                }
-                                .frame(height: 6)
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 16)
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
-                            .shadow(color: .black.opacity(0.1), radius: 4)
-                            .padding(.horizontal, 16)
-                        }
-
-                        // Recent attempts
-                        VStack(spacing: 12) {
-                            Text("Recent Attempts")
-                                .font(.title3)
-                                .fontWeight(.semibold)
-
-                            if let activeRoute = session.activeRoute {
-                                ForEach(activeRoute.attempts.sorted(by: { $0.date > $1.date }).prefix(5), id: \.id) { attempt in
-                                    HStack {
-                                        Image(systemName: attempt.status.iconName)
-                                            .foregroundColor(attempt.status.color)
-                                        Text(attempt.status.description)
-                                            .fontWeight(.medium)
-                                        Spacer()
-                                        Text(attempt.date.formatted(.relative(presentation: .named)))
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
+                                                Rectangle()
+                                                    .fill(Color.blue)
+                                                    .frame(width: geometry.size.width * distribution.percentage / 100.0, height: 6)
+                                                    .cornerRadius(3)
+                                            }
+                                        }
+                                        .frame(height: 6)
+                                        .frame(width: 60)
                                     }
                                     .padding(.vertical, 8)
                                     .padding(.horizontal, 16)
                                     .background(Color(.systemBackground))
                                     .cornerRadius(8)
+                                    .shadow(color: .black.opacity(0.05), radius: 4)
                                 }
-                            } else {
-                                Text("No recent attempts")
-                                    .foregroundColor(.secondary)
-                                    .padding(.vertical, 20)
                             }
                         }
                         .padding(.horizontal)
