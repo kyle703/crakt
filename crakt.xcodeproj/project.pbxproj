@@ -58,6 +58,12 @@
 		0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */; };
 		0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */; };
 		0852BD932D45489300CBF36D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD922D45489300CBF36D /* SettingsView.swift */; };
+		08760D5A2E6E6AC900E7A584 /* GlobalAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D592E6E6AC900E7A584 /* GlobalAnalytics.swift */; };
+		08760D652E6E6C1100E7A584 /* ProgressionChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D602E6E6C1100E7A584 /* ProgressionChart.swift */; };
+		08760D662E6E6C1100E7A584 /* DistributionChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D5E2E6E6C1100E7A584 /* DistributionChart.swift */; };
+		08760D672E6E6C1100E7A584 /* EfficiencyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D5F2E6E6C1100E7A584 /* EfficiencyChart.swift */; };
+		08760D682E6E6C1100E7A584 /* GlobalSessionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D632E6E6C1100E7A584 /* GlobalSessionsView.swift */; };
+		08760D692E6E6C1100E7A584 /* VolumeChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D612E6E6C1100E7A584 /* VolumeChart.swift */; };
 		0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1292BAD07E000D31AD3 /* Route.swift */; };
 		0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12B2BAD07E000D31AD3 /* Session.swift */; };
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
@@ -149,6 +155,12 @@
 		0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRouteCard.swift; sourceTree = "<group>"; };
 		0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToConfirmView.swift; sourceTree = "<group>"; };
 		0852BD922D45489300CBF36D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		08760D592E6E6AC900E7A584 /* GlobalAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalAnalytics.swift; sourceTree = "<group>"; };
+		08760D5E2E6E6C1100E7A584 /* DistributionChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionChart.swift; sourceTree = "<group>"; };
+		08760D5F2E6E6C1100E7A584 /* EfficiencyChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EfficiencyChart.swift; sourceTree = "<group>"; };
+		08760D602E6E6C1100E7A584 /* ProgressionChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionChart.swift; sourceTree = "<group>"; };
+		08760D612E6E6C1100E7A584 /* VolumeChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeChart.swift; sourceTree = "<group>"; };
+		08760D632E6E6C1100E7A584 /* GlobalSessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalSessionsView.swift; sourceTree = "<group>"; };
 		0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteAttempt.swift; sourceTree = "<group>"; };
 		0896B1292BAD07E000D31AD3 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -194,6 +206,7 @@
 		084FA4B22ABF577D00ADF994 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				08760D642E6E6C1100E7A584 /* Analytics */,
 				0852BD872D34AD2500CBF36D /* ActivityLog */,
 				08C7F49E2BF1B45A0063827E /* Route */,
 				08C7F49B2BF1B41C0063827E /* UI */,
@@ -350,6 +363,26 @@
 			path = ActivityLog;
 			sourceTree = "<group>";
 		};
+		08760D622E6E6C1100E7A584 /* Charts */ = {
+			isa = PBXGroup;
+			children = (
+				08760D5E2E6E6C1100E7A584 /* DistributionChart.swift */,
+				08760D5F2E6E6C1100E7A584 /* EfficiencyChart.swift */,
+				08760D602E6E6C1100E7A584 /* ProgressionChart.swift */,
+				08760D612E6E6C1100E7A584 /* VolumeChart.swift */,
+			);
+			path = Charts;
+			sourceTree = "<group>";
+		};
+		08760D642E6E6C1100E7A584 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				08760D622E6E6C1100E7A584 /* Charts */,
+				08760D632E6E6C1100E7A584 /* GlobalSessionsView.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
 		0896B12C2BAD086200D31AD3 /* SwiftData */ = {
 			isa = PBXGroup;
 			children = (
@@ -372,6 +405,7 @@
 		08C7F4932BDDACCE0063827E /* Stats */ = {
 			isa = PBXGroup;
 			children = (
+				08760D592E6E6AC900E7A584 /* GlobalAnalytics.swift */,
 				08C7F4942BDDACDC0063827E /* Session.stats.swift */,
 				08C7F4992BDDAFF90063827E /* Route.stats.swift */,
 			);
@@ -563,6 +597,11 @@
 				08C7F49D2BF1B42F0063827E /* ExpandableSection.swift in Sources */,
 				084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */,
 				084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */,
+				08760D652E6E6C1100E7A584 /* ProgressionChart.swift in Sources */,
+				08760D662E6E6C1100E7A584 /* DistributionChart.swift in Sources */,
+				08760D672E6E6C1100E7A584 /* EfficiencyChart.swift in Sources */,
+				08760D682E6E6C1100E7A584 /* GlobalSessionsView.swift in Sources */,
+				08760D692E6E6C1100E7A584 /* VolumeChart.swift in Sources */,
 				084EAC7E2E669C140011DD3F /* Workout.swift in Sources */,
 				084EACA62E6CE3A60011DD3F /* ActiveRouteCardView.swift in Sources */,
 				084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */,
@@ -586,6 +625,7 @@
 				084EAC842E6729F40011DD3F /* SessionConfigView.swift in Sources */,
 				0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */,
 				084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */,
+				08760D5A2E6E6AC900E7A584 /* GlobalAnalytics.swift in Sources */,
 				08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */,
 				0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */,
 				084EACB22E6CE7910011DD3F /* CompactGradeSelector.swift in Sources */,

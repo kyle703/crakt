@@ -22,9 +22,9 @@ struct MainTabView: View {
                     Label("Activity", systemImage: "clock")
                 }
 
-            Text("adf")
+            GlobalSessionsView()
                 .tabItem {
-                    Label("Stats", systemImage: "chart.bar")
+                    Label("Analytics", systemImage: "chart.bar")
                 }
 
             SettingsView()

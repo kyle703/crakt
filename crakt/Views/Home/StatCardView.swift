@@ -12,6 +12,15 @@ struct StatCardView: View {
     var title: String
     var subtitle: String
     var color: Color
+    var trend: String? = nil
+
+    private func trendColor(for trend: String) -> Color {
+        switch trend {
+        case "↑": return .green
+        case "↓": return .red
+        default: return .gray
+        }
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -25,11 +34,20 @@ struct StatCardView: View {
                 )
             
             VStack(spacing: 4) {
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                
+                HStack(spacing: 4) {
+                    Text(title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+
+                    if let trend = trend {
+                        Text(trend)
+                            .font(.title3)
+                            .foregroundColor(trendColor(for: trend))
+                            .fontWeight(.bold)
+                    }
+                }
+
                 Text(subtitle)
                     .font(.caption)
                     .foregroundColor(.secondary)

@@ -359,5 +359,103 @@ extension Session {
             (band: band, attempts: attempts, percentage: Double(attempts) / totalAttempts * 100.0)
         }.sorted { $0.band < $1.band }
     }
-    
+
+// MARK: - Session Summary Data Structure
+
+/// Summary metrics for a single session
+struct SessionSummary {
+    /// DI-normalized hardest grade sent (0-200 scale)
+    let hardestGradeDI: Int
+
+    /// DI-normalized median grade sent (0-200 scale)
+    let medianGradeDI: Int
+
+    /// Total successful sends in the session
+    let sendCount: Int
+
+    /// Total attempts in the session
+    let attemptCount: Int
+
+    /// Success percentage (0.0-100.0)
+    let sendPercent: Double
+
+    /// Attempts per send ratio
+    let attemptsPerSend: Double
+
+    /// Session date for time-series analysis
+    let sessionDate: Date
+}
+
+// MARK: - Global Analytics Properties (DI-normalized)
+
+/// DI-normalized hardest grade sent (0-200 scale)
+var hardestGradeDI: Int {
+        let successfulRoutes = routes.filter { route in
+            route.attempts.contains { $0.status == .send || $0.status == .flash || $0.status == .topped }
+        }
+
+        guard let hardestRoute = successfulRoutes.max(by: { $0.normalizedGrade < $1.normalizedGrade }) else {
+            return 0
+        }
+
+        // Convert normalized grade to DI (multiply by 10 for 0-200 scale)
+        let di = Int(hardestRoute.normalizedGrade * 10)
+        return max(0, min(200, di)) // Clamp to valid range
+    }
+
+    /// DI-normalized median grade sent (0-200 scale)
+    var medianGradeDI: Int {
+        let successfulRoutes = routes.filter { route in
+            route.attempts.contains { $0.status == .send || $0.status == .flash || $0.status == .topped }
+        }.sorted { $0.normalizedGrade < $1.normalizedGrade }
+
+        guard !successfulRoutes.isEmpty else { return 0 }
+
+        let middleIndex = successfulRoutes.count / 2
+        let medianRoute = successfulRoutes.count % 2 == 0 ?
+            successfulRoutes[middleIndex - 1] : successfulRoutes[middleIndex]
+
+        // Convert normalized grade to DI (multiply by 10 for 0-200 scale)
+        let di = Int(medianRoute.normalizedGrade * 10)
+        return max(0, min(200, di)) // Clamp to valid range
+    }
+
+    /// Total sends in session (alias for sessionTotalSends for consistency)
+    var sendCount: Int {
+        sessionTotalSends
+    }
+
+    /// Total attempts in session (alias for sessionTotalAttempts for consistency)
+    var attemptCount: Int {
+        sessionTotalAttempts
+    }
+
+    /// Success percentage (alias for sessionSuccessPercentage for consistency)
+    var sendPercent: Double {
+        sessionSuccessPercentage
+    }
+
+    /// Attempts per send ratio (alias for sessionAttemptsPerSend for consistency)
+    var attemptsPerSend: Double {
+        sessionAttemptsPerSend
+    }
+
+    // MARK: - Summary Metrics Computation
+
+    /// Compute summary metrics for this session
+    func computeSummaryMetrics() -> SessionSummary? {
+        // Include completed, cancelled, and active sessions (for historical data)
+        guard status == .complete || status == .cancelled || status == .active else { return nil }
+
+        return SessionSummary(
+            hardestGradeDI: hardestGradeDI,
+            medianGradeDI: medianGradeDI,
+            sendCount: sendCount,
+            attemptCount: attemptCount,
+            sendPercent: sendPercent,
+            attemptsPerSend: attemptsPerSend,
+            sessionDate: startDate
+        )
+    }
+
 }
