@@ -64,6 +64,8 @@
 		08760D672E6E6C1100E7A584 /* EfficiencyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D5F2E6E6C1100E7A584 /* EfficiencyChart.swift */; };
 		08760D682E6E6C1100E7A584 /* GlobalSessionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D632E6E6C1100E7A584 /* GlobalSessionsView.swift */; };
 		08760D692E6E6C1100E7A584 /* VolumeChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D612E6E6C1100E7A584 /* VolumeChart.swift */; };
+		08760D6B2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D6A2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift */; };
+		08760D6D2E6FCA2000E7A584 /* SessionTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */; };
 		0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1292BAD07E000D31AD3 /* Route.swift */; };
 		0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12B2BAD07E000D31AD3 /* Session.swift */; };
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
@@ -161,6 +163,8 @@
 		08760D602E6E6C1100E7A584 /* ProgressionChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionChart.swift; sourceTree = "<group>"; };
 		08760D612E6E6C1100E7A584 /* VolumeChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeChart.swift; sourceTree = "<group>"; };
 		08760D632E6E6C1100E7A584 /* GlobalSessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalSessionsView.swift; sourceTree = "<group>"; };
+		08760D6A2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAnalyticsView.swift; sourceTree = "<group>"; };
+		08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimelineView.swift; sourceTree = "<group>"; };
 		0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteAttempt.swift; sourceTree = "<group>"; };
 		0896B1292BAD07E000D31AD3 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -226,6 +230,8 @@
 				084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */,
 				084FDAED2AB7F5570015E8EE /* SessionView.swift */,
 				084EAC912E6933000011DD3F /* HapticManager.swift */,
+				08760D6A2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift */,
+				08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */,
 				0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */,
 				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
 				084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */,
@@ -575,6 +581,7 @@
 				084EAC942E69330D0011DD3F /* SessionTabView.swift in Sources */,
 				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,
 				084EAC7C2E669C0A0011DD3F /* WorkoutOrchestrator.swift in Sources */,
+				08760D6D2E6FCA2000E7A584 /* SessionTimelineView.swift in Sources */,
 				0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */,
 				084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */,
 				084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */,
@@ -611,6 +618,7 @@
 				084EACA82E6CE3B60011DD3F /* AttemptHistoryView.swift in Sources */,
 				084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */,
 				084FDAE42AB7E3430015E8EE /* ScrollingSectionView.swift in Sources */,
+				08760D6B2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift in Sources */,
 				084EACB02E6CE3C60011DD3F /* UndoSnackbarView.swift in Sources */,
 				084EAC8A2E672A490011DD3F /* StatCardView.swift in Sources */,
 				0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */,
