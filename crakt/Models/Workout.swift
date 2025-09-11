@@ -550,6 +550,7 @@ struct WorkoutMetrics {
     var hardestGradeAttempted: String? {
         let attempts = workout.sets.flatMap { $0.reps }
             .compactMap { $0.routeAttempt }
+            .filter { $0.route != nil }
 
         return attempts.max { $0.route!.gradeIndex < $1.route!.gradeIndex }?.route?.grade
     }

@@ -7,18 +7,22 @@
 
 import SwiftUI
 import SwiftData
+import Foundation
 
 struct HomeView: View {
     @Query private var user: [User]
-    
+
     @Query(sort: \Session.startDate, order: .reverse)
     var sessions: [Session] = []
-    
+
+    // Navigation
+    @State private var navigationPath = NavigationPath()
+
     // Analytics tracking
     @State private var hasTrackedEmptyStateImpression = false
         
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             ScrollView {
                 VStack(spacing: 24) {
                     // Header Section
@@ -37,7 +41,16 @@ struct HomeView: View {
                         
                         // Start a New Session Section
                         NavigationLink {
-                            SessionConfigView()
+                            SessionConfigView(
+                                onSessionComplete: { completedSession in
+                                    // Navigate to session detail view when session completes
+                                    navigationPath.append(completedSession)
+                                },
+                                onSessionStart: {
+                                    // Reset navigation when session starts
+                                    navigationPath = NavigationPath()
+                                }
+                            )
                         } label: {
                             StartSessionTile()
                         }
@@ -73,6 +86,9 @@ struct HomeView: View {
                 .padding(.top, 16)
             }
             .background(Color(.systemGroupedBackground))
+            .navigationDestination(for: Session.self) { session in
+                SessionDetailView(session: session)
+            }
         }
         .onAppear {
             // Analytics: Track Home View impression
@@ -223,32 +239,35 @@ struct HomeView: View {
     }
     
     private var averageGrade: String {
-        let routes = sessions.flatMap { $0.routes }
-        let grades = routes.compactMap { $0.normalizedGrade }
-        
-        guard !grades.isEmpty else { return "N/A" }
-        
-        let average = grades.reduce(0, +) / Double(grades.count)
-        return formatGrade(average)
+        // Get all successful attempts across all sessions
+        let successfulAttempts = sessions.flatMap { session in
+            session.allAttempts.filter { $0.status == .send || $0.status == .flash || $0.status == .topped }
+        }
+
+        // Get grade indices for successful attempts
+        let gradeIndices = successfulAttempts.compactMap { attempt in
+            attempt.route?.gradeIndex
+        }
+
+        guard !gradeIndices.isEmpty else { return "N/A" }
+
+        // Calculate average grade index
+        let averageIndex = gradeIndices.reduce(0, +) / gradeIndices.count
+
+        // Convert back to grade string using V-Scale as reference
+        if averageIndex >= 0 && averageIndex < VGrade().grades.count {
+            return "V\(VGrade().grades[averageIndex])"
+        } else {
+            return "V\(averageIndex)"
+        }
     }
     
     private var totalHours: Int {
-        let totalSeconds = sessions.reduce(0) { $0 + $1.elapsedTime }
-        return Int(totalSeconds / 3600)
-    }
-    
-    private func formatGrade(_ grade: Double) -> String {
-        // Simple grade formatting - you can enhance this based on your grade system
-        if grade < 1 { return "V0" }
-        if grade < 2 { return "V1" }
-        if grade < 3 { return "V2" }
-        if grade < 4 { return "V3" }
-        if grade < 5 { return "V4" }
-        if grade < 6 { return "V5" }
-        if grade < 7 { return "V6" }
-        if grade < 8 { return "V7" }
-        if grade < 9 { return "V8" }
-        return "V9+"
+        // Calculate actual climbing time based on attempt durations
+        // Estimate 3 minutes (180 seconds) per attempt as average climbing time
+        let totalAttempts = sessions.reduce(0) { $0 + $1.totalAttempts }
+        let estimatedClimbingSeconds = Double(totalAttempts) * 180.0 // 3 minutes per attempt
+        return Int(estimatedClimbingSeconds / 3600.0)
     }
 }
 

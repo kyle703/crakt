@@ -14,7 +14,7 @@ struct UnifiedSessionHeader: View {
     var session: Session
     @ObservedObject var stopwatch: Stopwatch
     var workoutOrchestrator: WorkoutOrchestrator?
-    var onSessionEnd: (() -> Void)?
+    var onSessionEnd: ((Session?) -> Void)?
 
     @Binding var selectedClimbType: ClimbType
     @Binding var selectedGradeSystem: GradeSystem

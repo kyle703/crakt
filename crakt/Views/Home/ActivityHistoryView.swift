@@ -17,9 +17,6 @@ struct ActivityHistoryView: View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
-                    // Weekly Progress Stats Header
-                    WeeklyProgressHeaderView(sessions: sessions)
-                        .padding(.horizontal)
 
                     // List View of Sessions
                     LazyVStack(spacing: 10) {

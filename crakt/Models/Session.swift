@@ -171,9 +171,9 @@ extension Session {
     var highestGrade : String {
         let filteredAttempts = allAttempts.filter {
             $0.status == .topped || $0.status == .send || $0.status == .flash
-        }
+        }.filter { $0.route != nil }
         return filteredAttempts.max { $0.route!.gradeIndex < $1.route!.gradeIndex }?.route?.grade ?? "NA"
-        
+
     }
     
 }

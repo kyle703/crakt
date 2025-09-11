@@ -23,14 +23,14 @@ struct SessionTabView: View {
     private var initialSelectedGrades: [String]?
     private var defaultClimbType: ClimbType
     private var defaultGradeSystem: GradeSystem
-    private var onSessionEnd: (() -> Void)?
+    private var onSessionEnd: ((Session?) -> Void)?
 
     init(session: Session,
          initialWorkoutType: WorkoutType? = nil,
          initialSelectedGrades: [String]? = nil,
          defaultClimbType: ClimbType = .boulder,
          defaultGradeSystem: GradeSystem = .vscale,
-         onSessionEnd: (() -> Void)? = nil) {
+         onSessionEnd: ((Session?) -> Void)? = nil) {
 
         self.session = session
         self.initialWorkoutType = initialWorkoutType
@@ -351,7 +351,13 @@ struct SessionTabView: View {
                                 }
 
                                 Button(action: {
-                                    onSessionEnd?()
+                                    // Mark session as complete and save
+                                    session.status = .complete
+                                    session.endDate = Date()
+                                    session.elapsedTime = session.endDate!.timeIntervalSince(session.startDate)
+
+                                    // Call completion callback with the session
+                                    onSessionEnd?(session)
                                 }) {
                                     HStack(spacing: 8) {
                                         Image(systemName: "stop.circle.fill")

@@ -117,9 +117,9 @@ struct SessionView: View {
     private var initialSelectedGrades: [String]?
     private var defaultClimbType: ClimbType
     private var defaultGradeSystem: GradeSystem
-    private var onSessionEnd: (() -> Void)?
+    private var onSessionEnd: ((Session?) -> Void)?
 
-    init(session: Session, initialWorkoutType: WorkoutType? = nil, initialSelectedGrades: [String]? = nil, defaultClimbType: ClimbType = .boulder, defaultGradeSystem: GradeSystem = .vscale, onSessionEnd: (() -> Void)? = nil) {
+    init(session: Session, initialWorkoutType: WorkoutType? = nil, initialSelectedGrades: [String]? = nil, defaultClimbType: ClimbType = .boulder, defaultGradeSystem: GradeSystem = .vscale, onSessionEnd: ((Session?) -> Void)? = nil) {
         self.session = session
         self.initialWorkoutType = initialWorkoutType
         self.initialSelectedGrades = initialSelectedGrades

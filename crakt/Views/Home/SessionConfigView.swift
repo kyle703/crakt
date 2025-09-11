@@ -32,6 +32,10 @@ struct SessionConfigView: View {
     // Navigation
     @State private var showSession = false
 
+    // Callbacks
+    var onSessionComplete: ((Session) -> Void)?
+    var onSessionStart: (() -> Void)?
+
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
@@ -205,6 +209,12 @@ struct SessionConfigView: View {
         .fullScreenCover(isPresented: $showSession) {
             createSessionView()
         }
+        .onChange(of: showSession) { oldValue, newValue in
+            if newValue {
+                // Session has started - reset navigation
+                onSessionStart?()
+            }
+        }
     }
 
 
@@ -244,9 +254,12 @@ struct SessionConfigView: View {
             initialSelectedGrades: selectedWorkout == .pyramid ? [pyramidStartGrade, pyramidPeakGrade].compactMap { $0 } : [selectedGrade].compactMap { $0 },
             defaultClimbType: selectedClimbType,
             defaultGradeSystem: selectedGradeSystem
-        ) {
-            // Dismiss action - called when session ends
+        ) { completedSession in
+            // Session completed - navigate to session detail view
             showSession = false
+            if let completedSession = completedSession {
+                onSessionComplete?(completedSession)
+            }
         }
 
         return sessionView
