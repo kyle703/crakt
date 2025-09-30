@@ -152,7 +152,7 @@ struct AttemptRowView: View {
 
 struct AttemptHistoryPreview: View {
     var body: some View {
-        let tempContext = try! ModelContainer(for: Route.self, RouteAttempt.self).mainContext
+        let _ = try! ModelContainer(for: Route.self, RouteAttempt.self).mainContext
         let route = Route(gradeSystem: .yds, grade: "5.10a")
 
         // Add some sample attempts

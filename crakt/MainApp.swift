@@ -44,15 +44,35 @@ struct MainApp: App {
             // Nuclear option: Force delete the app's data store
             // Uncomment the lines below if you want to clear all data programmatically
             /*
-            let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            let fileManager = FileManager.default
+            let appSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
             let storeURL = appSupportURL.appendingPathComponent("default.store")
 
             do {
-                try FileManager.default.removeItem(at: storeURL)
-                print("✅ Data store cleared successfully!")
-                print("Please restart the app.")
+                // Remove the existing store file if it exists
+                if fileManager.fileExists(atPath: storeURL.path) {
+                    try fileManager.removeItem(at: storeURL)
+                    print("✅ SwiftData store cleared successfully!")
+                }
+
+                // Also clear any backup stores
+                let backupURLs = [
+                    appSupportURL.appendingPathComponent("default.store-shm"),
+                    appSupportURL.appendingPathComponent("default.store-wal")
+                ]
+
+                for backupURL in backupURLs {
+                    if fileManager.fileExists(atPath: backupURL.path) {
+                        try fileManager.removeItem(at: backupURL)
+                    }
+                }
+
+                print("🔄 Restarting with fresh data...")
+                // Force re-initialization with fresh container
+                fatalError("Data store cleared. Please restart the app to continue with fresh data.")
             } catch {
-                print("Could not clear data store: \(error)")
+                print("Could not clear SwiftData store: \(error)")
+                fatalError("Could not clear data store. Please delete and reinstall the app. Error: \(error)")
             }
             */
 

@@ -18,6 +18,9 @@ class SessionManager: ObservableObject {
         }
     }
 
+    // Track the active session for resume purposes
+    @Published var activeSessionId: UUID?
+
     private var cancellables = Set<AnyCancellable>()
 
     private init() {
@@ -37,13 +40,20 @@ class SessionManager: ObservableObject {
     }
 
     /// Start a climbing session (enables auto-lock prevention)
-    func startSession() {
+    func startSession(sessionId: UUID? = nil) {
+        if let sessionId { activeSessionId = sessionId }
         isSessionActive = true
     }
 
     /// End a climbing session (disables auto-lock prevention)
     func endSession() {
         isSessionActive = false
+        activeSessionId = nil
+    }
+
+    /// Resume an unfinished session by id
+    func resumeSession(sessionId: UUID) {
+        startSession(sessionId: sessionId)
     }
 
     /// Update idle timer based on session state

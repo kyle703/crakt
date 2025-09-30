@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct SessionTabView: View {
     @Environment(\.modelContext) private var modelContext
@@ -60,16 +61,41 @@ struct SessionTabView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Unified Session Header - always visible
-            UnifiedSessionHeader(session: session,
-                                stopwatch: stopwatch,
-                                workoutOrchestrator: workoutOrchestrator,
-                                onSessionEnd: onSessionEnd,
-                                selectedClimbType: $selectedClimbType,
-                                selectedGradeSystem: $selectedGradeSystem,
-                                selectedTab: $selectedTab)
+            // Show warmup mode if session is in warmup phase
+            if session.currentPhase == .warmup {
+                WarmupModeView(session: $session)
+            } else {
+                // Unified Session Header - always visible during main session
+                UnifiedSessionHeader(session: session,
+                                    stopwatch: stopwatch,
+                                    workoutOrchestrator: workoutOrchestrator,
+                                    onSessionEnd: onSessionEnd,
+                                    selectedClimbType: $selectedClimbType,
+                                    selectedGradeSystem: $selectedGradeSystem,
+                                    selectedTab: $selectedTab)
                 .onAppear {
-                    stopwatch.start()
+                    // Set up background/foreground notifications for timer persistence
+                    NotificationCenter.default.addObserver(
+                        forName: UIApplication.willResignActiveNotification,
+                        object: nil,
+                        queue: .main
+                    ) { [weak stopwatch] _ in
+                        stopwatch?.enterBackground()
+                    }
+
+                    NotificationCenter.default.addObserver(
+                        forName: UIApplication.didBecomeActiveNotification,
+                        object: nil,
+                        queue: .main
+                    ) { [weak stopwatch] _ in
+                        stopwatch?.enterForeground()
+                    }
+
+                    // Start stopwatch if not already running
+                    if !stopwatch.isRunning {
+                        stopwatch.start()
+                    }
+
                     workoutOrchestrator.updateModelContext(modelContext)
 
                     // Start initial workout if specified
@@ -87,6 +113,10 @@ struct SessionTabView: View {
                     if session.activeRoute == nil {
                         createInitialRoute()
                     }
+                }
+                .onDisappear {
+                    // Clean up notifications
+                    NotificationCenter.default.removeObserver(self)
                 }
                 .onChange(of: selectedClimbType) {
                     handleClimbTypeChange()
@@ -327,51 +357,38 @@ struct SessionTabView: View {
                             }
                             .padding(.horizontal)
 
-                            // Pause/Resume and End Session buttons
-                            HStack(spacing: 16) {
-                                Button(action: {
-                                    if stopwatch.isRunning {
-                                        stopwatch.stop()
-                                    } else {
-                                        stopwatch.start()
-                                    }
-                                }) {
-                                    HStack(spacing: 8) {
-                                        Image(systemName: stopwatch.isRunning ? "pause.circle.fill" : "play.circle.fill")
-                                            .font(.title2)
-                                        Text(stopwatch.isRunning ? "Pause" : "Resume")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                    }
-                                    .foregroundColor(.blue)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(Color.blue.opacity(0.1))
-                                    .cornerRadius(12)
+                            // End Session button
+                            Button(action: {
+                                // Mark session as complete and persist using helper
+                                let elapsed: TimeInterval
+                                if stopwatch.isRunning {
+                                    stopwatch.stop()
+                                }
+                                elapsed = stopwatch.totalTime > 0 ? stopwatch.totalTime : Date().timeIntervalSince(session.startDate)
+
+                                session.completeSession(context: modelContext, elapsedTime: elapsed)
+
+                                do {
+                                    try modelContext.save()
+                                } catch {
+                                    print("❌ Failed to save completed session: \(error)")
                                 }
 
-                                Button(action: {
-                                    // Mark session as complete and save
-                                    session.status = .complete
-                                    session.endDate = Date()
-                                    session.elapsedTime = session.endDate!.timeIntervalSince(session.startDate)
-
-                                    // Call completion callback with the session
-                                    onSessionEnd?(session)
-                                }) {
-                                    HStack(spacing: 8) {
-                                        Image(systemName: "stop.circle.fill")
-                                            .font(.title2)
-                                        Text("End Session")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                    }
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(Color.red.opacity(0.8))
-                                    .cornerRadius(12)
+                                // Call completion callback with the session
+                                onSessionEnd?(session)
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "stop.circle.fill")
+                                        .font(.title2)
+                                    Text("End Session")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
                                 }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.red.opacity(0.8))
+                                .cornerRadius(12)
                             }
                             .padding(.horizontal)
 
@@ -384,6 +401,7 @@ struct SessionTabView: View {
                     }
                     .padding(.vertical, 16)
                 }
+            }
             }
         }
     }

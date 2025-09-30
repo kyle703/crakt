@@ -22,7 +22,11 @@ struct ActivityHistoryView: View {
                     LazyVStack(spacing: 10) {
                         ForEach(sessions, id: \.id) { session in
                             NavigationLink {
-                                SessionDetailView(session: session)
+                                if session.status == .active {
+                                    SessionView(session: session)
+                                } else {
+                                    SessionDetailView(session: session)
+                                }
                             } label: {
                                 SessionRowCardView(session: session)
                                     .padding(.horizontal)
@@ -313,7 +317,7 @@ struct ContainerStyleModifier: ViewModifier {
         content
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(Color.white.shadow(.drop(radius: 2)))
+                    .fill(Color(.systemBackground).shadow(.drop(radius: 2)))
             )
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UIKit
 
 extension TimeInterval {
     var formatted: String {
@@ -34,9 +35,13 @@ final class Stopwatch: ObservableObject {
     private var startTime: Date?
     private var lapStartTime: Date?
     private var lastStopDate: Date?
+    private var lastBackgroundDate: Date?
 
     // How often to update the stopwatch (in seconds)
     private let updateInterval: TimeInterval = 0.1
+
+    // Background task identifier
+    private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Public API
 
@@ -55,19 +60,14 @@ final class Stopwatch: ObservableObject {
             let pauseDuration = now.timeIntervalSince(lastStopDate)
             startTime = startTime?.addingTimeInterval(pauseDuration)
             lapStartTime = lapStartTime?.addingTimeInterval(pauseDuration)
+        } else if let lastBackgroundDate = lastBackgroundDate {
+            // Resuming after background
+            let backgroundDuration = now.timeIntervalSince(lastBackgroundDate)
+            startTime = startTime?.addingTimeInterval(backgroundDuration)
+            lapStartTime = lapStartTime?.addingTimeInterval(backgroundDuration)
         }
 
-        timer = Timer.scheduledTimer(
-            withTimeInterval: updateInterval,
-            repeats: true
-        ) { [weak self] _ in
-            self?.updateTimes()
-        }
-
-        // Add timer to the main run loop
-        if let timer = timer {
-            RunLoop.main.add(timer, forMode: .common)
-        }
+        startMainTimer()
     }
 
     /// Stops the stopwatch if running.
@@ -77,8 +77,18 @@ final class Stopwatch: ObservableObject {
         updateTimes() // ensure times are up-to-date at stop
         lastStopDate = Date()
 
+        // Stop all timers
         timer?.invalidate()
         timer = nil
+
+        // End background task if active
+        if backgroundTaskID != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = .invalid
+        }
+
+        // Reset background state
+        resetBackgroundState()
     }
 
     /// Resets the stopwatch completely.
@@ -90,6 +100,7 @@ final class Stopwatch: ObservableObject {
         startTime = nil
         lapStartTime = nil
         lastStopDate = nil
+        resetBackgroundState()
     }
 
     /// Records a lap and resets the current lap counter.
@@ -103,7 +114,88 @@ final class Stopwatch: ObservableObject {
         currentLapTime = 0
     }
 
+    /// Called when app enters background
+    func enterBackground() {
+        guard isRunning else { return }
+
+        lastBackgroundDate = Date()
+
+        // End background task if active
+        if backgroundTaskID != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = .invalid
+        }
+
+        // Request background task to continue timer
+        backgroundTaskID = UIApplication.shared.beginBackgroundTask { [weak self] in
+            self?.endBackgroundTask()
+        }
+
+        // Start background timer that updates every minute
+        startBackgroundTimer()
+    }
+
+    /// Called when app enters foreground
+    func enterForeground() {
+        guard isRunning, let lastBackgroundDate = lastBackgroundDate else { return }
+
+        let backgroundDuration = Date().timeIntervalSince(lastBackgroundDate)
+
+        // Adjust start times to account for background duration
+        if let startTime = startTime {
+            self.startTime = startTime.addingTimeInterval(backgroundDuration)
+        }
+        if let lapStartTime = lapStartTime {
+            self.lapStartTime = lapStartTime.addingTimeInterval(backgroundDuration)
+        }
+
+        // End background task
+        if backgroundTaskID != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = .invalid
+        }
+
+        // Stop background timer and resume main timer
+        stopBackgroundTimer()
+        startMainTimer()
+    }
+
+    /// Reset background state
+    func resetBackgroundState() {
+        lastBackgroundDate = nil
+        if backgroundTaskID != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = .invalid
+        }
+    }
+
     // MARK: - Private Helpers
+
+    private func startBackgroundTimer() {
+        // Background timer updates every minute to save battery
+        timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.updateTimesInBackground()
+        }
+    }
+
+    private func stopBackgroundTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func startMainTimer() {
+        timer = Timer.scheduledTimer(
+            withTimeInterval: updateInterval,
+            repeats: true
+        ) { [weak self] _ in
+            self?.updateTimes()
+        }
+
+        // Add timer to the main run loop
+        if let timer = timer {
+            RunLoop.main.add(timer, forMode: .common)
+        }
+    }
 
     private func updateTimes() {
         guard isRunning,
@@ -113,5 +205,27 @@ final class Stopwatch: ObservableObject {
         let now = Date()
         totalTime = now.timeIntervalSince(startTime)
         currentLapTime = now.timeIntervalSince(lapStartTime)
+    }
+
+    private func updateTimesInBackground() {
+        guard isRunning,
+              let startTime = startTime,
+              let lapStartTime = lapStartTime else { return }
+
+        let now = Date()
+        totalTime = now.timeIntervalSince(startTime)
+        currentLapTime = now.timeIntervalSince(lapStartTime)
+
+        // Notify observers of time change
+        DispatchQueue.main.async {
+            self.objectWillChange.send()
+        }
+    }
+
+    private func endBackgroundTask() {
+        if backgroundTaskID != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = .invalid
+        }
     }
 }

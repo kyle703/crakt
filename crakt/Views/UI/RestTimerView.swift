@@ -13,8 +13,10 @@ struct RestTimerView: View {
     let onDismiss: () -> Void
 
     @State private var timeRemaining: TimeInterval
+    @State private var timeElapsed: TimeInterval = 0
     @State private var timer: Timer?
-    @State private var isActive = true
+    @State private var isCountingUp = false
+    @State private var restStartTime: Date?
 
     init(duration: TimeInterval, onComplete: @escaping () -> Void, onDismiss: @escaping () -> Void) {
         self.duration = duration
@@ -24,14 +26,26 @@ struct RestTimerView: View {
     }
 
     private var progress: Double {
-        1.0 - (timeRemaining / duration)
+        if isCountingUp {
+            // When overtime, keep the ring full (1.0)
+            1.0
+        } else {
+            1.0 - (timeRemaining / duration)
+        }
+    }
+
+    private var progressColor: Color {
+        isCountingUp ? Color.red : Color.green
     }
 
     private var timeString: String {
-        let minutes = Int(timeRemaining) / 60
-        let seconds = Int(timeRemaining) % 60
-        return String(format: "%d:%02d", minutes, seconds)
+        let totalSeconds = isCountingUp ? Int(timeElapsed) : Int(timeRemaining)
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        let prefix = isCountingUp ? "+" : ""
+        return String(format: "%@%d:%02d", prefix, minutes, seconds)
     }
+
 
     var body: some View {
         ZStack {
@@ -61,45 +75,26 @@ struct RestTimerView: View {
                     // Progress circle
                     Circle()
                         .trim(from: 0, to: progress)
-                        .stroke(Color.green, lineWidth: 8)
+                        .stroke(progressColor, lineWidth: 8)
                         .frame(width: 200, height: 200)
                         .rotationEffect(.degrees(-90))
-                        .animation(.easeInOut(duration: 1), value: progress)
+                        .animation(.easeInOut(duration: 0.3), value: progress)
+                        .scaleEffect(isCountingUp ? (1.0 + 0.05 * sin(Date().timeIntervalSince1970 * 6)) : 1.0)
 
                     // Time display
-                    VStack(spacing: 8) {
-                        Text(timeString)
-                            .font(.system(size: 48, weight: .bold, design: .monospaced))
-                            .foregroundColor(.white)
-
-                        Text("remaining")
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.8))
-                    }
+                    Text(timeString)
+                        .font(.system(size: 48, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
                 }
 
-                // Control buttons
-                HStack(spacing: 40) {
-                    Button(action: {
-                        if isActive {
-                            pauseTimer()
-                        } else {
-                            resumeTimer()
-                        }
-                    }) {
-                        Image(systemName: isActive ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 44))
-                            .foregroundColor(.white)
-                    }
-
-                    Button(action: {
-                        stopTimer()
-                        onDismiss()
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 44))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
+                // Dismiss button
+                Button(action: {
+                    stopTimer()
+                    onDismiss()
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 44))
+                        .foregroundColor(.white.opacity(0.7))
                 }
             }
             .padding(.horizontal, 32)
@@ -113,41 +108,31 @@ struct RestTimerView: View {
     }
 
     private func startTimer() {
+        restStartTime = Date()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if timeRemaining > 0 {
-                timeRemaining -= 1
+            if !isCountingUp {
+                if timeRemaining > 0 {
+                    timeRemaining -= 1
+                } else {
+                    // Switch to count-up mode when timer reaches 0
+                    isCountingUp = true
+                    timeElapsed = 0
+                }
             } else {
-                timer?.invalidate()
-                timer = nil
-                HapticManager.shared.playSuccess()
-                onComplete()
+                timeElapsed += 1
             }
         }
-    }
-
-    private func pauseTimer() {
-        timer?.invalidate()
-        timer = nil
-        isActive = false
-        HapticManager.shared.playAttempt()
-    }
-
-    private func resumeTimer() {
-        isActive = true
-        startTimer()
-        HapticManager.shared.playAttempt()
     }
 
     private func stopTimer() {
         timer?.invalidate()
         timer = nil
-        isActive = false
     }
 }
 
 #Preview {
     RestTimerView(
-        duration: 120, // 2 minutes
+        duration: 10, // 10 seconds for testing
         onComplete: {
             print("Rest timer completed")
         },

@@ -8,6 +8,65 @@
 import SwiftUI
 import SwiftData
 
+struct ExerciseSelectionCard: View {
+    let exercise: WarmupExercise
+    let isSelected: Bool
+    let onToggle: (Bool) -> Void
+
+    var body: some View {
+        Button(action: {
+            onToggle(!isSelected)
+        }) {
+            HStack(spacing: 12) {
+                // Exercise icon
+                Image(systemName: exercise.type.iconName)
+                    .font(.title3)
+                    .foregroundColor(isSelected ? exercise.type.color : .gray)
+                    .frame(width: 32, height: 32)
+                    .background(
+                        Circle()
+                            .fill(isSelected ? exercise.type.color.opacity(0.15) : Color.gray.opacity(0.1))
+                    )
+
+                // Exercise details
+                VStack(alignment: .leading, spacing: 2) {
+                    // Exercise name
+                    Text(exercise.name)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(isSelected ? .primary : .secondary)
+                        .lineLimit(1)
+
+                    // Duration inline
+                    Text("\(Int(exercise.duration / 60))m")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                // Selection indicator
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(exercise.type.color)
+                        .font(.title3)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(isSelected ? Color.blue.opacity(0.05) : Color(.systemBackground))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2), lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct SessionConfigView: View {
     @Environment(\.modelContext) private var modelContext
 
@@ -26,177 +85,290 @@ struct SessionConfigView: View {
     @State private var problemCount: Int = 4
     @State private var sessionDuration: TimeInterval = 30 * 60 // 30 minutes
 
+    // Warm-up configuration
+    @State private var isWarmupEnabled = false
+    @State private var selectedWarmupExercises: [WarmupExercise] = WarmupExercise.defaultExercises
+
     // Location
     @State private var gymName: String = ""
 
     // Navigation
     @State private var showSession = false
+    @State private var showResumeAlert = false
+    @State private var unfinishedSession: Session?
 
     // Callbacks
     var onSessionComplete: ((Session) -> Void)?
     var onSessionStart: (() -> Void)?
+
+    // MARK: - View Components
+
+    private var locationSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Location")
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            VStack(spacing: 12) {
+                TextField("Gym Name (optional)", text: $gymName)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.horizontal, 4)
+
+                HStack {
+                    Image(systemName: "location.fill")
+                        .foregroundColor(.blue)
+                    Text("Use Current Location")
+                        .foregroundColor(.blue)
+                        .font(.subheadline)
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(8)
+                .onTapGesture {
+                    // TODO: Implement location services
+                }
+            }
+        }
+    }
+
+    private var climbingSetupSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Climbing Setup")
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            // Climb Type Toggle
+            ClimbTypeToggle(selectedType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
+        }
+    }
+
+    private var sessionTypeSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Session Type")
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            VStack(spacing: 12) {
+                ForEach(SessionType.allCases, id: \.self) { type in
+                    SessionTypeCard(
+                        type: type,
+                        isSelected: sessionType == type,
+                        action: { sessionType = type }
+                    )
+                }
+            }
+        }
+    }
+
+    private var workoutSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Choose Your Workout")
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            // Filter workouts by current climb type
+            let filteredWorkouts = WorkoutType.allCases.filter { workout in
+                workout.category == .both ||
+                (selectedClimbType == .boulder ? workout.category == .bouldering : workout.category == .ropes)
+            }
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                ForEach(filteredWorkouts, id: \.self) { workout in
+                    WorkoutTypeCard(
+                        workout: workout,
+                        isSelected: selectedWorkout == workout,
+                        action: {
+                            selectedWorkout = workout
+                            // Scroll to workout settings after a short delay
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    // proxy.scrollTo("workoutSettings", anchor: .top)
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private var workoutSettingsSection: some View {
+        Group {
+            if let workout = selectedWorkout {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Workout Header with Title and Icon
+                    HStack(spacing: 12) {
+                        Image(systemName: workout.icon)
+                            .font(.title2)
+                            .foregroundColor(.orange)
+                            .frame(width: 40, height: 40)
+                            .background(
+                                Circle()
+                                    .fill(Color.orange.opacity(0.15))
+                            )
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(workout.shortDescription)
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+
+                            Text(workout.category == .bouldering ? "Bouldering Workout" : "Rope Climbing Workout")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.vertical, 8)
+
+                    WorkoutDetailsSection(
+                        workout: workout,
+                        selectedGrade: $selectedGrade,
+                        pyramidStartGrade: $pyramidStartGrade,
+                        pyramidPeakGrade: $pyramidPeakGrade,
+                        selectedGradeSystem: selectedGradeSystem,
+                        problemCount: $problemCount,
+                        sessionDuration: $sessionDuration
+                    )
+                }
+                .id("workoutSettings")
+            }
+        }
+    }
+
+    private var warmupSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Warm-up")
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            // Warm-up toggle
+            Toggle("Include warm-up routine", isOn: $isWarmupEnabled)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+                .tint(.blue)
+
+            // Exercise selection - only show when warm-up is enabled
+            if isWarmupEnabled {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Select exercises to include in your warm-up routine")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                    // Exercise selection rows
+                    VStack(spacing: 8) {
+                        ForEach(WarmupExercise.allExercises, id: \.id) { exercise in
+                            ExerciseSelectionCard(
+                                exercise: exercise,
+                                isSelected: selectedWarmupExercises.contains(exercise),
+                                onToggle: { isSelected in
+                                    if isSelected {
+                                        if !selectedWarmupExercises.contains(where: { $0.id == exercise.id }) {
+                                            selectedWarmupExercises.append(exercise)
+                                        }
+                                    } else {
+                                        selectedWarmupExercises.removeAll { $0.id == exercise.id }
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var startSessionButton: some View {
+        Button(action: startSession) {
+            Text("Start Climbing")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    LinearGradient(
+                        colors: [.blue, .blue.opacity(0.8)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(16)
+                .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
+        }
+        .disabled(sessionType == .workout && selectedWorkout == nil)
+        .padding(.horizontal, 4)
+    }
 
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Gym Information
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Location")
-                                .font(.headline)
-                                .foregroundColor(.primary)
+                        locationSection
 
-                            VStack(spacing: 12) {
-                                TextField("Gym Name (optional)", text: $gymName)
-                                    .textFieldStyle(.roundedBorder)
-                                    .padding(.horizontal, 4)
+                        climbingSetupSection
 
-                                HStack {
-                                    Image(systemName: "location.fill")
-                                        .foregroundColor(.blue)
-                                    Text("Use Current Location")
-                                        .foregroundColor(.blue)
-                                        .font(.subheadline)
-                                }
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 12)
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(8)
-                                .onTapGesture {
-                                    // TODO: Implement location services
-                                }
-                            }
+                        sessionTypeSection
+
+                        // Workout Selection (if workout type selected)
+                        if sessionType == .workout {
+                            workoutSection
+
+                            workoutSettingsSection
                         }
 
-                    // Climbing Type and Grade System at the top
+                    // Warm-up Configuration
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Climbing Setup")
+                        Text("Warm-up")
                             .font(.headline)
                             .foregroundColor(.primary)
 
-                        // Climb Type Toggle
-                        ClimbTypeToggle(selectedType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
-                    }
-
-                    // Session Type Selection
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Session Type")
-                            .font(.headline)
+                        // Warm-up toggle
+                        Toggle("Include warm-up routine", isOn: $isWarmupEnabled)
+                            .font(.subheadline)
                             .foregroundColor(.primary)
+                            .tint(.blue)
 
-                        VStack(spacing: 12) {
-                            ForEach(SessionType.allCases, id: \.self) { type in
-                                SessionTypeCard(
-                                    type: type,
-                                    isSelected: sessionType == type,
-                                    action: { sessionType = type }
-                                )
-                            }
-                        }
-                    }
+                        // Exercise selection - only show when warm-up is enabled
+                        if isWarmupEnabled {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Select exercises to include in your warm-up routine")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
 
-                    // Workout Selection (if workout type selected)
-                    if sessionType == .workout {
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Choose Your Workout")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-
-                            // Filter workouts by current climb type
-                            let filteredWorkouts = WorkoutType.allCases.filter { workout in
-                                workout.category == .both ||
-                                (selectedClimbType == .boulder ? workout.category == .bouldering : workout.category == .ropes)
-                            }
-
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                                ForEach(filteredWorkouts, id: \.self) { workout in
-                                    WorkoutTypeCard(
-                                        workout: workout,
-                                        isSelected: selectedWorkout == workout,
-                                        action: {
-                                            selectedWorkout = workout
-                                            // Scroll to workout settings after a short delay
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                withAnimation(.easeInOut(duration: 0.5)) {
-                                                    proxy.scrollTo("workoutSettings", anchor: .top)
+                                // Exercise selection rows
+                                VStack(spacing: 8) {
+                                    ForEach(WarmupExercise.allExercises, id: \.id) { exercise in
+                                        ExerciseSelectionCard(
+                                            exercise: exercise,
+                                            isSelected: selectedWarmupExercises.contains(exercise),
+                                            onToggle: { isSelected in
+                                                if isSelected {
+                                                    if !selectedWarmupExercises.contains(exercise) {
+                                                        selectedWarmupExercises.append(exercise)
+                                                    }
+                                                } else {
+                                                    selectedWarmupExercises.removeAll { $0.id == exercise.id }
                                                 }
                                             }
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        // Workout-specific settings
-                        if let workout = selectedWorkout {
-                            VStack(alignment: .leading, spacing: 20) {
-                                // Workout Header with Title and Icon
-                                HStack(spacing: 12) {
-                                    Image(systemName: workout.icon)
-                                        .font(.title2)
-                                        .foregroundColor(.orange)
-                                        .frame(width: 40, height: 40)
-                                        .background(
-                                            Circle()
-                                                .fill(Color.orange.opacity(0.15))
                                         )
-
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(workout.shortDescription)
-                                            .font(.title2)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.primary)
-
-                                        Text(workout.category == .bouldering ? "Bouldering Workout" : "Rope Climbing Workout")
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
                                     }
-
-                                    Spacer()
                                 }
-                                .padding(.vertical, 8)
-
-                                WorkoutDetailsSection(
-                                    workout: workout,
-                                    selectedGrade: $selectedGrade,
-                                    pyramidStartGrade: $pyramidStartGrade,
-                                    pyramidPeakGrade: $pyramidPeakGrade,
-                                    selectedGradeSystem: selectedGradeSystem,
-                                    problemCount: $problemCount,
-                                    sessionDuration: $sessionDuration
-                                )
-
-                                
                             }
-                            .id("workoutSettings")
                         }
                     }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.05), radius: 4)
 
-                    
+                        Spacer(minLength: 40)
 
-                    Spacer(minLength: 40)
-
-                    // Start Session Button
-                    Button(action: startSession) {
-                        Text("Start Climbing")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(
-                                LinearGradient(
-                                    colors: [.blue, .blue.opacity(0.8)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(16)
-                            .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
-                    }
-                    .disabled(sessionType == .workout && selectedWorkout == nil)
-                    .padding(.horizontal, 4)
+                        // Start Session Button
+                        startSessionButton
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
@@ -205,9 +377,34 @@ struct SessionConfigView: View {
         }
         .navigationTitle("Start Session")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: startSession) {
+                    Text("Start Climbing")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                }
+                .disabled(sessionType == .workout && selectedWorkout == nil)
+            }
+        }
         }
         .fullScreenCover(isPresented: $showSession) {
             createSessionView()
+        }
+        .alert("Resume your last session?", isPresented: $showResumeAlert, presenting: unfinishedSession) { session in
+            Button("Resume") {
+                // Resume existing session
+                showSession = true
+            }
+            Button("Finish & Start New", role: .destructive) {
+                // Finish the existing session before starting a new one
+                finishSession(session)
+                showSession = true
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { session in
+            Text("You have an unfinished session from \(formatDate(session.startDate)). Would you like to resume or finish it?")
         }
         .onChange(of: showSession) { oldValue, newValue in
             if newValue {
@@ -220,12 +417,49 @@ struct SessionConfigView: View {
 
 
     private func startSession() {
-        showSession = true
+        // Check for unfinished session
+        if let active = findActiveSession() {
+            unfinishedSession = active
+            showResumeAlert = true
+        } else {
+            showSession = true
+        }
     }
 
     private func createSessionView() -> some View {
-        // Create session with configuration
-        let session = Session()
+        // Reuse unfinished session if resuming
+        let session = unfinishedSession ?? Session()
+
+        // Warm-up setup
+        if isWarmupEnabled {
+            let orderedExercises = selectedWarmupExercises.sorted(by: { lhs, rhs in
+                if lhs.type == rhs.type {
+                    return lhs.name < rhs.name
+                }
+                return lhs.type.sortOrder < rhs.type.sortOrder
+            })
+
+            if !orderedExercises.isEmpty {
+                session.currentPhase = .warmup
+                session.warmupStartTime = Date()
+                session.warmupExercises = orderedExercises.map { source in
+                    WarmupExercise(
+                        id: source.id,
+                        name: source.name,
+                        type: source.type,
+                        duration: source.duration,
+                        exerciseDescription: source.exerciseDescription,
+                        instructions: source.instructions,
+                        isCustom: source.isCustom,
+                        order: source.type.sortOrder
+                    )
+                }
+            } else {
+                session.currentPhase = .main
+            }
+        } else {
+            session.currentPhase = .main
+        }
         session.climbType = selectedClimbType
         session.gradeSystem = selectedGradeSystem
         if !gymName.isEmpty {
@@ -239,12 +473,14 @@ struct SessionConfigView: View {
         print("  - Session climbType: \(session.climbType ?? .boulder)")
         print("  - Session gradeSystem: \(session.gradeSystem ?? .vscale)")
 
-        // Save the session to ensure it's properly persisted
-        do {
-            try modelContext.save()
-            print("💾 Session saved successfully")
-        } catch {
-            print("❌ Failed to save session: \(error)")
+        // Save only when creating a new session
+        if unfinishedSession == nil {
+            do {
+                try modelContext.save()
+                print("💾 Session saved successfully")
+            } catch {
+                print("❌ Failed to save session: \(error)")
+            }
         }
 
         // Create the session view with defaults for nil values
@@ -263,6 +499,38 @@ struct SessionConfigView: View {
         }
 
         return sessionView
+    }
+
+    private func findActiveSession() -> Session? {
+        // Workaround: SwiftData predicate macros can struggle with enum cases
+        // Fetch recent sessions then filter in memory
+        var descriptor = FetchDescriptor<Session>(
+            sortBy: [SortDescriptor(\.startDate, order: .reverse)]
+        )
+        descriptor.fetchLimit = 25
+        if let results = try? modelContext.fetch(descriptor) {
+            return results.first { $0.status == .active }
+        }
+        return nil
+    }
+
+    private func finishSession(_ session: Session) {
+        let elapsed = Date().timeIntervalSince(session.startDate)
+        session.completeSession(context: modelContext, elapsedTime: elapsed)
+        do {
+            try modelContext.save()
+        } catch {
+            print("❌ Failed to finish existing session: \(error)")
+        }
+        // Clear unfinished reference so createSessionView builds a new one
+        unfinishedSession = nil
+    }
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 }
 

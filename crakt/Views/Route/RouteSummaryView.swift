@@ -23,7 +23,7 @@ struct RouteSummaryView: View {
                     .foregroundColor(.black)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.white)
+                    .background(Color(.systemBackground))
                     .cornerRadius(8)
                 
                 Spacer()
@@ -40,7 +40,7 @@ struct RouteSummaryView: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 6)
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                         .cornerRadius(8)
                     }
                 }

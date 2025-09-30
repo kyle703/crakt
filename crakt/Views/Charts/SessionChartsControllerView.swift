@@ -25,12 +25,12 @@ struct SessionChartsControllerView: View {
     }
 
     private var totalClimbingTime: TimeInterval {
+        // Use session elapsed time minus estimated rest periods for active climbing time
         let attempts = session.allAttempts.sorted { $0.date < $1.date }
-        guard attempts.count > 1 else { return 0 }
+        guard attempts.count > 1 else { return session.elapsedTime }
 
-        let totalSpan = attempts.last!.date.timeIntervalSince(attempts.first!.date)
         let estimatedRestTime = Double(attempts.count - 1) * 180.0 // Default 3min rest
-        return max(0, totalSpan - estimatedRestTime)
+        return max(0, session.elapsedTime - estimatedRestTime)
     }
 
     private var hardestGradeSent: String? {

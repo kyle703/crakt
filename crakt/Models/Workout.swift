@@ -262,7 +262,7 @@ enum WorkoutStatus: Int, Codable {
 @Model
 class Workout {
     var id: UUID
-    var session: Session
+    var session: Session?
     var type: WorkoutType
     var status: WorkoutStatus = WorkoutStatus.active
     var startedAt: Date

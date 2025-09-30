@@ -16,6 +16,12 @@ enum SessionStatus: Int, Codable {
     case cancelled = 2
 }
 
+enum SessionPhase: String, Codable {
+    case warmup = "Warm-up"
+    case main = "Main Session"
+    case complete = "Complete"
+}
+
 extension SessionStatus: CustomStringConvertible {
     public var description: String {
         switch self {
@@ -44,6 +50,9 @@ class Session {
     @Relationship(deleteRule: .cascade, inverse: \Workout.session)
     var workouts: [Workout] = []
 
+    @Relationship(deleteRule: .cascade, inverse: \WarmupExercise.session)
+    var warmupExercisesList: [WarmupExercise] = []
+
     var activeRoute: Route?
     var activeWorkout: Workout?
 
@@ -51,6 +60,13 @@ class Session {
     var climbType: ClimbType?
     var gradeSystem: GradeSystem?
     var gymName: String?
+
+    // Warm-up state
+    var currentPhase: SessionPhase?
+    var warmupExercises: [WarmupExercise] = []
+    var currentWarmupExerciseIndex: Int = 0
+    var warmupStartTime: Date?
+    var warmupCompleted: Bool = false
 
     // ----
     var sessionDescription = "Peak RVA"

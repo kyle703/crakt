@@ -276,12 +276,12 @@ struct VGrade: GradeProtocol {
     
     
     let system: GradeSystem = .vscale
-    let grades: [String] = ["VB", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"]
+    let grades: [String] = ["B", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"]
     
     
 
     let colorMap: [String: Color] = [
-        "VB": Color.blue,
+        "B": Color.blue,
         "0": Color.blue, // Previously [Color.blue, Color.green]
         "1": Color.green,
         "2": Color.green, // Previously [Color.green, Color.yellow]

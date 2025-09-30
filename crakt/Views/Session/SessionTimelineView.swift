@@ -23,11 +23,35 @@ struct SessionTimelineView: View {
             subtitle: "Warm-up and preparation"
         ))
 
-        // Process all attempts in chronological order
+        // Process all attempts in chronological order, inserting a route header before the first attempt of each route
         let allAttempts = session.allAttempts.sorted { $0.date < $1.date }
+        var lastRouteId: UUID?
 
         for (index, attempt) in allAttempts.enumerated() {
             if let route = attempt.route {
+                // Insert header when route changes
+                if lastRouteId != route.id {
+                    lastRouteId = route.id
+                    // Build header title and subtitle
+                    let headerTitle = route.grade ?? "Unknown Grade"
+                    var headerSubtitleParts: [String] = []
+                    if !route.styles.isEmpty {
+                        headerSubtitleParts.append(route.styles.map { $0.description }.joined(separator: ", "))
+                    }
+                    if !route.experiences.isEmpty {
+                        headerSubtitleParts.append(route.experiences.map { $0.description }.joined(separator: ", "))
+                    }
+                    let headerSubtitle = headerSubtitleParts.joined(separator: " • ")
+
+                    events.append(TimelineEvent(
+                        type: .routeHeader,
+                        timestamp: attempt.date,
+                        title: headerTitle,
+                        subtitle: headerSubtitle.isEmpty ? "Route details" : headerSubtitle,
+                        route: route,
+                        attempt: nil
+                    ))
+                }
                 events.append(TimelineEvent(
                     type: .attempt,
                     timestamp: attempt.date,
@@ -203,6 +227,7 @@ struct TimelineEvent: Identifiable {
 
 enum TimelineEventType {
     case sessionStart
+    case routeHeader
     case attempt
     case rest
     case sessionEnd
@@ -210,6 +235,7 @@ enum TimelineEventType {
     var color: Color {
         switch self {
         case .sessionStart: return .green
+        case .routeHeader: return .blue
         case .attempt: return .blue
         case .rest: return .orange
         case .sessionEnd: return .red
@@ -219,6 +245,7 @@ enum TimelineEventType {
     var icon: String {
         switch self {
         case .sessionStart: return "play.circle.fill"
+        case .routeHeader: return "tag.fill"
         case .attempt: return "figure.climbing"
         case .rest: return "pause.circle.fill"
         case .sessionEnd: return "stop.circle.fill"
@@ -231,6 +258,17 @@ struct TimelineRow: View {
     let isLast: Bool
 
     @State private var isExpanded: Bool = false
+
+    private func styleSummary(route: Route) -> String {
+        var parts: [String] = []
+        if !route.styles.isEmpty {
+            parts.append(route.styles.map { $0.description }.joined(separator: ", "))
+        }
+        if !route.experiences.isEmpty {
+            parts.append(route.experiences.map { $0.description }.joined(separator: ", "))
+        }
+        return parts.joined(separator: " • ")
+    }
 
     private func formatDuration(_ interval: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
@@ -253,7 +291,7 @@ struct TimelineRow: View {
 
                 // Event dot
                 Circle()
-                    .fill(event.type.color)
+                    .fill(event.type == .routeHeader ? Color.gray.opacity(0.4) : event.type.color)
                     .frame(width: 12, height: 12)
                     .overlay(
                         Image(systemName: event.type.icon)
@@ -279,17 +317,20 @@ struct TimelineRow: View {
 
                     Spacer()
 
-                    Text(formatTime(event.timestamp))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 2)
+                    if event.type != .routeHeader {
+                        Text(formatTime(event.timestamp))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 2)
+                    }
                 }
 
-                // Route details for attempts
-                if event.type == .attempt, let route = event.route, let attempt = event.attempt {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(spacing: 8) {
-                            // Grade badge
+                // Route header details (compact, divider-like)
+                if event.type == .routeHeader, let route = event.route {
+                    VStack(alignment: .leading, spacing: 8) {
+                        // Line 1: Grade chip + route experience icons (including difficulty rating)
+                        HStack(alignment: .center, spacing: 8) {
+                            // Grade chip
                             Text(route.grade ?? "Unknown")
                                 .font(.caption)
                                 .fontWeight(.bold)
@@ -298,26 +339,77 @@ struct TimelineRow: View {
                                 .background(route.gradeColor.opacity(0.2))
                                 .cornerRadius(4)
 
-                            // Attempt status
-                            HStack(spacing: 4) {
-                                Image(systemName: attempt.status.iconName)
-                                    .foregroundColor(attempt.status.color)
-                                    .font(.caption)
-                                Text(attempt.status.description)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                            // Experience icons row (decorative only)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    if let latestRating = route.attempts.sorted(by: { $0.date > $1.date }).first?.difficultyRating {
+                                        Image(systemName: latestRating.iconName)
+                                            .foregroundColor(latestRating.color)
+                                            .font(.caption2)
+                                            .padding(4)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 6)
+                                                    .stroke(latestRating.color.opacity(0.4), lineWidth: 1)
+                                            )
+                                    }
+
+                                    ForEach(route.experiences, id: \.self) { exp in
+                                        Image(systemName: exp.iconName)
+                                            .foregroundColor(exp.color)
+                                            .font(.caption2)
+                                            .padding(4)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 6)
+                                                    .stroke(exp.color.opacity(0.4), lineWidth: 1)
+                                            )
+                                    }
+                                }
                             }
+
+                            Spacer(minLength: 0)
                         }
 
-                        // Route stats
-                        HStack(spacing: 12) {
-                            if let firstAttemptDate = route.firstAttemptDate {
-                                Text("Route time: \(formatDuration(attempt.date.timeIntervalSince(firstAttemptDate)))")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
+                        // Line 2: outlined route style chips only
+                        if !route.styles.isEmpty {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    ForEach(route.styles, id: \.self) { style in
+                                        Text(style.description)
+                                            .font(.caption2)
+                                            .foregroundColor(style.color)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(style.color, lineWidth: 1)
+                                            )
+                                    }
+                                }
                             }
+                        }
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 8)
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(8)
+                }
 
-                            Text("\(route.attempts.count) total attempts")
+                // Route details for attempts (lean)
+                if event.type == .attempt, let route = event.route, let attempt = event.attempt {
+                    VStack(alignment: .leading, spacing: 6) {
+                        // Attempt status only; grade is shown in header
+                        HStack(spacing: 6) {
+                            Image(systemName: attempt.status.iconName)
+                                .foregroundColor(attempt.status.color)
+                                .font(.caption)
+                            Text(attempt.status.description)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                        }
+
+                        // Minimal metadata (consider showing only on last attempt; for now keep light)
+                        if let firstAttemptDate = route.firstAttemptDate {
+                            Text("Route time: \(formatDuration(attempt.date.timeIntervalSince(firstAttemptDate)))")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -328,7 +420,7 @@ struct TimelineRow: View {
                 }
 
                 // Rest period details
-                if event.type == .rest, let duration = event.duration {
+                if event.type == .rest, let _ = event.duration {
                     HStack {
                         Image(systemName: "pause.fill")
                             .font(.caption)

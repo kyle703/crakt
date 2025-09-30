@@ -31,8 +31,8 @@ struct AttemptsList: View {
                 }
                 .padding(.vertical, 6)
                 .padding(.horizontal, 8)
-                // White background for each row
-                .background(Color.white)
+                // System background for each row (supports dark mode)
+                .background(Color(.systemBackground))
                 .cornerRadius(8)
             }
         }

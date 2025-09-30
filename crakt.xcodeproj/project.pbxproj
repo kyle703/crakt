@@ -66,6 +66,10 @@
 		08760D692E6E6C1100E7A584 /* VolumeChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D612E6E6C1100E7A584 /* VolumeChart.swift */; };
 		08760D6B2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D6A2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift */; };
 		08760D6D2E6FCA2000E7A584 /* SessionTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */; };
+		088B9AE62E883BA90084C3F0 /* WarmupModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AE52E883BA80084C3F0 /* WarmupModeView.swift */; };
+		088B9AE82E883BC90084C3F0 /* RouteStylePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AE72E883BC90084C3F0 /* RouteStylePicker.swift */; };
+		088B9AEA2E883BF00084C3F0 /* WarmupExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AE92E883BF00084C3F0 /* WarmupExercise.swift */; };
+		088B9AEC2E883C100084C3F0 /* DifficultyRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AEB2E883C100084C3F0 /* DifficultyRatingView.swift */; };
 		0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1292BAD07E000D31AD3 /* Route.swift */; };
 		0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12B2BAD07E000D31AD3 /* Session.swift */; };
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
@@ -165,6 +169,10 @@
 		08760D632E6E6C1100E7A584 /* GlobalSessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalSessionsView.swift; sourceTree = "<group>"; };
 		08760D6A2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceAnalyticsView.swift; sourceTree = "<group>"; };
 		08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionTimelineView.swift; sourceTree = "<group>"; };
+		088B9AE52E883BA80084C3F0 /* WarmupModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmupModeView.swift; sourceTree = "<group>"; };
+		088B9AE72E883BC90084C3F0 /* RouteStylePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteStylePicker.swift; sourceTree = "<group>"; };
+		088B9AE92E883BF00084C3F0 /* WarmupExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmupExercise.swift; sourceTree = "<group>"; };
+		088B9AEB2E883C100084C3F0 /* DifficultyRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyRatingView.swift; sourceTree = "<group>"; };
 		0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteAttempt.swift; sourceTree = "<group>"; };
 		0896B1292BAD07E000D31AD3 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -234,9 +242,11 @@
 				08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */,
 				0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */,
 				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
+				088B9AEB2E883C100084C3F0 /* DifficultyRatingView.swift */,
 				084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */,
 				084EAC8D2E6932F30011DD3F /* SessionManager.swift */,
 				084EAC932E69330D0011DD3F /* SessionTabView.swift */,
+				088B9AE52E883BA80084C3F0 /* WarmupModeView.swift */,
 				084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */,
 				084FA4B82ABF581B00ADF994 /* PickerMenu.swift */,
 				084FA4B62ABF57E900ADF994 /* OutlineButton.swift */,
@@ -329,6 +339,7 @@
 				084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */,
 				084FDAE32AB7E3430015E8EE /* ScrollingSectionView.swift */,
 				084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */,
+				088B9AE72E883BC90084C3F0 /* RouteStylePicker.swift */,
 				084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */,
 			);
 			path = Selectors;
@@ -357,6 +368,7 @@
 				084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */,
 				084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */,
 				084EAC7D2E669C140011DD3F /* Workout.swift */,
+				088B9AE92E883BF00084C3F0 /* WarmupExercise.swift */,
 				084EAC7B2E669C0A0011DD3F /* WorkoutOrchestrator.swift */,
 			);
 			path = Models;
@@ -606,9 +618,11 @@
 				084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */,
 				08760D652E6E6C1100E7A584 /* ProgressionChart.swift in Sources */,
 				08760D662E6E6C1100E7A584 /* DistributionChart.swift in Sources */,
+				088B9AE62E883BA90084C3F0 /* WarmupModeView.swift in Sources */,
 				08760D672E6E6C1100E7A584 /* EfficiencyChart.swift in Sources */,
 				08760D682E6E6C1100E7A584 /* GlobalSessionsView.swift in Sources */,
 				08760D692E6E6C1100E7A584 /* VolumeChart.swift in Sources */,
+				088B9AEA2E883BF00084C3F0 /* WarmupExercise.swift in Sources */,
 				084EAC7E2E669C140011DD3F /* Workout.swift in Sources */,
 				084EACA62E6CE3A60011DD3F /* ActiveRouteCardView.swift in Sources */,
 				084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */,
@@ -621,6 +635,8 @@
 				08760D6B2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift in Sources */,
 				084EACB02E6CE3C60011DD3F /* UndoSnackbarView.swift in Sources */,
 				084EAC8A2E672A490011DD3F /* StatCardView.swift in Sources */,
+				088B9AE82E883BC90084C3F0 /* RouteStylePicker.swift in Sources */,
+				088B9AEC2E883C100084C3F0 /* DifficultyRatingView.swift in Sources */,
 				0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */,
 				084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */,
 				08C3EF2A2E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift in Sources */,

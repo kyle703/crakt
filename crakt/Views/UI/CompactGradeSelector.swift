@@ -11,85 +11,123 @@ import SwiftData
 struct CompactGradeSelector: View {
     var gradeSystem: any GradeProtocol
     @Binding var selectedGrade: String?
+    var isLocked: Bool = false
 
     @State private var isExpanded = false
+    @State private var showLockedAlert = false
+    @State private var wiggleTrigger = false
 
     var body: some View {
-        VStack(spacing: 16) {
+        // Fixed height container to prevent layout shifts
+        ZStack {
             if !isExpanded {
-                // Compact view
-                Button(action: {
-                    withAnimation(.spring()) {
-                        isExpanded = true
-                    }
-                }) {
-                    ZStack {
-                        if let selectedGrade = selectedGrade {
-                            let colors = gradeSystem.colors(for: selectedGrade)
-                            if colors.count == 1 {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(colors.first!)
-                                    .frame(width: 60, height: 60)
-                            } else if colors.count == 2 {
-                                LinearGradient(gradient: Gradient(colors: colors), startPoint: .leading, endPoint: .trailing)
-                                    .frame(width: 60, height: 60)
-                                    .cornerRadius(10)
-                            } else {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.gray)
-                                    .frame(width: 60, height: 60)
+                // Compact view - centered in fixed height container
+                ZStack {
+                    Button(action: {
+                        if isLocked {
+                            // Trigger wiggle animation
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.3)) {
+                                wiggleTrigger.toggle()
                             }
                         } else {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(width: 60, height: 60)
-                        }
-
-                        Text(gradeSystem.description(for: selectedGrade ?? "") ?? "Select")
-                            .foregroundColor(.white)
-                            .font(.system(size: 14, weight: .bold))
-                    }
-                }
-                .gesture(
-                    LongPressGesture(minimumDuration: 0.5)
-                        .onEnded { _ in
                             withAnimation(.spring()) {
                                 isExpanded = true
                             }
                         }
-                )
+                    }) {
+                        ZStack {
+                            if let selectedGrade = selectedGrade {
+                                let colors = gradeSystem.colors(for: selectedGrade)
+                                if colors.count == 1 {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(colors.first!)
+                                        .frame(width: 60, height: 60)
+                                } else if colors.count == 2 {
+                                    LinearGradient(gradient: Gradient(colors: colors), startPoint: .leading, endPoint: .trailing)
+                                        .frame(width: 60, height: 60)
+                                        .cornerRadius(10)
+                                } else {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color.gray)
+                                        .frame(width: 60, height: 60)
+                                }
+                            } else {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 60, height: 60)
+                            }
+
+                            Text(gradeSystem.description(for: selectedGrade ?? "") ?? "Select")
+                                .foregroundColor(.white)
+                                .font(.system(size: 14, weight: .bold))
+
+                            // Opacity overlay when locked
+                            if isLocked {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.black.opacity(0.4))
+                                    .frame(width: 60, height: 60)
+                            }
+                        }
+                    }
+                    .gesture(
+                        LongPressGesture(minimumDuration: 0.5)
+                            .onEnded { _ in
+                                if !isLocked {
+                                    withAnimation(.spring()) {
+                                        isExpanded = true
+                                    }
+                                }
+                            }
+                    )
+                    .gesture(
+                        TapGesture(count: 2)
+                            .onEnded { _ in
+                                if isLocked {
+                                    showLockedAlert = true
+                                }
+                            }
+                    )
+                    .modifier(WiggleModifier(trigger: wiggleTrigger))
+                }
             } else {
-                // Expanded view - takes full width of row
-                VStack(spacing: 12) {
-                    // Header with close button
-                    HStack {
-                        Text("Select Grade")
-                            .font(.headline)
-                        Spacer()
-                        Button(action: {
+                // Expanded view - fills the fixed height container
+                ZStack {
+                    // Background tap to dismiss
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture {
                             withAnimation(.spring()) {
                                 isExpanded = false
                             }
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.secondary)
                         }
-                    }
 
                     // Full grade selector
-                    VStack {
-                        ClimbingGradeSelector(
-                            gradeSystem: AnyGradeProtocol(gradeSystem),
-                            selectedGrade: $selectedGrade
-                        )
-                        .frame(height: 80)
-                    }
+                    ClimbingGradeSelector(
+                        gradeSystem: AnyGradeProtocol(gradeSystem),
+                        selectedGrade: $selectedGrade
+                    )
                 }
-                .padding(.vertical, 12)
                 .background(Color.white.opacity(0.05))
                 .cornerRadius(12)
             }
         }
+        .frame(height: 80) // Fixed height to match ClimbingGradeSelector
+        .alert("Grade is Locked", isPresented: $showLockedAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("This grade is locked because the route has attempts. Move to a new route to change the grade.")
+        }
+    }
+}
+
+// Wiggle animation modifier
+struct WiggleModifier: ViewModifier {
+    let trigger: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .rotationEffect(.degrees(trigger ? 2 : 0))
+            .animation(.spring(response: 0.3, dampingFraction: 0.3), value: trigger)
     }
 }
 

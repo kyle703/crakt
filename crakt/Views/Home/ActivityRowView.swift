@@ -16,9 +16,22 @@ struct ActivityRowView: View {
         HStack(spacing: 16) {
             // Session icon/indicator
             VStack(spacing: 4) {
-                Circle()
-                    .fill(session.totalRoutes > 0 ? Color.blue : Color.gray.opacity(0.3))
-                    .frame(width: 8, height: 8)
+                // Live indicator for active session
+                if session.status == .active {
+                    ZStack {
+                        Circle()
+                            .fill(Color.red.opacity(0.2))
+                            .frame(width: 14, height: 14)
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 8, height: 8)
+                    }
+                    .accessibilityLabel("Live session")
+                } else {
+                    Circle()
+                        .fill(session.totalRoutes > 0 ? Color.blue : Color.gray.opacity(0.3))
+                        .frame(width: 8, height: 8)
+                }
                 
                 if session.totalRoutes > 0 {
                     Circle()
@@ -43,6 +56,18 @@ struct ActivityRowView: View {
                             .foregroundColor(.secondary)
                     }
                     
+                    if session.status == .active {
+                        HStack(spacing: 6) {
+                            Image(systemName: "dot.radiowaves.left.and.right")
+                                .font(.caption2)
+                                .foregroundColor(.red)
+                            Text("Live")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .fontWeight(.semibold)
+                        }
+                    }
+
                     if session.totalRoutes > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "mountain.2")

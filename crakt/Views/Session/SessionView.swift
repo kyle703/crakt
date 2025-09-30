@@ -82,7 +82,7 @@ struct PillStyle: ViewModifier {
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(borderColor, lineWidth: 2)
             )
-            .background(Color.white)
+            .background(Color(.systemBackground))
             .cornerRadius(20)
     }
 }
@@ -141,11 +141,13 @@ struct SessionView: View {
         .environment(\.modelContext, modelContext)
         .onAppear {
             // Activate auto-lock prevention for active climbing sessions
-            sessionManager.isSessionActive = true
+            sessionManager.startSession(sessionId: session.id)
         }
         .onDisappear {
             // Deactivate auto-lock prevention when leaving session
-            sessionManager.isSessionActive = false
+            if session.status != .active {
+                sessionManager.endSession()
+            }
         }
     }
 }

@@ -13,31 +13,42 @@ import SwiftData
 @Model class RouteAttempt {
     var id: UUID
     var date: Date
-   
+
     var route: Route?
-    
+
     var status: ClimbStatus = ClimbStatus.fall
-    
+
+    // Subjective difficulty rating (optional)
+    var difficultyRating: DifficultyRating?
+
     public init(status: ClimbStatus) {
         self.date = Date()
         self.id = UUID()
-        
+
         self.status = status
     }
-    
+
     public init(date: Date, status: ClimbStatus) {
         self.id = UUID()
-        
+
         self.date = date
         self.status = status
     }
-    
+
     public init(date: Date, status: ClimbStatus, route: Route) {
         self.id = UUID()
-        
+
         self.date = date
         self.status = status
         self.route = route
     }
-    
+
+    public init(date: Date, status: ClimbStatus, route: Route, difficultyRating: DifficultyRating?) {
+        self.id = UUID()
+
+        self.date = date
+        self.status = status
+        self.route = route
+        self.difficultyRating = difficultyRating
+    }
 }

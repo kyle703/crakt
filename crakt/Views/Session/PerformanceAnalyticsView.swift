@@ -56,7 +56,14 @@ struct PerformanceAnalyticsView: View {
             hourlyAttempts[hour, default: 0] += 1
         }
 
-        return (0...23).map { hour in
+        // Calculate session duration in hours (max 3 hours for typical climbing sessions)
+        let sessionHours = min(Int(ceil(session.elapsedTime / 3600.0)), 3)
+        let startHour = Calendar.current.component(.hour, from: session.startDate)
+
+        // Only show hours that are relevant to the session (max 3 hours)
+        let relevantHours = (0...sessionHours).map { (startHour + $0) % 24 }
+
+        return relevantHours.map { hour in
             TimeData(hour: hour, attempts: hourlyAttempts[hour] ?? 0)
         }
     }
@@ -89,12 +96,13 @@ struct PerformanceAnalyticsView: View {
     }
 
     private var activeClimbingTime: TimeInterval {
+        // Use session elapsed time minus estimated rest periods for active climbing time
         let attempts = session.allAttempts.sorted { $0.date < $1.date }
-        guard attempts.count > 1 else { return 0 }
+        guard attempts.count > 1 else { return session.elapsedTime }
 
-        let totalSpan = attempts.last!.date.timeIntervalSince(attempts.first!.date)
-        let estimatedRestTime = Double(attempts.count - 1) * 180.0 // Default 3min rest
-        return max(0, totalSpan - estimatedRestTime)
+        // Estimate rest time based on number of attempts (3 minutes per rest period)
+        let estimatedRestTime = Double(attempts.count - 1) * 180.0 // 3min default rest
+        return max(0, session.elapsedTime - estimatedRestTime)
     }
 
     private var averageAttemptsPerRoute: Double {
@@ -291,7 +299,7 @@ struct PerformanceAnalyticsView: View {
                     }
                     .frame(height: 150)
                     .chartXAxis {
-                        AxisMarks(values: .stride(by: 4)) { value in
+                        AxisMarks { value in
                             AxisValueLabel {
                                 Text(String(format: "%02d:00", value.as(Int.self) ?? 0))
                             }

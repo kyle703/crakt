@@ -44,6 +44,8 @@ struct HomeView: View {
                             SessionConfigView(
                                 onSessionComplete: { completedSession in
                                     // Navigate to session detail view when session completes
+                                    // Reset navigation to root before pushing analysis
+                                    navigationPath = NavigationPath()
                                     navigationPath.append(completedSession)
                                 },
                                 onSessionStart: {
@@ -87,7 +89,11 @@ struct HomeView: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationDestination(for: Session.self) { session in
-                SessionDetailView(session: session)
+                if session.status == .active {
+                    SessionView(session: session)
+                } else {
+                    SessionDetailView(session: session)
+                }
             }
         }
         .onAppear {
@@ -135,33 +141,6 @@ struct HomeView: View {
                     .lineLimit(3)
             }
             
-            NavigationLink {
-                SessionConfigView()
-            } label: {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
-                    Text("Start Your First Session")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(
-                    LinearGradient(
-                        colors: [.blue, .blue.opacity(0.8)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .cornerRadius(16)
-                .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
-            }
-            .buttonStyle(PlainButtonStyle())
-            .onTapGesture {
-                trackEvent("empty_state_start_session_tapped")
-            }
         }
         .padding(24)
         .background(
@@ -175,7 +154,11 @@ struct HomeView: View {
         VStack(spacing: 0) {
             ForEach(sessions.prefix(10), id: \.id) { session in
                 NavigationLink {
-                    SessionDetailView(session: session)
+                    if session.status == .active {
+                        SessionView(session: session)
+                    } else {
+                        SessionDetailView(session: session)
+                    }
                 } label: {
                     ActivityRowView(session: session)
                 }

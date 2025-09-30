@@ -20,19 +20,19 @@ class SessionDetailViewModel: ObservableObject {
     }
 
     // MARK: - Session Overview
-    var startDateText: String {
+    var sessionDateRangeText: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: session.startDate)
-    }
+        formatter.dateFormat = "MMM d, yyyy • h:mm a"
 
-    var endDateText: String {
-        guard let endDate = session.endDate else { return "Active" }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: endDate)
+        let startTime = formatter.string(from: session.startDate)
+
+        if let endDate = session.endDate {
+            formatter.dateFormat = "h:mm a"
+            let endTime = formatter.string(from: endDate)
+            return "\(startTime) – \(endTime)"
+        } else {
+            return startTime
+        }
     }
 
     var elapsedTimeText: String {
@@ -95,13 +95,12 @@ class SessionDetailViewModel: ObservableObject {
     }
 
     var activeClimbingTime: TimeInterval {
-        // Estimate based on attempt timestamps
+        // Use session elapsed time minus estimated rest periods for active climbing time
         let attempts = session.allAttempts.sorted { $0.date < $1.date }
-        guard attempts.count > 1 else { return 0 }
+        guard attempts.count > 1 else { return session.elapsedTime }
 
-        let totalSpan = attempts.last!.date.timeIntervalSince(attempts.first!.date)
         let estimatedRestTime = Double(attempts.count - 1) * (averageRestTime ?? 180.0) // Default 3min rest
-        return max(0, totalSpan - estimatedRestTime)
+        return max(0, session.elapsedTime - estimatedRestTime)
     }
 
     // MARK: - Grade Analysis
@@ -543,15 +542,8 @@ struct SessionDetailView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
 
-                    HStack {
-                        Text(viewModel.startDateText)
-                            .font(.title3)
-                        if let endDate = viewModel.session.endDate {
-                            Text(" - \(viewModel.endDateText)")
-                                .font(.title3)
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                    Text(viewModel.sessionDateRangeText)
+                        .font(.title3)
 
                     if let gymName = viewModel.session.gymName {
                         Text(gymName)
