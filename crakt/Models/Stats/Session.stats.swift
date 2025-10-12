@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  Session.stats.swift
 //  crakt
 //
 //  Created by Kyle Thompson on 4/27/24.
@@ -8,454 +8,361 @@
 import SwiftUI
 
 extension Session {
-    var totalAttempts: Int {
-        routes.reduce(0) { $0 + $1.attempts.count }
+    
+    // MARK: - Core Helpers (Computed Once)
+    
+    /// All routes including active route if present
+    private var allRoutesIncludingActive: [Route] {
+        activeRoute != nil ? [activeRoute!] + routes : routes
     }
     
-    var totalRoutes: Int {
-            routes.count
-    }
-    
-    var successfulClimbs: Int {
-            routes.filter { route in
-                route.attempts.contains { attempt in
-                    attempt.status == .send
-                }
-            }.count
-        }
-    
-    var attemptStatusDistribution: [ClimbStatus: Int] {
-            var distribution: [ClimbStatus: Int] = [:]
-            for route in routes {
-                for attempt in route.attempts {
-                    distribution[attempt.status, default: 0] += 1
-                }
-            }
-            return distribution
-        }
-    
-    var averageGradeAttempted: Double {
-            let totalGrades = routes.compactMap { $0.normalizedGrade }
-            guard !totalGrades.isEmpty else { return 0.0 }
-            return totalGrades.reduce(0, +) / Double(totalGrades.count)
-        }
-    
-    var highestGradeSent: String? {
-            let _max_route = routes.filter { route in
-                route.attempts.contains { attempt in
-                    attempt.status == .send || attempt.status == .flash || attempt.status == .topped
-                }
-            }.max(by: { a, b in
-                a.normalizedGrade < b.normalizedGrade
-            })
-
-            if let _max_route {
-                return _max_route.gradeDescription ?? "Unknown"
-            }
-            return nil
-        }
-    
-    var highestGradeFlashedClimbed: String? {
-            let _max_route = routes.filter { route in
-                route.attempts.contains { attempt in
-                    attempt.status == .flash
-                }
-            }.max(by: { a, b in
-                a.normalizedGrade < b.normalizedGrade
-            })
-
-            if let _max_route {
-                return _max_route.gradeDescription ?? "Unknown"
-            }
-            return nil
-        }
-    
-    var totalAttemptsPerGrade: [(grade: String, attempts: Int)] {
-        let attemptsByGrade = attemptsGroupedByGrade(routes: routes)
-        let totalAttemptsPerGrade = totalAttemptsByGrade(attemptsByCategory: attemptsByGrade)
-        return totalAttemptsPerGrade
-    }
-    
-    var routesSorted: [Route] {
-        routes.sorted { route1, route2 in
-            let gradingProtocol1 = route1.gradeSystem._protocol
-            let gradingProtocol2 = route2.gradeSystem._protocol
-
-            let grade1Difficulty = route1.grade.map { gradingProtocol1.normalizedDifficulty(for: $0) } ?? 0.0
-            let grade2Difficulty = route2.grade.map { gradingProtocol2.normalizedDifficulty(for: $0) } ?? 0.0
-
-            return grade1Difficulty < grade2Difficulty
+    /// Routes that have been successfully sent (send, flash, or topped)
+    private var successfulRoutes: [Route] {
+        allRoutesIncludingActive.filter { route in
+            route.attempts.contains { $0.status == .send || $0.status == .flash || $0.status == .topped }
         }
     }
     
+    /// Routes sorted by normalized difficulty
+    var routesSortedByGrade: [Route] {
+        routes.sorted { $0.normalizedGrade < $1.normalizedGrade }
+    }
+    
+    /// Routes sorted by first attempt date
     var routesSortedByDate: [Route] {
-            routes.sorted { $0.firstAttemptDate ?? Date.distantPast < $1.firstAttemptDate ?? Date.distantPast }
+        routes.sorted { $0.firstAttemptDate ?? Date.distantPast < $1.firstAttemptDate ?? Date.distantPast }
     }
     
-    var attemptsByGradeAndStatus: [(grade: String, status: ClimbStatus, attempts: Int)] {
-        var aggregatedData = [(grade: String, status: ClimbStatus, attempts: Int)]()
+    // MARK: - Volume Metrics
+    
+    /// Total number of routes attempted (completed routes only)
+    var totalRoutes: Int {
+        routes.count
+    }
+    
+    /// Total attempts across all routes (including active route)
+    var totalAttempts: Int {
+        allAttempts.count
+    }
+    
+    /// Total successful sends (send, flash, or topped)
+    var totalSends: Int {
+        allAttempts.filter { $0.status == .send || $0.status == .flash || $0.status == .topped }.count
+    }
+    
+    /// Total number of routes successfully sent
+    var successfulClimbs: Int {
+        routes.filter { route in
+            route.attempts.contains { $0.status == .send }
+        }.count
+    }
+    
+    /// Distribution of attempts by status (send, fall, flash, etc.)
+    var attemptStatusDistribution: [ClimbStatus: Int] {
+        var distribution: [ClimbStatus: Int] = [:]
+        for attempt in allAttempts {
+            distribution[attempt.status, default: 0] += 1
+        }
+        return distribution
+    }
+    
+    // MARK: - Intensity Metrics
+    
+    /// Average normalized difficulty of all routes attempted
+    var averageGradeAttempted: Double {
+        let grades = routes.compactMap { $0.normalizedGrade }
+        guard !grades.isEmpty else { return 0.0 }
+        return grades.reduce(0, +) / Double(grades.count)
+    }
+    
+    /// Hardest grade successfully sent (string representation)
+    var hardestGradeSent: String? {
+        guard let route = successfulRoutes.max(by: { $0.normalizedGrade < $1.normalizedGrade }) else {
+            return nil
+        }
+        return route.gradeDescription ?? route.grade
+    }
+    
+    /// Hardest grade flashed
+    var highestGradeFlashed: String? {
+        let flashedRoutes = allRoutesIncludingActive.filter { route in
+            route.attempts.contains { $0.status == .flash }
+        }
+        guard let route = flashedRoutes.max(by: { $0.normalizedGrade < $1.normalizedGrade }) else {
+            return nil
+        }
+        return route.gradeDescription ?? route.grade
+    }
+    
+    /// Median grade of successfully sent routes
+    var medianGradeSent: String? {
+        let sorted = successfulRoutes.sorted { $0.normalizedGrade < $1.normalizedGrade }
+        guard !sorted.isEmpty else { return nil }
         
-        for route in routesSorted {
-            let grade = route.grade ?? "Unknown"
+        let middleIndex = sorted.count / 2
+        let medianRoute = sorted.count % 2 == 0 ?
+            sorted[middleIndex - 1] : sorted[middleIndex]
+        
+        return medianRoute.gradeDescription ?? medianRoute.grade
+    }
+    
+    // MARK: - Efficiency Metrics
+    
+    /// Success percentage (sends / total attempts)
+    var successPercentage: Double {
+        guard totalAttempts > 0 else { return 0.0 }
+        return Double(totalSends) / Double(totalAttempts) * 100.0
+    }
+    
+    /// Average attempts needed per successful send
+    var attemptsPerSend: Double {
+        guard totalSends > 0 else { return 0.0 }
+        return Double(totalAttempts) / Double(totalSends)
+    }
+    
+    // MARK: - Distribution Analytics
+    
+    /// Attempts grouped by grade and status for stacked bar charts
+    var attemptsByGradeAndStatus: [(grade: String, status: ClimbStatus, attempts: Int)] {
+        var aggregatedData: [String: [ClimbStatus: Int]] = [:]
+        
+        // Group by grade, then by status
+        for route in routesSortedByGrade {
+            guard let grade = route.gradeDescription ?? route.grade else { continue }
+            
             for attempt in route.attempts {
-                let status = attempt.status
-                if let index = aggregatedData.firstIndex(where: { $0.grade == grade && $0.status == status }) {
-                    aggregatedData[index].attempts += 1
-                } else {
-                    aggregatedData.append((grade: route.gradeDescription ?? "Unknown", status: status, attempts: 1))
+                if aggregatedData[grade] == nil {
+                    aggregatedData[grade] = [:]
                 }
+                aggregatedData[grade]![attempt.status, default: 0] += 1
             }
         }
         
-        return aggregatedData
+        // Convert to array format
+        return aggregatedData.flatMap { grade, statusCounts in
+            statusCounts.map { status, count in
+                (grade: grade, status: status, attempts: count)
+            }
+        }.sorted { $0.grade < $1.grade }
     }
     
-    func attemptsGroupedByGrade(routes: [Route]) -> [String: [Route]] {
-        var attemptsByGrade: [String: [Route]] = [:]
+    /// Total attempts per grade (for simple distributions)
+    var totalAttemptsPerGrade: [(grade: String, attempts: Int)] {
+        var gradeAttempts: [String: Int] = [:]
         
         for route in routes {
-            guard let grade = route.grade else { continue }
-
-            if attemptsByGrade[grade] != nil {
-                attemptsByGrade[grade]!.append(route)
-            } else {
-                attemptsByGrade[grade] = [route]
-            }
-            
-            
+            guard let grade = route.gradeDescription ?? route.grade else { continue }
+            gradeAttempts[grade, default: 0] += route.attempts.count
         }
         
-        return attemptsByGrade
+        return gradeAttempts.map { (grade: $0.key, attempts: $0.value) }
+            .sorted { $0.grade < $1.grade }
     }
     
-    func totalAttemptsByGrade(attemptsByCategory: [String: [Route]]) -> [(grade: String, attempts: Int)] {
-        var totals: [(String, Int)] = []
+    /// Grade band distribution with dynamic bucketing
+    var gradeBandDistribution: [(band: String, attempts: Int, normalizedRange: ClosedRange<Double>)] {
+        let routesWithAttempts = allRoutesIncludingActive.filter { !$0.attempts.isEmpty && $0.grade != nil }
+        guard !routesWithAttempts.isEmpty else { return [] }
         
-        for (grade, routes) in attemptsByCategory {
-            // Sum the total attempts for routes of this grade
-            let totalAttempts = routes.reduce(0) { $0 + $1.attempts.count }
-            totals.append((grade, totalAttempts))
-        }
+        // Aggregate attempts by unique grade
+        var gradeData: [(grade: String, normalized: Double, attempts: Int)] = []
+        var seen: Set<String> = []
         
-        // Sort the totals by grade if grades are numeric or alphabetically otherwise
-        // Assuming grades can be sorted in a meaningful way as strings
-        return totals.sorted(by: { $0.0 < $1.0 })
-    }
-    
-    var normalizedAttempts: [(normalizedTime: Date, grade: String, status: ClimbStatus, routeId: UUID)] {
-            guard endDate != nil else { return [] }
-        
-            let _grade_sorted = routes.sorted { $0.normalizedGrade < $1.normalizedGrade }
-            
-            return _grade_sorted.flatMap { route -> [(normalizedTime: Date, grade: String, status: ClimbStatus, routeId: UUID)] in
-                guard let grade = route.grade else { return [] }
-                return route.attempts.map { attempt in
-                    return (normalizedTime: attempt.date, grade: grade, status: attempt.status, routeId: route.id)
+        for route in routesWithAttempts {
+            guard let grade = route.grade, !seen.contains(grade) else {
+                if let grade = route.grade, let idx = gradeData.firstIndex(where: { $0.grade == grade }) {
+                    gradeData[idx].attempts += route.attempts.count
                 }
+                continue
             }
+            
+            seen.insert(grade)
+            gradeData.append((
+                grade: grade,
+                normalized: route.normalizedGrade,
+                attempts: route.attempts.count
+            ))
         }
+        
+        gradeData.sort { $0.normalized < $1.normalized }
+        guard !gradeData.isEmpty else { return [] }
+        
+        // Cap distribution at hardest successful send
+        let maxSendNormalized = successfulRoutes.map { $0.normalizedGrade }.max()
+        let filteredData = maxSendNormalized != nil ?
+            gradeData.filter { $0.normalized <= maxSendNormalized! } : gradeData
+        
+        guard !filteredData.isEmpty else { return [] }
+        
+        let minGrade = filteredData.first!.normalized
+        let maxGrade = filteredData.last!.normalized
+        let gradeRange = maxGrade - minGrade
+        
+        // Determine bucket count based on range
+        let bucketCount = min(max(2, filteredData.count),
+                            gradeRange <= 3.0 ? 3 : gradeRange <= 6.0 ? 4 : 5)
+        
+        // Single bucket case
+        guard bucketCount > 1 else {
+            let totalAttempts = filteredData.reduce(0) { $0 + $1.attempts }
+            let label = filteredData.count == 1 ?
+                filteredData[0].grade :
+                "\(filteredData.first!.grade)-\(filteredData.last!.grade)"
+            return [(band: label, attempts: totalAttempts, normalizedRange: minGrade...maxGrade)]
+        }
+        
+        // Multiple buckets
+        var distribution: [(band: String, attempts: Int, normalizedRange: ClosedRange<Double>)] = []
+        let bucketSize = gradeRange / Double(bucketCount)
+        
+        for i in 0..<bucketCount {
+            let rangeStart = minGrade + Double(i) * bucketSize
+            let rangeEnd = i == bucketCount - 1 ? maxGrade + 0.01 : rangeStart + bucketSize
+            
+            let gradesInBucket = filteredData.filter { $0.normalized >= rangeStart && $0.normalized < rangeEnd }
+            guard !gradesInBucket.isEmpty else { continue }
+            
+            let attemptsInBucket = gradesInBucket.reduce(0) { $0 + $1.attempts }
+            let label = gradesInBucket.count == 1 ?
+                gradesInBucket[0].grade :
+                "\(gradesInBucket.first!.grade)-\(gradesInBucket.last!.grade)"
+            
+            distribution.append((band: label, attempts: attemptsInBucket, normalizedRange: rangeStart...rangeEnd))
+        }
+        
+        return distribution
+    }
     
+    // MARK: - Timeline Data
+    
+    /// All attempts with normalized timestamps (for timeline charts)
+    var normalizedAttempts: [(normalizedTime: Date, grade: String, status: ClimbStatus, routeId: UUID)] {
+        guard endDate != nil else { return [] }
+        
+        return routesSortedByGrade.flatMap { route -> [(Date, String, ClimbStatus, UUID)] in
+            guard let grade = route.grade else { return [] }
+            return route.attempts.map { (
+                normalizedTime: $0.date,
+                grade: grade,
+                status: $0.status,
+                routeId: route.id
+            )}
+        }
+    }
+    
+    /// All attempts with their associated routes (for detailed analysis)
     var attemptsWithRoute: [(attemptNumber: Int, attemptDate: Date, status: ClimbStatus, route: Route)] {
         routes
             .flatMap { route in
-                route.attempts.map { attempt in
-                    (attempt.date, attempt.status, route)
-                }
+                route.attempts.map { ($0.date, $0.status, route) }
             }
-            .sorted { $0.0 < $1.0 }  // Sorting by attempt date
-            .enumerated()  // Enumerating the sorted attempts
-            .map { index, attempt in
-                (attemptNumber: index + 1, attemptDate: attempt.0, status: attempt.1, route: attempt.2)
-            }
+            .sorted { $0.0 < $1.0 }
+            .enumerated()
+            .map { (attemptNumber: $0 + 1, attemptDate: $1.0, status: $1.1, route: $1.2) }
     }
-
-    // MARK: - Session Volume Stats
-
-    /// Total attempts in current session
-    var sessionTotalAttempts: Int {
-        allAttempts.count
-    }
-
-    /// Total successful sends/tops in current session
-    var sessionTotalSends: Int {
-        allAttempts.filter { $0.status == .send || $0.status == .flash || $0.status == .topped }.count
-    }
-
-    /// Success percentage for current session
-    var sessionSuccessPercentage: Double {
-        guard sessionTotalAttempts > 0 else { return 0.0 }
-        return Double(sessionTotalSends) / Double(sessionTotalAttempts) * 100.0
-    }
-
-    // MARK: - Intensity Benchmarks
-
-    /// Hardest grade successfully sent in current session
-    var sessionHardestGradeSent: String? {
-        let successfulRoutes = routes.filter { route in
-            route.attempts.contains { $0.status == .send || $0.status == .flash || $0.status == .topped }
+    
+    // MARK: - DI-Normalized Metrics (for cross-session comparison)
+    
+    /// Hardest grade sent as Difficulty Index (0-200 scale)
+    var hardestGradeDI: Int {
+        guard let route = successfulRoutes.max(by: { $0.normalizedGrade < $1.normalizedGrade }) else {
+            return 0
         }
-
-        guard let hardestRoute = successfulRoutes.max(by: { $0.normalizedGrade < $1.normalizedGrade }) else {
-            return nil
+        let di = Int(route.normalizedGrade * 10)
+        return max(0, min(200, di))
+    }
+    
+    /// Median grade sent as Difficulty Index (0-200 scale)
+    var medianGradeDI: Int {
+        let sorted = successfulRoutes.sorted { $0.normalizedGrade < $1.normalizedGrade }
+        guard !sorted.isEmpty else { return 0 }
+        
+        let middleIndex = sorted.count / 2
+        let medianRoute = sorted.count % 2 == 0 ?
+            sorted[middleIndex - 1] : sorted[middleIndex]
+        
+        let di = Int(medianRoute.normalizedGrade * 10)
+        return max(0, min(200, di))
+    }
+    
+    // MARK: - Formatted Display Helpers
+    
+    /// Success percentage formatted for display
+    var formattedSuccessPercentage: String {
+        String(format: "%.1f%%", successPercentage)
+    }
+    
+    /// Attempts per send formatted for display
+    var formattedAttemptsPerSend: String {
+        guard attemptsPerSend > 0 else { return "0.0" }
+        return String(format: "%.1f", attemptsPerSend)
+    }
+    
+    /// Grade distribution with percentages (for display)
+    var formattedGradeDistribution: [(band: String, attempts: Int, percentage: Double)] {
+        guard totalAttempts > 0 else { return [] }
+        let total = Double(totalAttempts)
+        
+        return gradeBandDistribution.map {
+            (band: $0.band, attempts: $0.attempts, percentage: Double($0.attempts) / total * 100.0)
         }
-
-        return hardestRoute.gradeDescription ?? hardestRoute.grade
     }
-
-    /// Median grade of successfully sent routes
-    var sessionMedianGradeSent: String? {
-        let successfulRoutes = routes.filter { route in
-            route.attempts.contains { $0.status == .send || $0.status == .flash || $0.status == .topped }
-        }.sorted { $0.normalizedGrade < $1.normalizedGrade }
-
-        guard !successfulRoutes.isEmpty else { return nil }
-
-        let middleIndex = successfulRoutes.count / 2
-        let medianRoute = successfulRoutes.count % 2 == 0 ?
-            successfulRoutes[middleIndex - 1] : successfulRoutes[middleIndex]
-
-        return medianRoute.gradeDescription ?? medianRoute.grade
-    }
-
-    /// All grades attempted in current session (for volume distribution)
-    var sessionGradesAttempted: [Route] {
-        routes.filter { !$0.attempts.isEmpty }.sorted { $0.normalizedGrade < $1.normalizedGrade }
-    }
-
-    // MARK: - Efficiency Metrics
-
-    /// Attempts per send ratio for current session
-    var sessionAttemptsPerSend: Double {
-        guard sessionTotalSends > 0 else { return 0.0 }
-        return Double(sessionTotalAttempts) / Double(sessionTotalSends)
-    }
-
-    // MARK: - Volume Distribution
-
-    /// Grade band distribution for current session
-    var sessionGradeBandDistribution: [String: Int] {
-        var distribution: [String: Int] = [
-            "V0-V2": 0,
-            "V3-V5": 0,
-            "V6+": 0
-        ]
-
-        for route in routes where !route.attempts.isEmpty {
-            guard let grade = route.grade else { continue }
-
-            // For V-scale, parse the V number
-            if gradeSystem == .vscale, let vNumber = parseVGrade(grade) {
-                switch vNumber {
-                case 0...2:
-                    distribution["V0-V2", default: 0] += route.attempts.count
-                case 3...5:
-                    distribution["V3-V5", default: 0] += route.attempts.count
-                default:
-                    distribution["V6+", default: 0] += route.attempts.count
-                }
-            } else if gradeSystem == .yds {
-                // For YDS, we need to convert to V-scale equivalent for comparison
-                let normalized = route.normalizedGrade
-                if normalized <= 2.0 {
-                    distribution["V0-V2", default: 0] += route.attempts.count
-                } else if normalized <= 5.0 {
-                    distribution["V3-V5", default: 0] += route.attempts.count
-                } else {
-                    distribution["V6+", default: 0] += route.attempts.count
-                }
-            }
-        }
-
-        return distribution
-    }
-
-    /// Parse V-grade number from string (e.g., "V3" -> 3)
-    private func parseVGrade(_ grade: String) -> Int? {
-        let pattern = "V(\\d+)"
-        let regex = try? NSRegularExpression(pattern: pattern, options: [])
-        let range = NSRange(location: 0, length: grade.count)
-
-        if let match = regex?.firstMatch(in: grade, options: [], range: range),
-           let numberRange = Range(match.range(at: 1), in: grade) {
-            return Int(grade[numberRange])
-        }
-
-        return nil
-    }
-
-    // MARK: - Historical Comparison Helpers
-
-    /// Calculate trend direction compared to historical average
+    
+    // MARK: - Utility Functions
+    
+    /// Calculate trend arrow compared to historical value
     func calculateTrend(current: Double, historical: Double) -> String {
         if current > historical { return "↑" }
         if current < historical { return "↓" }
         return "→"
     }
-
-    /// Calculate percentage change from historical average
+    
+    /// Calculate percentage change from historical value
     func calculatePercentChange(current: Double, historical: Double) -> Double {
         guard historical > 0 else { return 0.0 }
         return ((current - historical) / historical) * 100.0
     }
-
-    // MARK: - Progress vs Past Sessions (Placeholder - needs historical session access)
-
-    /// Placeholder for hardest grade comparison with last N sessions
-    var hardestGradeTrend: (current: String?, trend: String, change: Double)? {
-        // This would need access to previous sessions
-        // For now, return current value with neutral trend
-        guard let current = sessionHardestGradeSent else { return nil }
-        return (current: current, trend: "→", change: 0.0)
-    }
-
-    /// Placeholder for median grade comparison with last N sessions
-    var medianGradeTrend: (current: String?, trend: String, change: Double)? {
-        // This would need access to previous sessions
-        guard let current = sessionMedianGradeSent else { return nil }
-        return (current: current, trend: "→", change: 0.0)
-    }
-
-    /// Placeholder for success percentage comparison with last N sessions
-    var successPercentageTrend: (current: Double, trend: String, change: Double) {
-        // This would need access to previous sessions
-        return (current: sessionSuccessPercentage, trend: "→", change: 0.0)
-    }
-
-    // MARK: - Personal Best Tracking
-
-    /// Check if current session sets a new personal best for hardest grade
-    var isHardestGradePersonalBest: Bool {
-        // This would need access to user's historical data
-        // For now, always return false
-        return false
-    }
-
-    /// Check if current session sets a new personal best for success percentage
-    var isSuccessPercentagePersonalBest: Bool {
-        // This would need access to user's historical data
-        // For now, always return false
-        return false
-    }
-
-    // MARK: - Formatted Display Helpers
-
-    /// Format success percentage for display
-    var formattedSuccessPercentage: String {
-        String(format: "%.1f%%", sessionSuccessPercentage)
-    }
-
-    /// Format attempts per send ratio for display
-    var formattedAttemptsPerSend: String {
-        guard sessionAttemptsPerSend > 0 else { return "0.0" }
-        return String(format: "%.1f", sessionAttemptsPerSend)
-    }
-
-    /// Format grade band distribution for display
-    var formattedGradeDistribution: [(band: String, attempts: Int, percentage: Double)] {
-        let totalAttempts = Double(sessionTotalAttempts)
-        guard totalAttempts > 0 else { return [] }
-
-        return sessionGradeBandDistribution.map { band, attempts in
-            (band: band, attempts: attempts, percentage: Double(attempts) / totalAttempts * 100.0)
-        }.sorted { $0.band < $1.band }
-    }
-
-// MARK: - Session Summary Data Structure
-
-/// Summary metrics for a single session
-struct SessionSummary {
-    /// DI-normalized hardest grade sent (0-200 scale)
-    let hardestGradeDI: Int
-
-    /// DI-normalized median grade sent (0-200 scale)
-    let medianGradeDI: Int
-
-    /// Total successful sends in the session
-    let sendCount: Int
-
-    /// Total attempts in the session
-    let attemptCount: Int
-
-    /// Success percentage (0.0-100.0)
-    let sendPercent: Double
-
-    /// Attempts per send ratio
-    let attemptsPerSend: Double
-
-    /// Session date for time-series analysis
-    let sessionDate: Date
-}
-
-// MARK: - Global Analytics Properties (DI-normalized)
-
-/// DI-normalized hardest grade sent (0-200 scale)
-var hardestGradeDI: Int {
-        let successfulRoutes = routes.filter { route in
-            route.attempts.contains { $0.status == .send || $0.status == .flash || $0.status == .topped }
-        }
-
-        guard let hardestRoute = successfulRoutes.max(by: { $0.normalizedGrade < $1.normalizedGrade }) else {
-            return 0
-        }
-
-        // Convert normalized grade to DI (multiply by 10 for 0-200 scale)
-        let di = Int(hardestRoute.normalizedGrade * 10)
-        return max(0, min(200, di)) // Clamp to valid range
-    }
-
-    /// DI-normalized median grade sent (0-200 scale)
-    var medianGradeDI: Int {
-        let successfulRoutes = routes.filter { route in
-            route.attempts.contains { $0.status == .send || $0.status == .flash || $0.status == .topped }
-        }.sorted { $0.normalizedGrade < $1.normalizedGrade }
-
-        guard !successfulRoutes.isEmpty else { return 0 }
-
-        let middleIndex = successfulRoutes.count / 2
-        let medianRoute = successfulRoutes.count % 2 == 0 ?
-            successfulRoutes[middleIndex - 1] : successfulRoutes[middleIndex]
-
-        // Convert normalized grade to DI (multiply by 10 for 0-200 scale)
-        let di = Int(medianRoute.normalizedGrade * 10)
-        return max(0, min(200, di)) // Clamp to valid range
-    }
-
-    /// Total sends in session (alias for sessionTotalSends for consistency)
-    var sendCount: Int {
-        sessionTotalSends
-    }
-
-    /// Total attempts in session (alias for sessionTotalAttempts for consistency)
-    var attemptCount: Int {
-        sessionTotalAttempts
-    }
-
-    /// Success percentage (alias for sessionSuccessPercentage for consistency)
-    var sendPercent: Double {
-        sessionSuccessPercentage
-    }
-
-    /// Attempts per send ratio (alias for sessionAttemptsPerSend for consistency)
-    var attemptsPerSend: Double {
-        sessionAttemptsPerSend
-    }
-
-    // MARK: - Summary Metrics Computation
-
-    /// Compute summary metrics for this session
+    
+    // MARK: - Session Summary (for historical tracking)
+    
+    /// Compute summary metrics for cross-session analysis
     func computeSummaryMetrics() -> SessionSummary? {
-        // Include completed, cancelled, and active sessions (for historical data)
         guard status == .complete || status == .cancelled || status == .active else { return nil }
-
+        
         return SessionSummary(
             hardestGradeDI: hardestGradeDI,
             medianGradeDI: medianGradeDI,
-            sendCount: sendCount,
-            attemptCount: attemptCount,
-            sendPercent: sendPercent,
+            sendCount: totalSends,
+            attemptCount: totalAttempts,
+            sendPercent: successPercentage,
             attemptsPerSend: attemptsPerSend,
             sessionDate: startDate
         )
     }
+}
 
+// MARK: - Session Summary Data Structure
+
+/// Summary metrics for a single session (for historical comparison)
+struct SessionSummary {
+    /// DI-normalized hardest grade sent (0-200 scale)
+    let hardestGradeDI: Int
+    
+    /// DI-normalized median grade sent (0-200 scale)
+    let medianGradeDI: Int
+    
+    /// Total successful sends in the session
+    let sendCount: Int
+    
+    /// Total attempts in the session
+    let attemptCount: Int
+    
+    /// Success percentage (0.0-100.0)
+    let sendPercent: Double
+    
+    /// Attempts per send ratio
+    let attemptsPerSend: Double
+    
+    /// Session date for time-series analysis
+    let sessionDate: Date
 }

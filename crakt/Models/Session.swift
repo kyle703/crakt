@@ -147,10 +147,6 @@ extension Session {
         return allAttempts.count
     }
     
-    func addAttempt(action: Any) -> Void {
-        fatalError("not implemented")
-    }
-    
     func clearRoute(context: ModelContext) -> Void {
         // find active route
         // remove active route from
@@ -175,7 +171,7 @@ extension Session {
     }
     
     func logRoute() -> Void {
-        // find active rotue
+        // find active route
         // mark inactive
         if let route = activeRoute {
             route.status = .inactive
@@ -184,12 +180,7 @@ extension Session {
         }
     }
     
-    var highestGrade : String {
-        let filteredAttempts = allAttempts.filter {
-            $0.status == .topped || $0.status == .send || $0.status == .flash
-        }.filter { $0.route != nil }
-        return filteredAttempts.max { $0.route!.gradeIndex < $1.route!.gradeIndex }?.route?.grade ?? "NA"
-
-    }
-    
 }
+
+// Enable item-based full-screen presentation using SwiftUI
+extension Session: Identifiable {}

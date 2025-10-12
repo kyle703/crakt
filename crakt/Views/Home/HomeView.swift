@@ -17,6 +17,8 @@ struct HomeView: View {
 
     // Navigation
     @State private var navigationPath = NavigationPath()
+    @State private var showActiveSession = false
+    @State private var activeSession: Session?
 
     // Analytics tracking
     @State private var hasTrackedEmptyStateImpression = false
@@ -89,16 +91,24 @@ struct HomeView: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationDestination(for: Session.self) { session in
-                if session.status == .active {
-                    SessionView(session: session)
-                } else {
-                    SessionDetailView(session: session)
-                }
+                SessionDetailView(session: session)
             }
         }
         .onAppear {
             // Analytics: Track Home View impression
             trackEvent("home_view_impression")
+        }
+        .fullScreenCover(item: $activeSession) { session in
+            SessionView(session: session) { completed in
+                // Dismiss cover, then navigate to analysis
+                activeSession = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    navigationPath = NavigationPath()
+                    if let completed {
+                        navigationPath.append(completed)
+                    }
+                }
+            }
         }
     }
     
@@ -153,19 +163,24 @@ struct HomeView: View {
     private var recentActivitiesList: some View {
         VStack(spacing: 0) {
             ForEach(sessions.prefix(10), id: \.id) { session in
-                NavigationLink {
-                    if session.status == .active {
-                        SessionView(session: session)
-                    } else {
-                        SessionDetailView(session: session)
+                if session.status == .active {
+                    Button(action: {
+                        activeSession = session
+                        trackEvent("activity_row_resume_active_tapped")
+                    }) {
+                        ActivityRowView(session: session)
                     }
-                } label: {
-                    ActivityRowView(session: session)
-                }
-                .buttonStyle(PlainButtonStyle())
-                .onTapGesture {
-                    // Analytics: Track activity row tap
-                    trackEvent("activity_row_tapped")
+                    .buttonStyle(PlainButtonStyle())
+                } else {
+                    NavigationLink {
+                        SessionDetailView(session: session)
+                    } label: {
+                        ActivityRowView(session: session)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .onTapGesture {
+                        trackEvent("activity_row_tapped")
+                    }
                 }
                 
                 if session.id != sessions.prefix(10).last?.id {

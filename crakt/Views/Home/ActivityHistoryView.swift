@@ -13,6 +13,9 @@ struct ActivityHistoryView: View {
     @Query(sort: \Session.startDate, order: .reverse)
     var sessions: [Session]
 
+    @State private var showActiveSession = false
+    @State private var activeSession: Session?
+
     var body: some View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: false) {
@@ -21,15 +24,22 @@ struct ActivityHistoryView: View {
                     // List View of Sessions
                     LazyVStack(spacing: 10) {
                         ForEach(sessions, id: \.id) { session in
-                            NavigationLink {
-                                if session.status == .active {
-                                    SessionView(session: session)
-                                } else {
-                                    SessionDetailView(session: session)
+                            if session.status == .active {
+                                Button(action: {
+                                    activeSession = session
+                                    showActiveSession = true
+                                }) {
+                                    SessionRowCardView(session: session)
+                                        .padding(.horizontal)
                                 }
-                            } label: {
-                                SessionRowCardView(session: session)
-                                    .padding(.horizontal)
+                                .buttonStyle(PlainButtonStyle())
+                            } else {
+                                NavigationLink {
+                                    SessionDetailView(session: session)
+                                } label: {
+                                    SessionRowCardView(session: session)
+                                        .padding(.horizontal)
+                                }
                             }
                         }
                     }
@@ -37,6 +47,12 @@ struct ActivityHistoryView: View {
                 .padding(.vertical)
             }
             .navigationTitle("Activity History")
+        }
+        .fullScreenCover(item: $activeSession) { session in
+            SessionView(session: session) { _ in
+                // On completion from History, just dismiss; analysis viewed via Home
+                activeSession = nil
+            }
         }
     }
 }

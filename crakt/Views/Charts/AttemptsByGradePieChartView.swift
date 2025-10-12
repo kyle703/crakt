@@ -24,7 +24,7 @@ struct HighestGradeSuccessfullyClimbedView: View {
                 .padding()
 
             // Displaying the highest grade or a default message
-            if let highestGrade = session.highestGradeSent {
+            if let highestGrade = session.hardestGradeSent {
                 Text(highestGrade)
                     .font(.largeTitle)
                     .fontWeight(.semibold)

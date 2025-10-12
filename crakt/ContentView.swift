@@ -40,27 +40,6 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        VStack {
-//            OutlineButton(action: clear_swift_data, label: "Delete db")
-            MainTabView()
-        }
+        MainTabView()
     }
 }
-
-//struct NewSessionView: View {
-//    // State to control showing exit alert
-//    
-//    
-//    var body: some View {
-//        SessionView()
-//            .navigationBarHidden(true)
-//            .interactiveDismissDisabled(true)
-//    }
-//}
-
-
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView()
-//    }
-//}

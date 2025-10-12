@@ -56,10 +56,35 @@ struct ActiveRouteCardView: View {
             // Timer section with inline controls
             if session.activeRoute != nil {
                 VStack(spacing: 12) {
-                    // Timer row with inline buttons
+                    // Timer row with inline buttons (flanked left/right)
                     HStack(alignment: .center, spacing: 16) {
-                        // Main timer (left/center)
-                        VStack(alignment: .leading, spacing: 2) {
+                        // Left: Route style indicator
+                        Button(action: {
+                            if let route = session.activeRoute {
+                                pendingRouteStyles = route.styles
+                                showStylePicker = true
+                            }
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "tag")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.secondary)
+                                if let route = session.activeRoute, !route.styles.isEmpty {
+                                    Text("\(route.styles.count)")
+                                        .font(.caption2)
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
+                        }
+
+                        Spacer(minLength: 0)
+
+                        // Center: Main timer
+                        VStack(alignment: .center, spacing: 2) {
                             // 1. TOTAL TIME ON ROUTE (from route initialization, excluding current rest periods)
                             if let startElapsed = session.activeRoute?.routeStartElapsed {
                                 let currentRestDeduction = isRestTimerActive && restStartTime != nil ? Date().timeIntervalSince(restStartTime!) : 0
@@ -67,6 +92,8 @@ struct ActiveRouteCardView: View {
                                 Text(timeString(from: max(0, routeTime))) // Ensure no negative times
                                     .font(.system(size: 36, weight: .bold, design: .monospaced))
                                     .foregroundColor(.primary)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.6)
                             }
 
                             // 2. TIME SINCE LAST ATTEMPT (for pacing) - more subtle
@@ -83,43 +110,26 @@ struct ActiveRouteCardView: View {
                                 }
                             }
                         }
+                        .layoutPriority(1)
 
-                        Spacer()
+                        Spacer(minLength: 0)
 
-                        // Control buttons (right side)
-                        HStack(spacing: 8) {
-                            // Route style indicator
-                            Button(action: {
-                                if let route = session.activeRoute {
-                                    pendingRouteStyles = route.styles
-                                    showStylePicker = true
-                                }
-                            }) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "tag")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.secondary)
-                                    if let route = session.activeRoute, !route.styles.isEmpty {
-                                        Text("\(route.styles.count)")
-                                            .font(.caption2)
-                                            .foregroundColor(.blue)
-                                    }
-                                }
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 6)
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(8)
-                            }
-
-                            // Effort/feedback button
-                            Button(action: {
+                        // Right: Effort/feedback button
+                        Button(action: {
+                            if let route = session.activeRoute,
+                               let attempt = route.attempts.sorted(by: { $0.date > $1.date }).first {
+                                lastAttemptForRating = attempt
+                                surveyRoute = route
                                 showDifficultyRating = true
-                            }) {
-                                Image(systemName: "hand.thumbsup")
+                            }
+                        }) {
+                            HStack(spacing: 0) {
+                                let latestRating = session.activeRoute?.attempts.sorted(by: { $0.date > $1.date }).first?.difficultyRating
+                                Image(systemName: latestRating?.iconName ?? "hand.thumbsup")
                                     .font(.system(size: 14))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(latestRating?.color ?? .secondary)
                                     .padding(6)
-                                    .background(Color.gray.opacity(0.1))
+                                    .background((latestRating?.color ?? .gray).opacity(0.1))
                                     .cornerRadius(8)
                             }
                         }

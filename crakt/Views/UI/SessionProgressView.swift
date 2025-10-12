@@ -14,114 +14,117 @@ struct SessionProgressView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Session Volume Stats
-                sessionVolumeSection
-
-                // Intensity Benchmarks
-                intensityBenchmarksSection
-
-                // Efficiency Metrics
-                efficiencySection
-
-                // Volume Distribution
+                // Hero Stats - Key session metrics
+                heroStatsSection
+                
+                // Performance - Best achievements
+                performanceSection
+                
+                // Volume Breakdown - Where you focused
                 volumeDistributionSection
-
-                // Progress vs Past Sessions
-                progressTrendsSection
+                
+                // Efficiency - How effective
+                efficiencySection
             }
             .padding(.vertical, 16)
         }
     }
 
-    // MARK: - Session Volume Section
-    private var sessionVolumeSection: some View {
-        VStack(spacing: 16) {
-            SectionHeader(title: "Session Volume", icon: "chart.bar.fill")
-
-            HStack(spacing: 16) {
-                StatCardView(
-                    icon: "arrow.up.circle",
-                    title: "\(session.sessionTotalAttempts)",
-                    subtitle: "Total Attempts",
-                    color: .blue
-                )
-
-                StatCardView(
-                    icon: "checkmark.circle",
-                    title: "\(session.sessionTotalSends)",
-                    subtitle: "Sends",
-                    color: .green
-                )
-
-                StatCardView(
-                    icon: "percent",
-                    title: session.formattedSuccessPercentage,
-                    subtitle: "Success Rate",
-                    color: .orange
-                )
+    // MARK: - Hero Stats Section
+    private var heroStatsSection: some View {
+        VStack(spacing: 20) {
+            SectionHeader(title: "Session Summary", icon: "chart.bar.fill")
+            
+            // Primary metrics in larger format
+            VStack(spacing: 16) {
+                // Attempts and Sends
+                HStack(spacing: 20) {
+                    HeroStatCard(
+                        value: "\(session.totalAttempts)",
+                        label: "Attempts",
+                        icon: "arrow.up.circle.fill",
+                        color: .blue
+                    )
+                    
+                    HeroStatCard(
+                        value: "\(session.totalSends)",
+                        label: "Sends",
+                        icon: "checkmark.circle.fill",
+                        color: .green
+                    )
+                }
+                
+                // Success rate - prominent display
+                VStack(spacing: 8) {
+                    Text(session.formattedSuccessPercentage)
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundColor(.orange)
+                    
+                    Text("Success Rate")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
+                        .tracking(1)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(Color.orange.opacity(0.1))
+                .cornerRadius(12)
             }
         }
         .padding(.horizontal)
     }
-
-    // MARK: - Intensity Benchmarks Section
-    private var intensityBenchmarksSection: some View {
+    
+    // MARK: - Performance Section
+    private var performanceSection: some View {
         VStack(spacing: 16) {
-            SectionHeader(title: "Intensity Benchmarks", icon: "flame.fill")
-
+            SectionHeader(title: "Performance", icon: "flame.fill")
+            
             HStack(spacing: 16) {
-                if let hardestGrade = session.sessionHardestGradeSent {
-                    StatCardView(
-                        icon: "mountain.2.fill",
-                        title: hardestGrade,
-                        subtitle: "Hardest Sent",
-                        color: .red
-                    )
-                } else {
-                    StatCardView(
-                        icon: "mountain.2.fill",
-                        title: "—",
-                        subtitle: "Hardest Sent",
-                        color: .gray
-                    )
-                }
-
-                if let medianGrade = session.sessionMedianGradeSent {
-                    StatCardView(
-                        icon: "chart.line.uptrend.xyaxis",
-                        title: medianGrade,
-                        subtitle: "Median Grade",
-                        color: .purple
-                    )
-                } else {
-                    StatCardView(
-                        icon: "chart.line.uptrend.xyaxis",
-                        title: "—",
-                        subtitle: "Median Grade",
-                        color: .gray
-                    )
-                }
-            }
-
-            // Historical comparison (placeholder for now)
-            if let hardestTrend = session.hardestGradeTrend {
-                HStack(spacing: 8) {
-                    Text("Today's hardest:")
-                        .font(.subheadline)
+                // Hardest sent
+                VStack(spacing: 8) {
+                    Image(systemName: "trophy.fill")
+                        .font(.title)
+                        .foregroundColor(.yellow)
+                    
+                    Text(session.hardestGradeSent ?? "—")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Hardest Sent")
+                        .font(.caption)
                         .foregroundColor(.secondary)
-
-                    Text(hardestTrend.current ?? "—")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-
-                    Text(hardestTrend.trend)
-                        .font(.subheadline)
-                        .foregroundColor(hardestTrend.trend == "↑" ? .green : hardestTrend.trend == "↓" ? .red : .gray)
+                        .textCase(.uppercase)
+                        .tracking(0.5)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
                 .background(Color(.systemBackground))
-                .cornerRadius(8)
+                .cornerRadius(12)
+                .shadow(color: .black.opacity(0.05), radius: 4)
+                
+                // Median grade
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.title)
+                        .foregroundColor(.purple)
+                    
+                    Text(session.medianGradeSent ?? "—")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Median Grade")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
+                        .tracking(0.5)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
                 .shadow(color: .black.opacity(0.05), radius: 4)
             }
         }
@@ -132,49 +135,39 @@ struct SessionProgressView: View {
     private var efficiencySection: some View {
         VStack(spacing: 16) {
             SectionHeader(title: "Efficiency", icon: "target")
-
+            
             VStack(spacing: 12) {
-                HStack(spacing: 16) {
-                    StatCardView(
-                        icon: "repeat",
-                        title: session.formattedAttemptsPerSend,
-                        subtitle: "Attempts/Send",
-                        color: .blue
-                    )
-
-                    StatCardView(
-                        icon: "gauge.with.dots.needle.50percent",
-                        title: "2.5",
-                        subtitle: "Baseline",
-                        color: .gray
-                    )
+                // Main efficiency metric
+                HStack(spacing: 12) {
+                    Image(systemName: "repeat.circle.fill")
+                        .font(.title)
+                        .foregroundColor(.blue)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(session.formattedAttemptsPerSend)
+                            .font(.system(size: 36, weight: .bold))
+                            .foregroundColor(.primary)
+                        
+                        Text("Attempts per Send")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    // Quality indicator
+                    EfficiencyBadge(attemptsPerSend: session.attemptsPerSend)
                 }
-
-                // Efficiency comparison
-                let efficiencyChange = session.calculatePercentChange(
-                    current: session.sessionAttemptsPerSend,
-                    historical: 2.5
-                )
-
-                HStack(spacing: 8) {
-                    Text("Efficiency vs baseline:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-
-                    Text(String(format: "%.1f attempts/send today (baseline: 2.5)", session.sessionAttemptsPerSend))
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-
-                    let trend = session.calculateTrend(current: session.sessionAttemptsPerSend, historical: 2.5)
-                    Text(trend)
-                        .font(.subheadline)
-                        .foregroundColor(trend == "↑" ? .red : trend == "↓" ? .green : .gray)
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
+                .padding(20)
                 .background(Color(.systemBackground))
-                .cornerRadius(8)
+                .cornerRadius(12)
                 .shadow(color: .black.opacity(0.05), radius: 4)
+                
+                // Context text
+                Text("Lower is better - fewer attempts needed to send each route")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.horizontal)
@@ -183,124 +176,82 @@ struct SessionProgressView: View {
     // MARK: - Volume Distribution Section
     private var volumeDistributionSection: some View {
         VStack(spacing: 16) {
-            SectionHeader(title: "Volume Distribution", icon: "chart.pie.fill")
-
-            VStack(spacing: 12) {
-                ForEach(session.formattedGradeDistribution, id: \.band) { distribution in
-                    HStack {
-                        Text(distribution.band)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .frame(width: 60, alignment: .leading)
-
-                        Text("\(distribution.attempts) attempts")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-
-                        Spacer()
-
-                        Text(String(format: "%.1f%%", distribution.percentage))
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.primary)
-
-                        // Progress bar
-                        GeometryReader { geometry in
-                            ZStack(alignment: .leading) {
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.2))
-                                    .frame(height: 6)
-                                    .cornerRadius(3)
-
-                                Rectangle()
-                                    .fill(Color.blue)
-                                    .frame(width: geometry.size.width * distribution.percentage / 100.0, height: 6)
-                                    .cornerRadius(3)
+            SectionHeader(title: "Grade Distribution", icon: "chart.bar.fill")
+            
+            if session.formattedGradeDistribution.isEmpty {
+                // Empty state
+                VStack(spacing: 12) {
+                    Image(systemName: "chart.bar")
+                        .font(.largeTitle)
+                        .foregroundColor(.secondary.opacity(0.5))
+                    
+                    Text("No attempts yet")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Text("Start climbing to see your grade distribution")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(session.formattedGradeDistribution, id: \.band) { distribution in
+                        VStack(spacing: 8) {
+                            HStack {
+                                // Grade band
+                                Text(distribution.band)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .frame(width: 70, alignment: .leading)
+                                
+                                // Progress bar
+                                GeometryReader { geometry in
+                                    ZStack(alignment: .leading) {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.gray.opacity(0.15))
+                                            .frame(height: 24)
+                                        
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.blue.opacity(0.8))
+                                            .frame(width: geometry.size.width * distribution.percentage / 100.0, height: 24)
+                                        
+                                        // Count label inside bar
+                                        if distribution.percentage > 15 {
+                                            Text("\(distribution.attempts)")
+                                                .font(.caption)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.white)
+                                                .padding(.leading, 8)
+                                        }
+                                    }
+                                }
+                                .frame(height: 24)
+                                
+                                // Percentage
+                                Text(String(format: "%.0f%%", distribution.percentage))
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.secondary)
+                                    .frame(width: 45, alignment: .trailing)
                             }
+                            .frame(height: 24)
                         }
-                        .frame(height: 6)
-                        .frame(width: 60)
                     }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
-                    .background(Color(.systemBackground))
-                    .cornerRadius(8)
-                    .shadow(color: .black.opacity(0.05), radius: 4)
                 }
+                .padding(16)
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
+                .shadow(color: .black.opacity(0.05), radius: 4)
             }
         }
         .padding(.horizontal)
     }
 
-    // MARK: - Progress Trends Section
-    private var progressTrendsSection: some View {
-        VStack(spacing: 16) {
-            SectionHeader(title: "Progress Trends", icon: "arrow.up.arrow.down")
-
-            VStack(spacing: 12) {
-                // Success percentage trend
-                let successTrend = session.successPercentageTrend
-                TrendRowView(
-                    label: "Success Rate",
-                    current: session.formattedSuccessPercentage,
-                    trend: successTrend.trend,
-                    change: successTrend.change
-                )
-
-                // Hardest grade trend
-                if let hardestTrend = session.hardestGradeTrend {
-                    TrendRowView(
-                        label: "Hardest Grade",
-                        current: hardestTrend.current ?? "—",
-                        trend: hardestTrend.trend,
-                        change: hardestTrend.change
-                    )
-                }
-
-                // Median grade trend
-                if let medianTrend = session.medianGradeTrend {
-                    TrendRowView(
-                        label: "Median Grade",
-                        current: medianTrend.current ?? "—",
-                        trend: medianTrend.trend,
-                        change: medianTrend.change
-                    )
-                }
-
-                // Personal best indicators
-                if session.isHardestGradePersonalBest {
-                    HStack {
-                        Image(systemName: "trophy.fill")
-                            .foregroundColor(.yellow)
-                        Text("New personal best - hardest grade!")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.primary)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color.yellow.opacity(0.1))
-                    .cornerRadius(8)
-                }
-
-                if session.isSuccessPercentagePersonalBest {
-                    HStack {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
-                        Text("New personal best - success rate!")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.primary)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color.yellow.opacity(0.1))
-                    .cornerRadius(8)
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
 }
 
 // MARK: - Supporting Views
@@ -323,40 +274,67 @@ struct SectionHeader: View {
     }
 }
 
-struct TrendRowView: View {
+struct HeroStatCard: View {
+    let value: String
     let label: String
-    let current: String
-    let trend: String
-    let change: Double
-
+    let icon: String
+    let color: Color
+    
     var body: some View {
-        HStack {
+        VStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title)
+                .foregroundColor(color)
+            
+            Text(value)
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundColor(.primary)
+            
             Text(label)
-                .font(.subheadline)
+                .font(.caption)
                 .foregroundColor(.secondary)
-                .frame(width: 100, alignment: .leading)
-
-            Spacer()
-
-            Text(current)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-
-            Text(trend)
-                .font(.subheadline)
-                .foregroundColor(trend == "↑" ? .green : trend == "↓" ? .red : .gray)
-
-            if change != 0 {
-                Text(String(format: "%.1f%%", abs(change)))
-                    .font(.caption)
-                    .foregroundColor(change > 0 ? .green : .red)
-            }
+                .textCase(.uppercase)
+                .tracking(0.5)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
         .background(Color(.systemBackground))
-        .cornerRadius(8)
+        .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4)
+    }
+}
+
+struct EfficiencyBadge: View {
+    let attemptsPerSend: Double
+    
+    private var quality: (label: String, color: Color) {
+        switch attemptsPerSend {
+        case 0..<2.0:
+            return ("Excellent", .green)
+        case 2.0..<3.5:
+            return ("Good", .blue)
+        case 3.5..<5.0:
+            return ("Average", .orange)
+        default:
+            return ("Working", .gray)
+        }
+    }
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.title2)
+                .foregroundColor(quality.color)
+            
+            Text(quality.label)
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(quality.color)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(quality.color.opacity(0.15))
+        .cornerRadius(8)
     }
 }
 

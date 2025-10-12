@@ -24,23 +24,18 @@
 		084EACA82E6CE3B60011DD3F /* AttemptHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACA72E6CE3B60011DD3F /* AttemptHistoryView.swift */; };
 		084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */; };
 		084EACAE2E6CE3C20011DD3F /* RoutePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */; };
-		084EACB02E6CE3C60011DD3F /* UndoSnackbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACAF2E6CE3C60011DD3F /* UndoSnackbarView.swift */; };
 		084EACB22E6CE7910011DD3F /* CompactGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */; };
-		084FA4B72ABF57E900ADF994 /* OutlineButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B62ABF57E900ADF994 /* OutlineButton.swift */; };
 		084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B82ABF581B00ADF994 /* PickerMenu.swift */; };
 		084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */; };
 		084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */; };
 		084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */; };
-		084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */; };
 		084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */; };
 		084FA4C72ABF592F00ADF994 /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C62ABF592F00ADF994 /* ActionButton.swift */; };
 		084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */; };
 		084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */; };
 		084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */; };
 		084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4D02AC2645A00ADF994 /* HomeView.swift */; };
-		084FA4D32AC5B90300ADF994 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4D22AC5B86A00ADF994 /* LoadingView.swift */; };
 		084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAB2AB6590B0015E8EE /* MainApp.swift */; };
-		084FDAAE2AB6590B0015E8EE /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAD2AB6590B0015E8EE /* Persistence.swift */; };
 		084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAB22AB6590B0015E8EE /* ContentView.swift */; };
 		084FDAB52AB6590C0015E8EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 084FDAB42AB6590C0015E8EE /* Assets.xcassets */; };
 		084FDAB92AB6590C0015E8EE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 084FDAB82AB6590C0015E8EE /* Preview Assets.xcassets */; };
@@ -54,9 +49,6 @@
 		084FDAF32ABF1E560015E8EE /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF22ABF1E560015E8EE /* Color.swift */; };
 		084FDAF52ABF20B10015E8EE /* ClimbingGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */; };
 		084FDAF72ABF20C90015E8EE /* ClimbingGrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */; };
-		0852BD862D34ACE300CBF36D /* BaseTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD852D34ACD600CBF36D /* BaseTileView.swift */; };
-		0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */; };
-		0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */; };
 		0852BD932D45489300CBF36D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0852BD922D45489300CBF36D /* SettingsView.swift */; };
 		08760D5A2E6E6AC900E7A584 /* GlobalAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D592E6E6AC900E7A584 /* GlobalAnalytics.swift */; };
 		08760D652E6E6C1100E7A584 /* ProgressionChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08760D602E6E6C1100E7A584 /* ProgressionChart.swift */; };
@@ -122,14 +114,11 @@
 		084EACA72E6CE3B60011DD3F /* AttemptHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptHistoryView.swift; sourceTree = "<group>"; };
 		084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerView.swift; sourceTree = "<group>"; };
 		084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutePickerView.swift; sourceTree = "<group>"; };
-		084EACAF2E6CE3C60011DD3F /* UndoSnackbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoSnackbarView.swift; sourceTree = "<group>"; };
 		084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactGradeSelector.swift; sourceTree = "<group>"; };
-		084FA4B62ABF57E900ADF994 /* OutlineButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineButton.swift; sourceTree = "<group>"; };
 		084FA4B82ABF581B00ADF994 /* PickerMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerMenu.swift; sourceTree = "<group>"; };
 		084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbTypePicker.swift; sourceTree = "<group>"; };
 		084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeSystemPicker.swift; sourceTree = "<group>"; };
 		084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbStatus.swift; sourceTree = "<group>"; };
-		084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionActionBar.swift; sourceTree = "<group>"; };
 		084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteLogRowItem.swift; sourceTree = "<group>"; };
 		084FA4C62ABF592F00ADF994 /* ActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
 		084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stopwatch.swift; sourceTree = "<group>"; };
@@ -137,10 +126,8 @@
 		084FA4CC2AC0F32D00ADF994 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		084FA4CD2AC0F59500ADF994 /* GradeSystemSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeSystemSelectionView.swift; sourceTree = "<group>"; };
 		084FA4D02AC2645A00ADF994 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		084FA4D22AC5B86A00ADF994 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		084FDAA82AB6590B0015E8EE /* crakt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = crakt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		084FDAAB2AB6590B0015E8EE /* MainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainApp.swift; sourceTree = "<group>"; };
-		084FDAAD2AB6590B0015E8EE /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		084FDAB22AB6590B0015E8EE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		084FDAB42AB6590C0015E8EE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		084FDAB62AB6590C0015E8EE /* crakt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = crakt.entitlements; sourceTree = "<group>"; };
@@ -157,9 +144,6 @@
 		084FDAF22ABF1E560015E8EE /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		084FDAF42ABF20B10015E8EE /* ClimbingGradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGradeSelector.swift; sourceTree = "<group>"; };
 		084FDAF62ABF20C90015E8EE /* ClimbingGrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGrade.swift; sourceTree = "<group>"; };
-		0852BD852D34ACD600CBF36D /* BaseTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTileView.swift; sourceTree = "<group>"; };
-		0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRouteCard.swift; sourceTree = "<group>"; };
-		0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToConfirmView.swift; sourceTree = "<group>"; };
 		0852BD922D45489300CBF36D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		08760D592E6E6AC900E7A584 /* GlobalAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalAnalytics.swift; sourceTree = "<group>"; };
 		08760D5E2E6E6C1100E7A584 /* DistributionChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionChart.swift; sourceTree = "<group>"; };
@@ -240,16 +224,13 @@
 				084EAC912E6933000011DD3F /* HapticManager.swift */,
 				08760D6A2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift */,
 				08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */,
-				0852BD8A2D39E57F00CBF36D /* ActiveRouteCard.swift */,
 				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
 				088B9AEB2E883C100084C3F0 /* DifficultyRatingView.swift */,
 				084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */,
 				084EAC8D2E6932F30011DD3F /* SessionManager.swift */,
 				084EAC932E69330D0011DD3F /* SessionTabView.swift */,
 				088B9AE52E883BA80084C3F0 /* WarmupModeView.swift */,
-				084FA4C02ABF58C400ADF994 /* SessionActionBar.swift */,
 				084FA4B82ABF581B00ADF994 /* PickerMenu.swift */,
-				084FA4B62ABF57E900ADF994 /* OutlineButton.swift */,
 				084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */,
 				084EAC812E6726FD0011DD3F /* WorkoutSummaryCard.swift */,
 			);
@@ -298,9 +279,7 @@
 				084FDAF12ABF1D900015E8EE /* Models */,
 				084FDAEA2AB7EE860015E8EE /* Extensions */,
 				084FDAAB2AB6590B0015E8EE /* MainApp.swift */,
-				084FDAAD2AB6590B0015E8EE /* Persistence.swift */,
 				084FDAB22AB6590B0015E8EE /* ContentView.swift */,
-				084FA4D22AC5B86A00ADF994 /* LoadingView.swift */,
 				084FDAB42AB6590C0015E8EE /* Assets.xcassets */,
 				084FDAB62AB6590C0015E8EE /* crakt.entitlements */,
 				084FDAB72AB6590C0015E8EE /* Preview Content */,
@@ -433,7 +412,6 @@
 		08C7F49B2BF1B41C0063827E /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				0852BD852D34ACD600CBF36D /* BaseTileView.swift */,
 				084EACA52E6CE3A60011DD3F /* ActiveRouteCardView.swift */,
 				08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */,
 				084EACA32E6CE3A00011DD3F /* GradeScrubberView.swift */,
@@ -441,9 +419,7 @@
 				08C3EF292E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift */,
 				084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */,
 				084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */,
-				084EACAF2E6CE3C60011DD3F /* UndoSnackbarView.swift */,
 				084EACA72E6CE3B60011DD3F /* AttemptHistoryView.swift */,
-				0852BD8F2D3EAAE800CBF36D /* SwipeToConfirmView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -594,13 +570,10 @@
 				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,
 				084EAC7C2E669C0A0011DD3F /* WorkoutOrchestrator.swift in Sources */,
 				08760D6D2E6FCA2000E7A584 /* SessionTimelineView.swift in Sources */,
-				0852BD902D3EAAE800CBF36D /* SwipeToConfirmView.swift in Sources */,
 				084FA4CE2AC0F59500ADF994 /* GradeSystemSelectionView.swift in Sources */,
 				084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */,
 				084FDADC2AB75C3C0015E8EE /* GradeSystem.swift in Sources */,
 				084FDAEE2AB7F5570015E8EE /* SessionView.swift in Sources */,
-				084FDAAE2AB6590B0015E8EE /* Persistence.swift in Sources */,
-				0852BD862D34ACE300CBF36D /* BaseTileView.swift in Sources */,
 				084FDAF32ABF1E560015E8EE /* Color.swift in Sources */,
 				0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */,
 				0852BD932D45489300CBF36D /* SettingsView.swift in Sources */,
@@ -611,7 +584,6 @@
 				084EACAE2E6CE3C20011DD3F /* RoutePickerView.swift in Sources */,
 				08C7F4962BDDAF280063827E /* SessionChartsControllerView.swift in Sources */,
 				084EAC802E6726F50011DD3F /* WorkoutSelectorView.swift in Sources */,
-				084FA4D32AC5B90300ADF994 /* LoadingView.swift in Sources */,
 				084FDAEC2AB7EEC60015E8EE /* Date+String.swift in Sources */,
 				08C7F49D2BF1B42F0063827E /* ExpandableSection.swift in Sources */,
 				084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */,
@@ -625,15 +597,12 @@
 				088B9AEA2E883BF00084C3F0 /* WarmupExercise.swift in Sources */,
 				084EAC7E2E669C140011DD3F /* Workout.swift in Sources */,
 				084EACA62E6CE3A60011DD3F /* ActiveRouteCardView.swift in Sources */,
-				084FA4C12ABF58C400ADF994 /* SessionActionBar.swift in Sources */,
 				08C7F4A22BF1B4900063827E /* RouteSummaryView.swift in Sources */,
 				08C7F4982BDDAF2D0063827E /* AttemptStatusByGradeStackedBarChartView.swift in Sources */,
-				084FA4B72ABF57E900ADF994 /* OutlineButton.swift in Sources */,
 				084EACA82E6CE3B60011DD3F /* AttemptHistoryView.swift in Sources */,
 				084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */,
 				084FDAE42AB7E3430015E8EE /* ScrollingSectionView.swift in Sources */,
 				08760D6B2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift in Sources */,
-				084EACB02E6CE3C60011DD3F /* UndoSnackbarView.swift in Sources */,
 				084EAC8A2E672A490011DD3F /* StatCardView.swift in Sources */,
 				088B9AE82E883BC90084C3F0 /* RouteStylePicker.swift in Sources */,
 				088B9AEC2E883C100084C3F0 /* DifficultyRatingView.swift in Sources */,
@@ -647,7 +616,6 @@
 				08C7F4952BDDACDC0063827E /* Session.stats.swift in Sources */,
 				084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */,
 				084EAC842E6729F40011DD3F /* SessionConfigView.swift in Sources */,
-				0852BD8B2D39E57F00CBF36D /* ActiveRouteCard.swift in Sources */,
 				084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */,
 				08760D5A2E6E6AC900E7A584 /* GlobalAnalytics.swift in Sources */,
 				08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */,

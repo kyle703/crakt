@@ -156,14 +156,14 @@ struct SessionTabView: View {
                             HStack(spacing: 16) {
                                 StatCardView(
                                     icon: "arrow.up.circle",
-                                    title: "\(session.sessionTotalAttempts)",
+                                    title: "\(session.totalAttempts)",
                                     subtitle: "Total Attempts",
                                     color: .blue
                                 )
 
                                 StatCardView(
                                     icon: "checkmark.circle",
-                                    title: "\(session.sessionTotalSends)",
+                                    title: "\(session.totalSends)",
                                     subtitle: "Sends",
                                     color: .green
                                 )
@@ -191,7 +191,7 @@ struct SessionTabView: View {
                             }
 
                             HStack(spacing: 16) {
-                                if let hardestGrade = session.sessionHardestGradeSent {
+                                if let hardestGrade = session.hardestGradeSent {
                                     StatCardView(
                                         icon: "mountain.2.fill",
                                         title: hardestGrade,
@@ -207,7 +207,7 @@ struct SessionTabView: View {
                                     )
                                 }
 
-                                if let medianGrade = session.sessionMedianGradeSent {
+                                if let medianGrade = session.medianGradeSent {
                                     StatCardView(
                                         icon: "chart.line.uptrend.xyaxis",
                                         title: medianGrade,
@@ -260,11 +260,11 @@ struct SessionTabView: View {
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
 
-                                Text(String(format: "%.1f attempts/send today (baseline: 2.5)", session.sessionAttemptsPerSend))
+                                Text(String(format: "%.1f attempts/send today (baseline: 2.5)", session.attemptsPerSend))
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
 
-                                let trend = session.calculateTrend(current: session.sessionAttemptsPerSend, historical: 2.5)
+                                let trend = session.calculateTrend(current: session.attemptsPerSend, historical: 2.5)
                                 Text(trend)
                                     .font(.subheadline)
                                     .foregroundColor(trend == "↑" ? .red : trend == "↓" ? .green : .gray)
