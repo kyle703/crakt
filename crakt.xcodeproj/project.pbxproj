@@ -62,6 +62,7 @@
 		088B9AE82E883BC90084C3F0 /* RouteStylePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AE72E883BC90084C3F0 /* RouteStylePicker.swift */; };
 		088B9AEA2E883BF00084C3F0 /* WarmupExercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AE92E883BF00084C3F0 /* WarmupExercise.swift */; };
 		088B9AEC2E883C100084C3F0 /* DifficultyRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AEB2E883C100084C3F0 /* DifficultyRatingView.swift */; };
+		088B9AEE2E9B5F150084C3F0 /* LaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088B9AED2E9B5F150084C3F0 /* LaunchScreen.swift */; };
 		0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1292BAD07E000D31AD3 /* Route.swift */; };
 		0896B12E2BAF7A7F00D31AD3 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12B2BAD07E000D31AD3 /* Session.swift */; };
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
@@ -157,6 +158,7 @@
 		088B9AE72E883BC90084C3F0 /* RouteStylePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteStylePicker.swift; sourceTree = "<group>"; };
 		088B9AE92E883BF00084C3F0 /* WarmupExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmupExercise.swift; sourceTree = "<group>"; };
 		088B9AEB2E883C100084C3F0 /* DifficultyRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyRatingView.swift; sourceTree = "<group>"; };
+		088B9AED2E9B5F150084C3F0 /* LaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreen.swift; sourceTree = "<group>"; };
 		0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteAttempt.swift; sourceTree = "<group>"; };
 		0896B1292BAD07E000D31AD3 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -211,6 +213,7 @@
 				084FA4B32ABF57A300ADF994 /* Session */,
 				084FDAE92AB7E4D10015E8EE /* Selectors */,
 				0852BD922D45489300CBF36D /* SettingsView.swift */,
+				088B9AED2E9B5F150084C3F0 /* LaunchScreen.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -565,6 +568,7 @@
 			files = (
 				084EAC862E672A0F0011DD3F /* ActivityHistoryView.swift in Sources */,
 				084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */,
+				088B9AEE2E9B5F150084C3F0 /* LaunchScreen.swift in Sources */,
 				0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */,
 				084EAC942E69330D0011DD3F /* SessionTabView.swift in Sources */,
 				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,

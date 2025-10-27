@@ -82,11 +82,31 @@ struct MainApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LaunchScreenWrapper()
                 .modelContainer(modelContainer)
-                //.modelContainer(DataController.previewContainer)
         }
+    }
+}
 
+// MARK: - Launch Screen Wrapper
+
+struct LaunchScreenWrapper: View {
+    @State private var showLaunchScreen = true
+    
+    var body: some View {
+        ZStack {
+            if showLaunchScreen {
+                LaunchScreen {
+                    withAnimation(.easeOut(duration: 0.4)) {
+                        showLaunchScreen = false
+                    }
+                }
+                .transition(.opacity)
+            } else {
+                ContentView()
+                    .transition(.opacity)
+            }
+        }
     }
 }
 

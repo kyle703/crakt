@@ -17,13 +17,13 @@ struct ProfileHeaderView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Hi, \(user.name)!")
+                    Text("Sup, Climber!")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
 
                     if sessions.isEmpty {
-                        Text("Ready for your next climb?")
+                        Text("Ready to start a new session?")
                             .font(.title3)
                             .foregroundColor(.secondary)
                     } else {
