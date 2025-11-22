@@ -104,62 +104,10 @@ struct SessionConfigView: View {
     // MARK: - View Components
 
     private var locationSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Location")
-                .font(.headline)
-                .foregroundColor(.primary)
-
-            VStack(spacing: 12) {
-                TextField("Gym Name (optional)", text: $gymName)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal, 4)
-
-                HStack {
-                    Image(systemName: "location.fill")
-                        .foregroundColor(.blue)
-                    Text("Use Current Location")
-                        .foregroundColor(.blue)
-                        .font(.subheadline)
-                }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 12)
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(8)
-                .onTapGesture {
-                    // TODO: Implement location services
-                }
-            }
-        }
+        SessionGymSelectorView(selectedGymName: $gymName)
     }
 
-    private var climbingSetupSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Climbing Setup")
-                .font(.headline)
-                .foregroundColor(.primary)
 
-            // Climb Type Toggle
-            ClimbTypeToggle(selectedType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
-        }
-    }
-
-    private var sessionTypeSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Session Type")
-                .font(.headline)
-                .foregroundColor(.primary)
-
-            VStack(spacing: 12) {
-                ForEach(SessionType.allCases, id: \.self) { type in
-                    SessionTypeCard(
-                        type: type,
-                        isSelected: sessionType == type,
-                        action: { sessionType = type }
-                    )
-                }
-            }
-        }
-    }
 
     private var workoutSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -240,20 +188,27 @@ struct SessionConfigView: View {
 
     private var warmupSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Warm-up")
-                .font(.headline)
-                .foregroundColor(.primary)
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Warm-up routine")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    Text("Add a guided warm-up.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
 
-            // Warm-up toggle
-            Toggle("Include warm-up routine", isOn: $isWarmupEnabled)
-                .font(.subheadline)
-                .foregroundColor(.primary)
-                .tint(.blue)
+                Spacer()
+
+                Toggle("", isOn: $isWarmupEnabled)
+                    .labelsHidden()
+                    .tint(.blue)
+            }
 
             // Exercise selection - only show when warm-up is enabled
             if isWarmupEnabled {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Select exercises to include in your warm-up routine")
+                    Text("Choose the moves that help you get loose.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
 
@@ -278,6 +233,12 @@ struct SessionConfigView: View {
                 }
             }
         }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
+        )
     }
 
     private var startSessionButton: some View {
@@ -289,17 +250,13 @@ struct SessionConfigView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(
-                    LinearGradient(
-                        colors: [.blue, .blue.opacity(0.8)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.blue)
                 )
-                .cornerRadius(16)
-                .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .disabled(sessionType == .workout && selectedWorkout == nil)
         .padding(.horizontal, 4)
+        .shadow(color: .blue.opacity(0.25), radius: 8, x: 0, y: 6)
     }
 
     var body: some View {
@@ -309,9 +266,18 @@ struct SessionConfigView: View {
                     VStack(spacing: 24) {
                         locationSection
 
-                        climbingSetupSection
+                        ClimbTypeToggle(selectedType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
 
-                        sessionTypeSection
+                        // Session Type Selection
+                        VStack(spacing: 12) {
+                            ForEach(SessionType.allCases, id: \.self) { type in
+                                SessionTypeCard(
+                                    type: type,
+                                    isSelected: sessionType == type,
+                                    action: { sessionType = type }
+                                )
+                            }
+                        }
 
                         // Workout Selection (if workout type selected)
                         if sessionType == .workout {
@@ -320,55 +286,11 @@ struct SessionConfigView: View {
                             workoutSettingsSection
                         }
 
-                    // Warm-up Configuration
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Warm-up")
-                            .font(.headline)
-                            .foregroundColor(.primary)
+                        warmupSection
 
-                        // Warm-up toggle
-                        Toggle("Include warm-up routine", isOn: $isWarmupEnabled)
-                            .font(.subheadline)
-                            .foregroundColor(.primary)
-                            .tint(.blue)
 
-                        // Exercise selection - only show when warm-up is enabled
-                        if isWarmupEnabled {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Select exercises to include in your warm-up routine")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-
-                                // Exercise selection rows
-                                VStack(spacing: 8) {
-                                    ForEach(WarmupExercise.allExercises, id: \.id) { exercise in
-                                        ExerciseSelectionCard(
-                                            exercise: exercise,
-                                            isSelected: selectedWarmupExercises.contains(exercise),
-                                            onToggle: { isSelected in
-                                                if isSelected {
-                                                    if !selectedWarmupExercises.contains(exercise) {
-                                                        selectedWarmupExercises.append(exercise)
-                                                    }
-                                                } else {
-                                                    selectedWarmupExercises.removeAll { $0.id == exercise.id }
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(12)
-                    .shadow(color: Color.black.opacity(0.05), radius: 4)
-
-                        Spacer(minLength: 40)
-
-                        // Start Session Button
-                        startSessionButton
+                    // Start Session Button
+                    startSessionButton
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
@@ -543,9 +465,9 @@ enum SessionType: String, CaseIterable {
     var description: String {
         switch self {
         case .freeClimb:
-            return "Climb freely and log your routes"
+            return "Log attempts as you go"
         case .workout:
-            return "Follow a structured workout plan"
+            return "Follow preset sets & rest"
         }
     }
 
@@ -564,89 +486,82 @@ struct ClimbTypeToggle: View {
     @Binding var selectedGradeSystem: GradeSystem
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Climb Type Selection - Custom Toggle
+        VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Climb Type")
+                Text("Style")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
 
-                ZStack {
-                    // Background
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(Color(.secondarySystemBackground))
-                        .frame(height: 50)
-
-                    // Sliding background
-                    RoundedRectangle(cornerRadius: 23)
-                        .fill(.blue)
-                        .frame(width: 78, height: 44)
-                        .offset(x: selectedType == .boulder ? -41 : 41)
-                        .animation(.spring(response: 0.25, dampingFraction: 0.8), value: selectedType)
-
-                    // Buttons
-                    HStack(spacing: 0) {
-                        Button(action: {
-                            withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
-                                selectedType = .boulder
-                            }
-                        }) {
-                            VStack(spacing: 4) {
-                                Image(systemName: "mountain.2.fill")
-                                    .font(.title3)
-                                Text("Boulder")
-                                    .font(.caption2)
-                                    .fontWeight(.medium)
-                            }
-                            .foregroundColor(selectedType == .boulder ? .white : .secondary)
-                            .frame(width: 80, height: 50)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-
-                        Button(action: {
-                            withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
-                                selectedType = .toprope
-                            }
-                        }) {
-                            VStack(spacing: 4) {
-                                Image(systemName: "figure.climbing")
-                                    .font(.title3)
-                                Text("Rope")
-                                    .font(.caption2)
-                                    .fontWeight(.medium)
-                            }
-                            .foregroundColor(selectedType.isRopes ? .white : .secondary)
-                            .frame(width: 80, height: 50)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                    }
+                HStack(spacing: 8) {
+                    styleSegment(for: .boulder, icon: "mountain.2.fill", label: "Boulder")
+                    styleSegment(for: .toprope, icon: "figure.climbing", label: "Rope")
                 }
-                .frame(height: 50)
             }
 
-            // Grade System Selection (horizontal)
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Grade System")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+            Divider()
 
-                Picker("Grade System", selection: $selectedGradeSystem) {
-                    ForEach(filteredGradeSystems, id: \.self) { system in
-                        Text(system.description).tag(system)
-                    }
-                }
-                .pickerStyle(.menu)
-                .tint(.blue)
-                .frame(height: 50) // Match toggle height
-                .onChange(of: selectedType) {
-                    // Auto-adjust grade system when climb type changes
-                    if !filteredGradeSystems.contains(selectedGradeSystem) {
-                        selectedGradeSystem = filteredGradeSystems.first ?? .vscale
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Grade scale")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+
+                gradeMenu
+
+                Text("Match the grades used at your gym.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
+        )
+        .onChange(of: selectedType) {
+            if !filteredGradeSystems.contains(selectedGradeSystem) {
+                selectedGradeSystem = filteredGradeSystems.first ?? .vscale
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var gradeMenu: some View {
+        Menu {
+            ForEach(filteredGradeSystems, id: \.self) { system in
+                Button {
+                    selectedGradeSystem = system
+                } label: {
+                    HStack {
+                        Text(system.description)
+                        Spacer()
+                        if selectedGradeSystem == system {
+                            Image(systemName: "checkmark")
+                        }
                     }
                 }
             }
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(selectedGradeSystem.description)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.down")
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.secondarySystemBackground))
+            )
         }
     }
 
@@ -660,6 +575,40 @@ struct ClimbTypeToggle: View {
             }
         }
     }
+
+    private func styleSegment(for type: ClimbType, icon: String, label: String) -> some View {
+        let isActive: Bool
+        if type == .boulder {
+            isActive = selectedType == .boulder
+        } else {
+            isActive = selectedType.isRopes
+        }
+        return Button {
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                selectedType = type
+            }
+        } label: {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.headline)
+                Text(label)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+            }
+            .foregroundColor(isActive ? .blue : .primary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isActive ? Color.blue.opacity(0.1) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isActive ? Color.blue : Color.gray.opacity(0.2), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 struct SessionTypeCard: View {
@@ -669,40 +618,45 @@ struct SessionTypeCard: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 16) {
-                Image(systemName: type.icon)
-                    .font(.title2)
-                    .foregroundColor(isSelected ? .white : .blue)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        Circle()
-                            .fill(isSelected ? .blue : .blue.opacity(0.1))
-                    )
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(isSelected ? Color.blue.opacity(0.15) : Color.blue.opacity(0.08))
+                            .frame(width: 44, height: 44)
+                        Image(systemName: type.icon)
+                            .font(.title3)
+                            .foregroundColor(.blue)
+                    }
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(type.rawValue)
-                        .font(.headline)
-                        .foregroundColor(isSelected ? .white : .primary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(type.rawValue)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Text(type.description)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
 
-                    Text(type.description)
-                        .font(.subheadline)
-                        .foregroundColor(isSelected ? .white.opacity(0.9) : .secondary)
-                        .multilineTextAlignment(.leading)
-                }
+                    Spacer()
 
-                Spacer()
-
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .foregroundColor(.white)
-                        .font(.title3)
+                    if isSelected {
+                        Label("Selected", systemImage: "checkmark.circle.fill")
+                            .labelStyle(.titleAndIcon)
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                    }
                 }
             }
             .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.blue : Color(.systemBackground))
-                    .shadow(color: .black.opacity(isSelected ? 0.2 : 0.05), radius: 8, x: 0, y: 2)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(isSelected ? Color.blue : Color.gray.opacity(0.2), lineWidth: isSelected ? 1.5 : 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
             )
         }
         .buttonStyle(PlainButtonStyle())

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		033F207FEF3558750BB6C2E4 /* GymFinderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68C8B35292D660C66A823F65 /* GymFinderView.swift */; };
+		082C33412EB9A35E006CD96E /* gyms.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 082C33402EB9A35E006CD96E /* gyms.sqlite */; };
 		084EAC7C2E669C0A0011DD3F /* WorkoutOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC7B2E669C0A0011DD3F /* WorkoutOrchestrator.swift */; };
 		084EAC7E2E669C140011DD3F /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC7D2E669C140011DD3F /* Workout.swift */; };
 		084EAC802E6726F50011DD3F /* WorkoutSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */; };
@@ -25,6 +27,7 @@
 		084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */; };
 		084EACAE2E6CE3C20011DD3F /* RoutePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */; };
 		084EACB22E6CE7910011DD3F /* CompactGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */; };
+		08C3F4B12EC0F606004F8B28 /* SessionGymSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C3F4B02EC0F606004F8B28 /* SessionGymSelectorView.swift */; };
 		084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B82ABF581B00ADF994 /* PickerMenu.swift */; };
 		084FA4BB2ABF584300ADF994 /* ClimbTypePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BA2ABF584300ADF994 /* ClimbTypePicker.swift */; };
 		084FA4BD2ABF585100ADF994 /* GradeSystemPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BC2ABF585100ADF994 /* GradeSystemPicker.swift */; };
@@ -78,6 +81,14 @@
 		08C7F49D2BF1B42F0063827E /* ExpandableSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */; };
 		08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F49F2BF1B46A0063827E /* AttemptsList.swift */; };
 		08C7F4A22BF1B4900063827E /* RouteSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4A12BF1B4900063827E /* RouteSummaryView.swift */; };
+		5D2FE8C375534617F137299E /* SQLiteGymDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F221109B8663C60E6231CD0 /* SQLiteGymDataSource.swift */; };
+		77493D71CCDD15E3D51CEA25 /* GymSearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1881BBADFEDF4AE66A9CB0 /* GymSearchBar.swift */; };
+		A2F3391D936E4BB84CDDAB5F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9680943AFD4DF5BF8192D83D /* LocationManager.swift */; };
+		AA4698E387FEF8E736B8D414 /* GymDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0995277D840D1E9D8683962 /* GymDetailSheet.swift */; };
+		C29B94AB898EAF169085DB8B /* GymListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BB90F0043ABC5FDDE16A68 /* GymListView.swift */; };
+		E3A2EEFA004D8DD3ADB76B1A /* GymDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13C97F233B9B7980B969756 /* GymDataSource.swift */; };
+		F683547123FA3F4CABDA3511 /* GymMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35106958D24722F0FC112D70 /* GymMapView.swift */; };
+		FFDDBBE1F9078392BC00C9C9 /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CE9F9C9903D341D975C394 /* Gym.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,11 +109,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		082C33402EB9A35E006CD96E /* gyms.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = gyms.sqlite; sourceTree = "<group>"; };
+		082C33422EB9A458006CD96E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		084EAC7B2E669C0A0011DD3F /* WorkoutOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutOrchestrator.swift; sourceTree = "<group>"; };
 		084EAC7D2E669C140011DD3F /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSelectorView.swift; sourceTree = "<group>"; };
 		084EAC812E6726FD0011DD3F /* WorkoutSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryCard.swift; sourceTree = "<group>"; };
 		084EAC832E6729F40011DD3F /* SessionConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionConfigView.swift; sourceTree = "<group>"; };
+		08C3F4B02EC0F606004F8B28 /* SessionGymSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGymSelectorView.swift; sourceTree = "<group>"; };
 		084EAC852E672A0F0011DD3F /* ActivityHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityHistoryView.swift; sourceTree = "<group>"; };
 		084EAC872E672A440011DD3F /* ProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderView.swift; sourceTree = "<group>"; };
 		084EAC892E672A490011DD3F /* StatCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatCardView.swift; sourceTree = "<group>"; };
@@ -174,6 +188,15 @@
 		08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableSection.swift; sourceTree = "<group>"; };
 		08C7F49F2BF1B46A0063827E /* AttemptsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptsList.swift; sourceTree = "<group>"; };
 		08C7F4A12BF1B4900063827E /* RouteSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSummaryView.swift; sourceTree = "<group>"; };
+		35106958D24722F0FC112D70 /* GymMapView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GymMapView.swift; path = Gym/GymMapView.swift; sourceTree = "<group>"; };
+		4F221109B8663C60E6231CD0 /* SQLiteGymDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SQLiteGymDataSource.swift; path = ../Models/Gym/SQLiteGymDataSource.swift; sourceTree = "<group>"; };
+		68C8B35292D660C66A823F65 /* GymFinderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GymFinderView.swift; path = Gym/GymFinderView.swift; sourceTree = "<group>"; };
+		7B1881BBADFEDF4AE66A9CB0 /* GymSearchBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GymSearchBar.swift; path = Gym/GymSearchBar.swift; sourceTree = "<group>"; };
+		86BB90F0043ABC5FDDE16A68 /* GymListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GymListView.swift; path = Gym/GymListView.swift; sourceTree = "<group>"; };
+		9680943AFD4DF5BF8192D83D /* LocationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocationManager.swift; path = ../Models/Gym/LocationManager.swift; sourceTree = "<group>"; };
+		E13C97F233B9B7980B969756 /* GymDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GymDataSource.swift; path = ../Models/Gym/GymDataSource.swift; sourceTree = "<group>"; };
+		F0995277D840D1E9D8683962 /* GymDetailSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GymDetailSheet.swift; path = Gym/GymDetailSheet.swift; sourceTree = "<group>"; };
+		F4CE9F9C9903D341D975C394 /* Gym.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Gym.swift; path = Gym/Gym.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +227,7 @@
 		084FA4B22ABF577D00ADF994 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				EE7D261A1C575AA008A6BA7B /* Gym */,
 				08760D642E6E6C1100E7A584 /* Analytics */,
 				0852BD872D34AD2500CBF36D /* ActivityLog */,
 				08C7F49E2BF1B45A0063827E /* Route */,
@@ -245,6 +269,7 @@
 			children = (
 				084FA4D02AC2645A00ADF994 /* HomeView.swift */,
 				084EAC832E6729F40011DD3F /* SessionConfigView.swift */,
+				08C3F4B02EC0F606004F8B28 /* SessionGymSelectorView.swift */,
 				084EAC8B2E672A520011DD3F /* ActivityRowView.swift */,
 				084EAC872E672A440011DD3F /* ProfileHeaderView.swift */,
 				084EAC892E672A490011DD3F /* StatCardView.swift */,
@@ -256,6 +281,7 @@
 		084FDA9F2AB6590B0015E8EE = {
 			isa = PBXGroup;
 			children = (
+				082C33402EB9A35E006CD96E /* gyms.sqlite */,
 				084FA4CC2AC0F32D00ADF994 /* TODO.md */,
 				084FDAAA2AB6590B0015E8EE /* crakt */,
 				084FDAC12AB6590D0015E8EE /* craktTests */,
@@ -277,6 +303,7 @@
 		084FDAAA2AB6590B0015E8EE /* crakt */ = {
 			isa = PBXGroup;
 			children = (
+				082C33422EB9A458006CD96E /* Info.plist */,
 				0896B12C2BAD086200D31AD3 /* SwiftData */,
 				084FA4B22ABF577D00ADF994 /* Views */,
 				084FDAF12ABF1D900015E8EE /* Models */,
@@ -352,6 +379,7 @@
 				084EAC7D2E669C140011DD3F /* Workout.swift */,
 				088B9AE92E883BF00084C3F0 /* WarmupExercise.swift */,
 				084EAC7B2E669C0A0011DD3F /* WorkoutOrchestrator.swift */,
+				F4CE9F9C9903D341D975C394 /* Gym.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -434,6 +462,21 @@
 				08C7F4A12BF1B4900063827E /* RouteSummaryView.swift */,
 			);
 			path = Route;
+			sourceTree = "<group>";
+		};
+		EE7D261A1C575AA008A6BA7B /* Gym */ = {
+			isa = PBXGroup;
+			children = (
+				4F221109B8663C60E6231CD0 /* SQLiteGymDataSource.swift */,
+				E13C97F233B9B7980B969756 /* GymDataSource.swift */,
+				9680943AFD4DF5BF8192D83D /* LocationManager.swift */,
+				F0995277D840D1E9D8683962 /* GymDetailSheet.swift */,
+				86BB90F0043ABC5FDDE16A68 /* GymListView.swift */,
+				35106958D24722F0FC112D70 /* GymMapView.swift */,
+				7B1881BBADFEDF4AE66A9CB0 /* GymSearchBar.swift */,
+				68C8B35292D660C66A823F65 /* GymFinderView.swift */,
+			);
+			name = Gym;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -542,6 +585,7 @@
 			files = (
 				084FDAB92AB6590C0015E8EE /* Preview Assets.xcassets in Resources */,
 				084FDAB52AB6590C0015E8EE /* Assets.xcassets in Resources */,
+				082C33412EB9A35E006CD96E /* gyms.sqlite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -620,6 +664,7 @@
 				08C7F4952BDDACDC0063827E /* Session.stats.swift in Sources */,
 				084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */,
 				084EAC842E6729F40011DD3F /* SessionConfigView.swift in Sources */,
+				08C3F4B12EC0F606004F8B28 /* SessionGymSelectorView.swift in Sources */,
 				084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */,
 				08760D5A2E6E6AC900E7A584 /* GlobalAnalytics.swift in Sources */,
 				08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */,
@@ -632,6 +677,15 @@
 				084EAC882E672A440011DD3F /* ProfileHeaderView.swift in Sources */,
 				084EAC822E6726FD0011DD3F /* WorkoutSummaryCard.swift in Sources */,
 				08C7F49A2BDDAFF90063827E /* Route.stats.swift in Sources */,
+				5D2FE8C375534617F137299E /* SQLiteGymDataSource.swift in Sources */,
+				FFDDBBE1F9078392BC00C9C9 /* Gym.swift in Sources */,
+				E3A2EEFA004D8DD3ADB76B1A /* GymDataSource.swift in Sources */,
+				A2F3391D936E4BB84CDDAB5F /* LocationManager.swift in Sources */,
+				AA4698E387FEF8E736B8D414 /* GymDetailSheet.swift in Sources */,
+				C29B94AB898EAF169085DB8B /* GymListView.swift in Sources */,
+				F683547123FA3F4CABDA3511 /* GymMapView.swift in Sources */,
+				77493D71CCDD15E3D51CEA25 /* GymSearchBar.swift in Sources */,
+				033F207FEF3558750BB6C2E4 /* GymFinderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -792,6 +846,7 @@
 				DEVELOPMENT_TEAM = WLBYAWXK4G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = crakt/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -829,6 +884,7 @@
 				DEVELOPMENT_TEAM = WLBYAWXK4G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = crakt/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

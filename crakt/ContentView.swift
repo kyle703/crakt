@@ -16,6 +16,11 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
+            
+            GymFinderView()
+                .tabItem {
+                    Label("Gyms", systemImage: "figure.climbing")
+                }
 
             ActivityHistoryView()
                 .tabItem {
