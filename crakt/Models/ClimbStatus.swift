@@ -18,7 +18,7 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
     
     case fall
     case send
-//    case highpoint
+    case highPoint
     case topped
     case flash
     
@@ -27,7 +27,7 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
     }
     
 
-    var boulderTypes: Set<ClimbStatus> { [.fall, .send] }
+    var boulderTypes: Set<ClimbStatus> { [.fall, .send, .highPoint] }
     
     var description: String {
         switch self {
@@ -35,12 +35,32 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return "Fall"
         case .send:
             return "Send"
+        case .highPoint:
+            return "High Point"
         case .topped:
             return "Topped"
         case .flash:
             return "Flash"
-//        case .highpoint:
-//            return "High point"
+        }
+    }
+    
+    /// Whether this status counts as a successful completion
+    var isSend: Bool {
+        switch self {
+        case .send, .topped, .flash:
+            return true
+        case .fall, .highPoint:
+            return false
+        }
+    }
+    
+    /// Whether this status shows improvement/progress signal
+    var isProgress: Bool {
+        switch self {
+        case .highPoint:
+            return true
+        default:
+            return false
         }
     }
     
@@ -51,12 +71,12 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return .red
         case .send:
             return .green
+        case .highPoint:
+            return .orange
         case .topped:
             return .orange
         case .flash:
             return .yellow
-//        case .highpoint:
-//            return .indigo
         }
     }
     
@@ -66,12 +86,12 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return "xmark.circle.fill"
         case .send:
             return "arrow.up.circle.fill"
+        case .highPoint:
+            return "arrow.up.to.line.circle.fill"
         case .topped:
             return "flag.circle.fill"
         case .flash:
             return "bolt.circle.fill"
-//        case .highpoint:
-//            return "figure.stairs"
         }
     }
 }

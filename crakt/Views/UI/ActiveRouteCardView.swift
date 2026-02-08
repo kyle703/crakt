@@ -18,6 +18,23 @@ struct ActiveRouteCardView: View {
     // New parameters for grade selection
     @Binding var selectedGrade: String?
     @Binding var selectedGradeSystem: GradeSystem
+    
+    // Callback to show feedback popover at parent level (to overlay header)
+    var onShowFeedbackPopover: (Route, RouteAttempt?) -> Void
+    
+    init(session: Session,
+         stopwatch: Stopwatch,
+         workoutOrchestrator: WorkoutOrchestrator,
+         selectedGrade: Binding<String?>,
+         selectedGradeSystem: Binding<GradeSystem>,
+         onShowFeedbackPopover: @escaping (Route, RouteAttempt?) -> Void = { _, _ in }) {
+        self.session = session
+        self.stopwatch = stopwatch
+        self.workoutOrchestrator = workoutOrchestrator
+        self._selectedGrade = selectedGrade
+        self._selectedGradeSystem = selectedGradeSystem
+        self.onShowFeedbackPopover = onShowFeedbackPopover
+    }
 
     // UI State
     @State private var showAttemptHistory = false
@@ -30,7 +47,7 @@ struct ActiveRouteCardView: View {
     @State private var isDragging = false
 
     // Rest timer state
-    @State private var restDuration: TimeInterval = 10 // 10 seconds for testing
+    @State private var restDuration: TimeInterval = 120 // 2 minutes default
     @State private var restStartTime: Date?
     @State private var isRestTimerActive: Bool = false
 
@@ -39,14 +56,11 @@ struct ActiveRouteCardView: View {
     @State private var animateOldAttempt = false
     @State private var routeChangeTrigger: UUID = UUID() // Force view refresh on route changes
 
-    // Difficulty rating state
-    @State private var showDifficultyRating = false
-    @State private var lastAttemptForRating: RouteAttempt?
-    @State private var surveyRoute: Route?
-
-    // Route style selection state
-    @State private var showStylePicker = false
-    @State private var pendingRouteStyles: [RouteStyle] = []
+    // Route review state (consolidated difficulty rating, styles, and experiences)
+    @State private var showRouteReview = false
+    @State private var reviewAttempt: RouteAttempt?
+    @State private var reviewRoute: Route?
+    @State private var isReviewAutoPresented = false
 
 
 
@@ -58,21 +72,26 @@ struct ActiveRouteCardView: View {
                 VStack(spacing: 12) {
                     // Timer row with inline buttons (flanked left/right)
                     HStack(alignment: .center, spacing: 16) {
-                        // Left: Route style indicator
+                        // Left: Route review button (tags/styles)
                         Button(action: {
                             if let route = session.activeRoute {
-                                pendingRouteStyles = route.styles
-                                showStylePicker = true
+                                reviewRoute = route
+                                reviewAttempt = route.attempts.sorted(by: { $0.date > $1.date }).first
+                                isReviewAutoPresented = false // Manual open
+                                showRouteReview = true
                             }
                         }) {
                             HStack(spacing: 4) {
                                 Image(systemName: "tag")
                                     .font(.system(size: 14))
                                     .foregroundColor(.secondary)
-                                if let route = session.activeRoute, !route.styles.isEmpty {
-                                    Text("\(route.styles.count)")
-                                        .font(.caption2)
-                                        .foregroundColor(.blue)
+                                if let route = session.activeRoute {
+                                    let tagCount = route.wallAngles.count + route.holdTypes.count + route.movementStyles.count
+                                    if tagCount > 0 {
+                                        Text("\(tagCount)")
+                                            .font(.caption2)
+                                            .foregroundColor(.blue)
+                                    }
                                 }
                             }
                             .padding(.horizontal, 8)
@@ -116,11 +135,11 @@ struct ActiveRouteCardView: View {
 
                         // Right: Effort/feedback button
                         Button(action: {
-                            if let route = session.activeRoute,
-                               let attempt = route.attempts.sorted(by: { $0.date > $1.date }).first {
-                                lastAttemptForRating = attempt
-                                surveyRoute = route
-                                showDifficultyRating = true
+                            if let route = session.activeRoute {
+                                reviewRoute = route
+                                reviewAttempt = route.attempts.sorted(by: { $0.date > $1.date }).first
+                                isReviewAutoPresented = false // Manual open
+                                showRouteReview = true
                             }
                         }) {
                             HStack(spacing: 0) {
@@ -140,41 +159,52 @@ struct ActiveRouteCardView: View {
                 }
             }
 
-            // Route feedback tags (show under timer if route has styles, experiences, or rating)
-            if let route = session.activeRoute, (!route.styles.isEmpty || !route.experiences.isEmpty || route.attempts.contains(where: { $0.difficultyRating != nil })) {
-                HStack(spacing: 6) {
-                    // Difficulty rating as symbol
-                    if let latestRating = route.attempts.sorted(by: { $0.date > $1.date }).first?.difficultyRating {
-                        Image(systemName: latestRating.iconName)
-                            .font(.system(size: 14))
-                            .foregroundColor(latestRating.color)
-                            .padding(6)
-                            .background(latestRating.color.opacity(0.1))
-                            .cornerRadius(8)
-                    }
+            // Route feedback tags (show under timer if route has characteristics or rating)
+            if let route = session.activeRoute {
+                let hasCharacteristics = !route.wallAngles.isEmpty || !route.holdTypes.isEmpty || !route.movementStyles.isEmpty || !route.experiences.isEmpty
+                let hasRating = route.attempts.contains(where: { $0.difficultyRating != nil })
+                
+                if hasCharacteristics || hasRating {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            // Difficulty rating
+                            if let latestRating = route.attempts.sorted(by: { $0.date > $1.date }).first?.difficultyRating {
+                                Image(systemName: latestRating.iconName)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(latestRating.color)
+                                    .padding(5)
+                                    .background(latestRating.color.opacity(0.1))
+                                    .cornerRadius(6)
+                            }
+                            
+                            // Wall angles
+                            ForEach(route.wallAngles, id: \.self) { angle in
+                                routeTag(angle.description, color: angle.color)
+                            }
+                            
+                            // Hold types
+                            ForEach(route.holdTypes, id: \.self) { hold in
+                                routeTag(hold.description, color: hold.color)
+                            }
+                            
+                            // Movement styles
+                            ForEach(route.movementStyles, id: \.self) { style in
+                                routeTag(style.description, color: style.color)
+                            }
 
-                    // Route styles
-                    ForEach(route.styles, id: \.self) { style in
-                        Text(style.description)
-                            .font(.caption2)
-                            .foregroundColor(style.color)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(style.color.opacity(0.1))
-                            .cornerRadius(12)
+                            // Experiences
+                            ForEach(route.experiences, id: \.self) { exp in
+                                Image(systemName: exp.iconName)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(exp.color)
+                                    .padding(5)
+                                    .background(exp.color.opacity(0.1))
+                                    .cornerRadius(6)
+                            }
+                        }
                     }
-
-                    // Climb experiences
-                    ForEach(route.experiences, id: \.self) { experience in
-                        Image(systemName: experience.iconName)
-                            .font(.system(size: 14))
-                            .foregroundColor(experience.color)
-                            .padding(6)
-                            .background(experience.color.opacity(0.1))
-                            .cornerRadius(8)
-                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
             }
 
             // Call to action when no attempts
@@ -254,7 +284,7 @@ struct ActiveRouteCardView: View {
                     .foregroundColor(.secondary)
             }
 
-            // Accessibility gesture buttons
+            // Action buttons
             HStack(spacing: 12) {
                
                 accessibilityButton(
@@ -273,20 +303,18 @@ struct ActiveRouteCardView: View {
                     logAttempt(.fall)
                 }
                 
-
-            
                 accessibilityButton(
-                    icon: "timer",
-                    title: "Rest",
+                    icon: "arrow.up.to.line.circle.fill",
+                    title: "High Point",
                     color: .orange
                 ) {
-                    startRestTimer()
+                    logAttempt(.highPoint)
                 }
 
                 accessibilityButton(
                     icon: "arrow.right.circle.fill",
                     title: "Next Route",
-                    color: .orange
+                    color: .blue
                 ) {
                     resetRoute()
                 }
@@ -380,18 +408,23 @@ struct ActiveRouteCardView: View {
             Spacer()
 
             // Compact Grade Selector
-            if let gradeSystem = session.activeRoute?.gradeSystem._protocol {
+            if let route = session.activeRoute {
+                let gradeSystem = GradeSystemFactory.gradeProtocol(
+                    for: route.gradeSystem,
+                    modelContext: modelContext,
+                    customCircuitId: route.customCircuitId
+                )
                 CompactGradeSelector(
                     gradeSystem: gradeSystem,
                     selectedGrade: .init(
-                        get: { session.activeRoute?.grade },
+                        get: { route.grade },
                         set: { newGrade in
                             if let newGrade = newGrade {
                                 changeGrade(to: newGrade)
                             }
                         }
                     ),
-                    isLocked: !(session.activeRoute?.attempts.isEmpty ?? true)
+                    isLocked: !route.attempts.isEmpty
                 )
             }
 
@@ -438,6 +471,7 @@ struct ActiveRouteCardView: View {
         self.workoutOrchestrator = workoutOrchestrator
         self._selectedGrade = .constant(nil)
         self._selectedGradeSystem = .constant(.vscale)
+        self.onShowFeedbackPopover = { _, _ in }
 
         // Timer initialization is now handled in .onAppear using stopwatch timing
     }
@@ -448,6 +482,7 @@ struct ActiveRouteCardView: View {
         self.workoutOrchestrator = workoutOrchestrator
         self._selectedGrade = selectedGrade
         self._selectedGradeSystem = selectedGradeSystem
+        self.onShowFeedbackPopover = { _, _ in }
 
         // Timer initialization is now handled in .onAppear using stopwatch timing
     }
@@ -494,23 +529,32 @@ struct ActiveRouteCardView: View {
                     showRoutePicker = false
                 }
             }
-            .sheet(isPresented: $showStylePicker) {
-                if let route = session.activeRoute {
-                    StyleSelectorView(
-                        selectedStyles: $pendingRouteStyles,
-                        isMultiSelect: true,
-                        onSelectionChanged: {
-                            // Save the selected styles to the route
-                            route.styles = pendingRouteStyles
+            .sheet(isPresented: $showRouteReview) {
+                if let route = reviewRoute ?? session.activeRoute {
+                    RouteReviewView(
+                        route: route,
+                        attempt: reviewAttempt,
+                        isAutoPresented: isReviewAutoPresented,
+                        onSave: { rating, wallAngles, holdTypes, movementStyles, experiences in
+                            // Save difficulty rating to attempt if provided
+                            if let rating = rating, let attempt = reviewAttempt {
+                                attempt.difficultyRating = rating
+                            }
+                            // Save route characteristics
+                            route.wallAngles = wallAngles
+                            route.holdTypes = holdTypes
+                            route.movementStyles = movementStyles
+                            route.experiences = experiences
                             do {
                                 try modelContext.save()
                             } catch {
-                                print("Failed to save route styles: \(error)")
+                                print("Failed to save route review: \(error)")
                             }
+                            // Clean up state
+                            reviewAttempt = nil
+                            reviewRoute = nil
                         }
                     )
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
                 }
             }
     }
@@ -582,32 +626,6 @@ struct ActiveRouteCardView: View {
                         }
                     )
                 }
-
-                if showDifficultyRating, let attempt = lastAttemptForRating, let route = (surveyRoute ?? session.activeRoute) {
-                    DifficultyRatingView(
-                        route: route,
-                        attempt: attempt,
-                        onRatingSelected: { rating in
-                            if let rating = rating {
-                                attempt.difficultyRating = rating
-                                do {
-                                    try modelContext.save()
-                                } catch {
-                                    print("Failed to save difficulty rating: \(error)")
-                                }
-                            }
-                            showDifficultyRating = false
-                            lastAttemptForRating = nil
-                            surveyRoute = nil
-                        },
-                        onDismiss: {
-                            showDifficultyRating = false
-                            lastAttemptForRating = nil
-                            surveyRoute = nil
-                        }
-                    )
-                }
-
             }
         )
     }
@@ -742,13 +760,12 @@ struct ActiveRouteCardView: View {
         route.totalRestTime = 0
         isRestTimerActive = false
 
-        // Show experience survey for the PREVIOUS route if it had attempts
+        // Show quick feedback popover for the PREVIOUS route if it had attempts
         if !route.attempts.isEmpty {
             let previousRoute = route
+            let lastAttempt = previousRoute.attempts.last
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                lastAttemptForRating = previousRoute.attempts.last
-                surveyRoute = previousRoute
-                showDifficultyRating = true
+                onShowFeedbackPopover(previousRoute, lastAttempt)
             }
         }
 
@@ -806,12 +823,11 @@ struct ActiveRouteCardView: View {
             activeRoute.totalRestTime = 0
         }
 
-        // Present experience survey for the previous route if it had attempts
+        // Present quick feedback popover for the previous route if it had attempts
         if let prev = previousRouteForSurvey, !prev.attempts.isEmpty {
+            let lastAttempt = prev.attempts.last
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                lastAttemptForRating = prev.attempts.last
-                surveyRoute = prev
-                showDifficultyRating = true
+                onShowFeedbackPopover(prev, lastAttempt)
             }
         }
         HapticManager.shared.playSuccess()
@@ -858,6 +874,12 @@ struct ActiveRouteCardView: View {
 
         // Set the climb type to match the current route
         newRoute.climbType = currentRoute.climbType
+        
+        // For circuit grades, copy the circuit reference from the current route
+        if currentRoute.gradeSystem == .circuit {
+            newRoute.customCircuit = currentRoute.customCircuit
+            newRoute.customCircuitId = currentRoute.customCircuitId
+        }
 
         // Add to session
         session.routes.append(newRoute)
@@ -919,6 +941,17 @@ struct ActiveRouteCardView: View {
         } else {
             return String(format: "%dh ago", Int(interval / 3600))
         }
+    }
+    
+    @ViewBuilder
+    private func routeTag(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(.caption2)
+            .foregroundColor(color)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.1))
+            .cornerRadius(6)
     }
 
     private func accessibilityButton(icon: String, title: String, color: Color, action: @escaping () -> Void) -> some View {

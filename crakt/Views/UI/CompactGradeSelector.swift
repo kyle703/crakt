@@ -16,99 +16,29 @@ struct CompactGradeSelector: View {
     @State private var isExpanded = false
     @State private var showLockedAlert = false
     @State private var wiggleTrigger = false
+    
+    /// Check if we're displaying a circuit grade system
+    private var isCircuitGrade: Bool {
+        gradeSystem.system == .circuit
+    }
+    
+    /// Get the circuit if this is a circuit grade
+    private var circuit: CustomCircuitGrade? {
+        if let circuitGrade = gradeSystem as? CircuitGrade {
+            return circuitGrade.customCircuit
+        }
+        return nil
+    }
 
     var body: some View {
         // Fixed height container to prevent layout shifts
         ZStack {
             if !isExpanded {
                 // Compact view - centered in fixed height container
-                ZStack {
-                    Button(action: {
-                        if isLocked {
-                            // Trigger wiggle animation
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.3)) {
-                                wiggleTrigger.toggle()
-                            }
-                        } else {
-                            withAnimation(.spring()) {
-                                isExpanded = true
-                            }
-                        }
-                    }) {
-                        ZStack {
-                            if let selectedGrade = selectedGrade {
-                                let colors = gradeSystem.colors(for: selectedGrade)
-                                if colors.count == 1 {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(colors.first!)
-                                        .frame(width: 60, height: 60)
-                                } else if colors.count == 2 {
-                                    LinearGradient(gradient: Gradient(colors: colors), startPoint: .leading, endPoint: .trailing)
-                                        .frame(width: 60, height: 60)
-                                        .cornerRadius(10)
-                                } else {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(Color.gray)
-                                        .frame(width: 60, height: 60)
-                                }
-                            } else {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 60, height: 60)
-                            }
-
-                            Text(gradeSystem.description(for: selectedGrade ?? "") ?? "Select")
-                                .foregroundColor(.white)
-                                .font(.system(size: 14, weight: .bold))
-
-                            // Opacity overlay when locked
-                            if isLocked {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.black.opacity(0.4))
-                                    .frame(width: 60, height: 60)
-                            }
-                        }
-                    }
-                    .gesture(
-                        LongPressGesture(minimumDuration: 0.5)
-                            .onEnded { _ in
-                                if !isLocked {
-                                    withAnimation(.spring()) {
-                                        isExpanded = true
-                                    }
-                                }
-                            }
-                    )
-                    .gesture(
-                        TapGesture(count: 2)
-                            .onEnded { _ in
-                                if isLocked {
-                                    showLockedAlert = true
-                                }
-                            }
-                    )
-                    .modifier(WiggleModifier(trigger: wiggleTrigger))
-                }
+                compactView
             } else {
                 // Expanded view - fills the fixed height container
-                ZStack {
-                    // Background tap to dismiss
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation(.spring()) {
-                                isExpanded = false
-                            }
-                        }
-
-                    // Full grade selector
-                    ClimbingGradeSelector(
-                        gradeSystem: AnyGradeProtocol(gradeSystem),
-                        selectedGrade: $selectedGrade
-                    )
-                }
-                .background(Color.white.opacity(0.05))
-                .cornerRadius(12)
+                expandedView
             }
         }
         .frame(height: 80) // Fixed height to match ClimbingGradeSelector
@@ -118,16 +48,171 @@ struct CompactGradeSelector: View {
             Text("This grade is locked because the route has attempts. Move to a new route to change the grade.")
         }
     }
+    
+    // MARK: - Compact View
+    
+    private var compactView: some View {
+        ZStack {
+            Button(action: {
+                if isLocked {
+                    // Trigger wiggle animation
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.3)) {
+                        wiggleTrigger.toggle()
+                    }
+                } else {
+                    withAnimation(.spring()) {
+                        isExpanded = true
+                    }
+                }
+            }) {
+                ZStack {
+                    gradeColorSwatch
+                    
+                    // Only show text for non-circuit grades
+                    if !isCircuitGrade {
+                        Text(gradeSystem.description(for: selectedGrade ?? "") ?? "Select")
+                            .foregroundColor(.white)
+                            .font(.system(size: 14, weight: .bold))
+                            .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+                    }
+
+                    // Opacity overlay when locked
+                    if isLocked {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.black.opacity(0.4))
+                            .frame(width: 60, height: 60)
+                        
+                        Image(systemName: "lock.fill")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                }
+            }
+            .gesture(
+                LongPressGesture(minimumDuration: 0.5)
+                    .onEnded { _ in
+                        if !isLocked {
+                            withAnimation(.spring()) {
+                                isExpanded = true
+                            }
+                        }
+                    }
+            )
+            .gesture(
+                TapGesture(count: 2)
+                    .onEnded { _ in
+                        if isLocked {
+                            showLockedAlert = true
+                        }
+                    }
+            )
+            .modifier(WiggleModifier(trigger: wiggleTrigger))
+        }
+    }
+    
+    @ViewBuilder
+    private var gradeColorSwatch: some View {
+        if let selectedGrade = selectedGrade {
+            let colors = gradeSystem.colors(for: selectedGrade)
+            if colors.count == 1 {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(colors.first!)
+                    .frame(width: 60, height: 60)
+            } else if colors.count == 2 {
+                LinearGradient(gradient: Gradient(colors: colors), startPoint: .leading, endPoint: .trailing)
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(10)
+            } else {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.gray)
+                    .frame(width: 60, height: 60)
+            }
+        } else {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 60, height: 60)
+        }
+    }
+    
+    // MARK: - Expanded View
+    
+    @ViewBuilder
+    private var expandedView: some View {
+        ZStack {
+            // Background tap to dismiss
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    withAnimation(.spring()) {
+                        isExpanded = false
+                    }
+                }
+
+            // Use circuit picker for circuit grades, regular selector otherwise
+            if isCircuitGrade, let circuit = circuit {
+                CircuitGradePicker(circuit: circuit, selectedGrade: $selectedGrade)
+            } else {
+                ClimbingGradeSelector(
+                    gradeSystem: AnyGradeProtocol(gradeSystem),
+                    selectedGrade: $selectedGrade
+                )
+            }
+        }
+        .background(Color.white.opacity(0.05))
+        .cornerRadius(12)
+        .onChange(of: selectedGrade) { _, _ in
+            // Collapse when grade is selected
+            withAnimation(.spring()) {
+                isExpanded = false
+            }
+        }
+    }
 }
 
-// Wiggle animation modifier
+// Wiggle animation modifier - shakes 3 times and returns to starting position
 struct WiggleModifier: ViewModifier {
     let trigger: Bool
-
+    @State private var wiggleOffset: Double = 0
+    
     func body(content: Content) -> some View {
         content
-            .rotationEffect(.degrees(trigger ? 2 : 0))
-            .animation(.spring(response: 0.3, dampingFraction: 0.3), value: trigger)
+            .rotationEffect(.degrees(wiggleOffset))
+            .onChange(of: trigger) { _, _ in
+                // Animate wiggle sequence: 3 shakes back and forth, ending at 0
+                withAnimation(.easeInOut(duration: 0.08)) {
+                    wiggleOffset = 8
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                    withAnimation(.easeInOut(duration: 0.08)) {
+                        wiggleOffset = -8
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) {
+                    withAnimation(.easeInOut(duration: 0.08)) {
+                        wiggleOffset = 6
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
+                    withAnimation(.easeInOut(duration: 0.08)) {
+                        wiggleOffset = -6
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {
+                    withAnimation(.easeInOut(duration: 0.08)) {
+                        wiggleOffset = 4
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.40) {
+                    withAnimation(.easeInOut(duration: 0.08)) {
+                        wiggleOffset = -4
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.48) {
+                    withAnimation(.easeInOut(duration: 0.1)) {
+                        wiggleOffset = 0
+                    }
+                }
+            }
     }
 }
 
@@ -335,7 +420,7 @@ struct CompactGradeSelectorPreview: View {
     @State private var selectedGrade: String? = "V3"
 
     var gradeSystem: any GradeProtocol {
-        GradeSystems.systems[selectedGradeSystem]!
+        GradeSystemFactory.safeProtocol(for: selectedGradeSystem)
     }
 
     var body: some View {

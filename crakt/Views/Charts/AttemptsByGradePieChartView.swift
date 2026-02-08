@@ -56,6 +56,24 @@ struct AttemptsByGradePieChartView: View {
 
     @State var selectedAngle: Int?
     
+    /// Get color for a grade label (handles circuit grades)
+    private func colorForGrade(_ gradeLabel: String) -> Color {
+        // Find the route that matches this grade label
+        // For circuit grades, use the route's actual color
+        for route in session.routes {
+            if let routeGradeLabel = route.gradeDescription, routeGradeLabel == gradeLabel {
+                return route.gradeColor
+            }
+        }
+        // Check active route too
+        if let route = session.activeRoute,
+           let routeGradeLabel = route.gradeDescription,
+           routeGradeLabel == gradeLabel {
+            return route.gradeColor
+        }
+        // Fallback: use a hash-based color for consistency
+        return Color(hash: gradeLabel.hashValue)
+    }
     
     private var selectedSector: String {
         if let angle = selectedAngle {
@@ -64,47 +82,51 @@ struct AttemptsByGradePieChartView: View {
         return ""
     }
     
-    // attemptsByGradeAndStatus
-    
     private func findSelectedSector(value: Int) -> String? {
-     
         var accumulatedCount = 0
-     
         let entry = session.totalAttemptsPerGrade.first { (_, attempts) in
             accumulatedCount += attempts
             return value <= accumulatedCount
         }
-     
         return entry?.grade
     }
     
-    
     var body: some View {
-        
         Chart(session.totalAttemptsPerGrade, id: \.grade) { data in
-            
             SectorMark(
                 angle: .value("Attempts", data.attempts),
                 innerRadius: .ratio(0.618),
                 angularInset: 1.5
             )
             .cornerRadius(5.0)
-            .foregroundStyle(by: .value("Grade", data.grade))
+            .foregroundStyle(colorForGrade(data.grade))
             .opacity(selectedSector == data.grade ? 1.0 : 0.5)
-            
-            
-            
         }
         .chartAngleSelection(value: $selectedAngle)
         .chartLegend(preview ? .hidden : .automatic)
         .aspectRatio(1, contentMode: .fit)
         .chartBackground { proxy in
+            VStack(spacing: 4) {
                 Text(selectedSector)
-            
-                
+                    .font(.headline)
+                // Show grade range for circuit grades if available
+                if let route = session.routes.first(where: { $0.gradeDescription == selectedSector }),
+                   let range = route.circuitGradeRange {
+                    Text(range)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
         }
-        
-        
+    }
+}
+
+// Helper extension for consistent color generation
+extension Color {
+    init(hash: Int) {
+        // Generate a color from a hash value
+        let hue = Double(abs(hash) % 360) / 360.0
+        self.init(hue: hue, saturation: 0.6, brightness: 0.8)
     }
 }
 

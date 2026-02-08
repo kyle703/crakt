@@ -31,8 +31,26 @@ struct MainApp: App {
         
     init() {
         do {
-            modelContainer = try ModelContainer(for: User.self, Session.self, Route.self, RouteAttempt.self)
+            // Register all models including new circuit grade system models
+            modelContainer = try ModelContainer(
+                for: User.self,
+                     Session.self,
+                     Route.self,
+                     RouteAttempt.self,
+                     CustomCircuitGrade.self,
+                     CircuitColorMapping.self,
+                     GymGradeConfiguration.self
+            )
             try ensureSingleUserExists(in: modelContainer.mainContext)
+            
+            // Ensure default circuit exists
+            _ = GradeSystemFactory.defaultCircuit(modelContainer.mainContext)
+            
+            // Run circuit grade migration if needed
+            let migrationResult = CircuitGradeMigration.migrateIfNeeded(modelContainer.mainContext)
+            if migrationResult.isSuccess {
+                print("📦 Migration completed: \(migrationResult.message)")
+            }
         } catch {
             print("ModelContainer initialization failed: \(error)")
             print("This is likely due to a data model mismatch from a previous app version.")
@@ -116,7 +134,15 @@ class DataController {
     static let previewContainer: ModelContainer = {
         do {
             let config = ModelConfiguration(isStoredInMemoryOnly: true)
-            let container = try ModelContainer(for: Session.self, Route.self, RouteAttempt.self, configurations: config)
+            let container = try ModelContainer(
+                for: Session.self,
+                     Route.self,
+                     RouteAttempt.self,
+                     CustomCircuitGrade.self,
+                     CircuitColorMapping.self,
+                     GymGradeConfiguration.self,
+                configurations: config
+            )
             let session = Session()
             container.mainContext.insert(session)
             

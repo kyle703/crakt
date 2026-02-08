@@ -70,9 +70,13 @@ struct ExerciseSelectionCard: View {
 struct SessionConfigView: View {
     @Environment(\.modelContext) private var modelContext
 
-    // Core session configuration - at the top
+    // Core session configuration - persisted to UserDefaults
+    @AppStorage("defaultClimbType") private var storedClimbType: Int = Int(ClimbType.boulder.rawValue)
+    @AppStorage("defaultGradeSystem") private var storedGradeSystem: Int = Int(GradeSystem.vscale.rawValue)
+    
     @State private var selectedClimbType: ClimbType = .boulder
     @State private var selectedGradeSystem: GradeSystem = .vscale
+    @State private var selectedCircuit: CustomCircuitGrade?
 
     // Session type
     @State private var sessionType: SessionType = .freeClimb
@@ -91,11 +95,14 @@ struct SessionConfigView: View {
 
     // Location
     @State private var gymName: String = ""
+    @State private var selectedGym: Gym?
+    @State private var gymGradeConfig: GymGradeConfiguration?
 
     // Navigation
     @State private var showSession = false
     @State private var showResumeAlert = false
     @State private var unfinishedSession: Session?
+    @State private var activeSessionForView: Session?
 
     // Callbacks
     var onSessionComplete: ((Session) -> Void)?
@@ -161,10 +168,6 @@ struct SessionConfigView: View {
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
-
-                            Text(workout.category == .bouldering ? "Bouldering Workout" : "Rope Climbing Workout")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
                         }
 
                         Spacer()
@@ -266,7 +269,12 @@ struct SessionConfigView: View {
                     VStack(spacing: 24) {
                         locationSection
 
-                        ClimbTypeToggle(selectedType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
+                        ClimbTypeToggle(
+                            selectedType: $selectedClimbType,
+                            selectedGradeSystem: $selectedGradeSystem,
+                            selectedCircuit: $selectedCircuit,
+                            modelContext: modelContext
+                        )
 
                         // Session Type Selection
                         VStack(spacing: 12) {
@@ -312,16 +320,27 @@ struct SessionConfigView: View {
         }
         }
         .fullScreenCover(isPresented: $showSession) {
-            createSessionView()
+            if let session = activeSessionForView {
+                createSessionView(for: session)
+            }
         }
         .alert("Resume your last session?", isPresented: $showResumeAlert, presenting: unfinishedSession) { session in
             Button("Resume") {
-                // Resume existing session
+                // Resume existing session - sync UI state to session's stored values
+                if let climbType = session.climbType {
+                    selectedClimbType = climbType
+                }
+                if let gradeSystem = session.gradeSystem {
+                    selectedGradeSystem = gradeSystem
+                }
+                selectedCircuit = session.customCircuit
+                activeSessionForView = session
                 showSession = true
             }
             Button("Finish & Start New", role: .destructive) {
                 // Finish the existing session before starting a new one
                 finishSession(session)
+                prepareNewSession()
                 showSession = true
             }
             Button("Cancel", role: .cancel) {}
@@ -334,6 +353,23 @@ struct SessionConfigView: View {
                 onSessionStart?()
             }
         }
+        .onChange(of: selectedClimbType) { _, newValue in
+            // Persist user's climb type preference
+            storedClimbType = Int(newValue.rawValue)
+        }
+        .onChange(of: selectedGradeSystem) { _, newValue in
+            // Persist user's grade system preference
+            storedGradeSystem = Int(newValue.rawValue)
+        }
+        .task {
+            // Initialize from UserDefaults on first appear
+            if let climbType = ClimbType(rawValue: Int16(storedClimbType)) {
+                selectedClimbType = climbType
+            }
+            if let gradeSystem = GradeSystem(rawValue: Int16(storedGradeSystem)) {
+                selectedGradeSystem = gradeSystem
+            }
+        }
     }
 
 
@@ -344,14 +380,14 @@ struct SessionConfigView: View {
             unfinishedSession = active
             showResumeAlert = true
         } else {
+            prepareNewSession()
             showSession = true
         }
     }
-
-    private func createSessionView() -> some View {
-        // Reuse unfinished session if resuming
-        let session = unfinishedSession ?? Session()
-
+    
+    private func prepareNewSession() {
+        let session = Session()
+        
         // Warm-up setup
         if isWarmupEnabled {
             let orderedExercises = selectedWarmupExercises.sorted(by: { lhs, rhs in
@@ -382,45 +418,53 @@ struct SessionConfigView: View {
         } else {
             session.currentPhase = .main
         }
+        
+        // Set session config
         session.climbType = selectedClimbType
         session.gradeSystem = selectedGradeSystem
+        session.customCircuit = selectedCircuit
         if !gymName.isEmpty {
             session.gymName = gymName
         }
 
         // Debug logging
-        print("📝 SessionConfigView - Creating session with:")
+        print("📝 SessionConfigView - Creating NEW session with:")
         print("  - Climb Type: \(selectedClimbType)")
         print("  - Grade System: \(selectedGradeSystem)")
-        print("  - Session climbType: \(session.climbType ?? .boulder)")
-        print("  - Session gradeSystem: \(session.gradeSystem ?? .vscale)")
 
-        // Save only when creating a new session
-        if unfinishedSession == nil {
-            do {
-                try modelContext.save()
-                print("💾 Session saved successfully")
-            } catch {
-                print("❌ Failed to save session: \(error)")
-            }
+        // Save the new session
+        modelContext.insert(session)
+        do {
+            try modelContext.save()
+            print("💾 Session saved successfully")
+        } catch {
+            print("❌ Failed to save session: \(error)")
         }
+        
+        activeSessionForView = session
+    }
 
-        // Create the session view with defaults for nil values
-        let sessionView = SessionView(
+    private func createSessionView(for session: Session) -> some View {
+        // For resumed sessions, use the session's stored values as defaults
+        let effectiveClimbType = session.climbType ?? selectedClimbType
+        let effectiveGradeSystem = session.gradeSystem ?? selectedGradeSystem
+        let isResumed = unfinishedSession != nil
+
+        // Create the session view with effective values (respects resumed session config)
+        return SessionView(
             session: session,
-            initialWorkoutType: selectedWorkout,
-            initialSelectedGrades: selectedWorkout == .pyramid ? [pyramidStartGrade, pyramidPeakGrade].compactMap { $0 } : [selectedGrade].compactMap { $0 },
-            defaultClimbType: selectedClimbType,
-            defaultGradeSystem: selectedGradeSystem
+            initialWorkoutType: !isResumed ? selectedWorkout : nil,
+            initialSelectedGrades: !isResumed ? (selectedWorkout == .pyramid ? [pyramidStartGrade, pyramidPeakGrade].compactMap { $0 } : [selectedGrade].compactMap { $0 }) : nil,
+            defaultClimbType: effectiveClimbType,
+            defaultGradeSystem: effectiveGradeSystem
         ) { completedSession in
             // Session completed - navigate to session detail view
             showSession = false
+            activeSessionForView = nil
             if let completedSession = completedSession {
                 onSessionComplete?(completedSession)
             }
         }
-
-        return sessionView
     }
 
     private func findActiveSession() -> Session? {
@@ -467,7 +511,7 @@ enum SessionType: String, CaseIterable {
         case .freeClimb:
             return "Log attempts as you go"
         case .workout:
-            return "Follow preset sets & rest"
+            return "Follow preset sets"
         }
     }
 
@@ -484,6 +528,10 @@ enum SessionType: String, CaseIterable {
 struct ClimbTypeToggle: View {
     @Binding var selectedType: ClimbType
     @Binding var selectedGradeSystem: GradeSystem
+    @Binding var selectedCircuit: CustomCircuitGrade?
+    var modelContext: ModelContext
+    
+    @Query private var circuits: [CustomCircuitGrade]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -508,6 +556,11 @@ struct ClimbTypeToggle: View {
                     .foregroundColor(.primary)
 
                 gradeMenu
+                
+                // Show circuit selector if circuit is selected
+                if selectedGradeSystem == .circuit {
+                    circuitSelector
+                }
 
                 Text("Match the grades used at your gym.")
                     .font(.caption)
@@ -520,9 +573,87 @@ struct ClimbTypeToggle: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
         )
-        .onChange(of: selectedType) {
+        .onChange(of: selectedType) { _, _ in
             if !filteredGradeSystems.contains(selectedGradeSystem) {
                 selectedGradeSystem = filteredGradeSystems.first ?? .vscale
+            }
+        }
+        .onChange(of: selectedGradeSystem) { _, newValue in
+            // Auto-select default circuit when circuit is selected
+            if newValue == .circuit && selectedCircuit == nil {
+                selectedCircuit = circuits.first(where: { $0.isDefault }) ?? circuits.first
+            }
+        }
+        .onAppear {
+            // Initialize default circuit if circuit system is selected
+            if selectedGradeSystem == .circuit && selectedCircuit == nil {
+                selectedCircuit = circuits.first(where: { $0.isDefault }) ?? circuits.first
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var circuitSelector: some View {
+        if circuits.isEmpty {
+            Text("No circuits configured. Create one in Settings.")
+                .font(.caption)
+                .foregroundColor(.orange)
+                .padding(.vertical, 4)
+        } else {
+            Menu {
+                ForEach(circuits) { circuit in
+                    Button {
+                        selectedCircuit = circuit
+                    } label: {
+                        HStack {
+                            // Color preview
+                            HStack(spacing: 2) {
+                                ForEach(circuit.orderedMappings.prefix(5)) { mapping in
+                                    Circle()
+                                        .fill(mapping.swiftUIColor)
+                                        .frame(width: 10, height: 10)
+                                }
+                            }
+                            Text(circuit.name)
+                            Spacer()
+                            if selectedCircuit?.id == circuit.id {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack {
+                    // Show color preview for selected circuit
+                    if let circuit = selectedCircuit {
+                        HStack(spacing: 2) {
+                            ForEach(circuit.orderedMappings.prefix(5)) { mapping in
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(mapping.swiftUIColor)
+                                    .frame(width: 16, height: 20)
+                            }
+                        }
+                        Text(circuit.name)
+                            .font(.subheadline)
+                            .foregroundColor(.primary)
+                    } else {
+                        Text("Select Circuit")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.down")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(.tertiarySystemBackground))
+                )
             }
         }
     }
@@ -753,7 +884,7 @@ struct WorkoutDetailsSection: View {
                                     .foregroundColor(.secondary)
 
                                 ClimbingGradeSelector(
-                                    gradeSystem: GradeSystems.systems[selectedGradeSystem]!,
+                                    gradeSystem: AnyGradeProtocol(GradeSystemFactory.safeProtocol(for: selectedGradeSystem)),
                                     selectedGrade: $pyramidStartGrade
                                 )
                                 .frame(height: 60)
@@ -765,7 +896,7 @@ struct WorkoutDetailsSection: View {
                                     .foregroundColor(.secondary)
 
                                 ClimbingGradeSelector(
-                                    gradeSystem: GradeSystems.systems[selectedGradeSystem]!,
+                                    gradeSystem: AnyGradeProtocol(GradeSystemFactory.safeProtocol(for: selectedGradeSystem)),
                                     selectedGrade: $pyramidPeakGrade
                                 )
                                 .frame(height: 60)
@@ -777,7 +908,7 @@ struct WorkoutDetailsSection: View {
                             .foregroundColor(.secondary)
 
                         ClimbingGradeSelector(
-                            gradeSystem: GradeSystems.systems[selectedGradeSystem]!,
+                            gradeSystem: AnyGradeProtocol(GradeSystemFactory.safeProtocol(for: selectedGradeSystem)),
                             selectedGrade: $selectedGrade
                         )
                         .frame(height: 60)

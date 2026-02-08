@@ -71,9 +71,27 @@ struct AttemptsHistogramView: View {
             AxisMarks { value in
                 AxisValueLabel {
                     if let rawGrade = value.as(Int.self) {
-                        let grade = gradeSystem._protocol.grades[rawGrade];
-                        let desc = gradeSystem._protocol.description(for: grade)
-                        Text(desc ?? rawGrade.description)
+                        // For circuit grades, find the route with this grade index
+                        if gradeSystem == .circuit {
+                            if let route = session.routesSortedByDate.first(where: { $0.gradeIndex == rawGrade }) {
+                                Text(route.gradeDescription ?? "Circuit")
+                                    .foregroundStyle(route.gradeColor)
+                            } else {
+                                Text("\(rawGrade)")
+                            }
+                        } else {
+                            // For standard grades, use the protocol
+                            let proto = GradeSystemFactory.safeProtocol(for: gradeSystem)
+                            let grades = proto.grades
+                            if rawGrade >= 0 && rawGrade < grades.count {
+                                let grade = grades[rawGrade]
+                                let desc = proto.description(for: grade)
+                                Text(desc ?? rawGrade.description)
+                                    .foregroundStyle(proto.colorMap[grade] ?? .primary)
+                            } else {
+                                Text("\(rawGrade)")
+                            }
+                        }
                     }
                 }
             }
@@ -84,11 +102,21 @@ struct AttemptsHistogramView: View {
     @ViewBuilder
     var selectionPopover: some View {
         if let selectedRoute {
-            VStack {
-                Text(selectedRoute.grade ?? "idk")
-                Text("Attempts: ")
+            VStack(alignment: .leading, spacing: 4) {
+                // Use gradeDescription instead of grade to avoid UUIDs
+                Text(selectedRoute.gradeDescription ?? "Unknown")
+                    .font(.headline)
+                if let range = selectedRoute.circuitGradeRange {
+                    Text(range)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Text("Attempts: \(selectedRoute.attempts.count)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
-            .background(Color.white)
+            .padding(8)
+            .background(Color(.systemBackground))
             .cornerRadius(12)
             .shadow(radius: 8)
         }

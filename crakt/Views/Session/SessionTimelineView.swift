@@ -32,14 +32,17 @@ struct SessionTimelineView: View {
                 // Insert header when route changes
                 if lastRouteId != route.id {
                     lastRouteId = route.id
-                    // Build header title and subtitle
-                    let headerTitle = route.grade ?? "Unknown Grade"
+                    // Build header title using gradeDescription to avoid UUIDs
+                    let headerTitle = route.gradeDescription ?? route.grade ?? "Unknown Grade"
                     var headerSubtitleParts: [String] = []
-                    if !route.styles.isEmpty {
-                        headerSubtitleParts.append(route.styles.map { $0.description }.joined(separator: ", "))
+                    if !route.wallAngles.isEmpty {
+                        headerSubtitleParts.append(route.wallAngles.map { $0.description }.joined(separator: ", "))
                     }
-                    if !route.experiences.isEmpty {
-                        headerSubtitleParts.append(route.experiences.map { $0.description }.joined(separator: ", "))
+                    if !route.holdTypes.isEmpty {
+                        headerSubtitleParts.append(route.holdTypes.map { $0.description }.joined(separator: ", "))
+                    }
+                    if !route.movementStyles.isEmpty {
+                        headerSubtitleParts.append(route.movementStyles.map { $0.description }.joined(separator: ", "))
                     }
                     let headerSubtitle = headerSubtitleParts.joined(separator: " • ")
 
@@ -55,7 +58,7 @@ struct SessionTimelineView: View {
                 events.append(TimelineEvent(
                     type: .attempt,
                     timestamp: attempt.date,
-                    title: "Attempt on \(route.grade ?? "Unknown")",
+                    title: "Attempt on \(route.gradeDescription ?? route.grade ?? "Unknown")",
                     subtitle: attempt.status.description,
                     route: route,
                     attempt: attempt
@@ -261,13 +264,29 @@ struct TimelineRow: View {
 
     private func styleSummary(route: Route) -> String {
         var parts: [String] = []
-        if !route.styles.isEmpty {
-            parts.append(route.styles.map { $0.description }.joined(separator: ", "))
+        if !route.wallAngles.isEmpty {
+            parts.append(route.wallAngles.map { $0.description }.joined(separator: ", "))
         }
-        if !route.experiences.isEmpty {
-            parts.append(route.experiences.map { $0.description }.joined(separator: ", "))
+        if !route.holdTypes.isEmpty {
+            parts.append(route.holdTypes.map { $0.description }.joined(separator: ", "))
+        }
+        if !route.movementStyles.isEmpty {
+            parts.append(route.movementStyles.map { $0.description }.joined(separator: ", "))
         }
         return parts.joined(separator: " • ")
+    }
+    
+    @ViewBuilder
+    private func routeChip(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(.caption2)
+            .foregroundColor(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(color, lineWidth: 1)
+            )
     }
 
     private func formatDuration(_ interval: TimeInterval) -> String {
@@ -330,8 +349,8 @@ struct TimelineRow: View {
                     VStack(alignment: .leading, spacing: 8) {
                         // Line 1: Grade chip + route experience icons (including difficulty rating)
                         HStack(alignment: .center, spacing: 8) {
-                            // Grade chip
-                            Text(route.grade ?? "Unknown")
+                            // Grade chip - use gradeDescription to avoid UUIDs
+                            Text(route.gradeDescription ?? route.grade ?? "Unknown")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .padding(.horizontal, 8)
@@ -369,20 +388,19 @@ struct TimelineRow: View {
                             Spacer(minLength: 0)
                         }
 
-                        // Line 2: outlined route style chips only
-                        if !route.styles.isEmpty {
+                        // Line 2: route characteristic chips
+                        let hasCharacteristics = !route.wallAngles.isEmpty || !route.holdTypes.isEmpty || !route.movementStyles.isEmpty
+                        if hasCharacteristics {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
-                                    ForEach(route.styles, id: \.self) { style in
-                                        Text(style.description)
-                                            .font(.caption2)
-                                            .foregroundColor(style.color)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .stroke(style.color, lineWidth: 1)
-                                            )
+                                    ForEach(route.wallAngles, id: \.self) { angle in
+                                        routeChip(angle.description, color: angle.color)
+                                    }
+                                    ForEach(route.holdTypes, id: \.self) { hold in
+                                        routeChip(hold.description, color: hold.color)
+                                    }
+                                    ForEach(route.movementStyles, id: \.self) { style in
+                                        routeChip(style.description, color: style.color)
                                     }
                                 }
                             }

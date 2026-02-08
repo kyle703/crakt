@@ -1,0 +1,21 @@
+# API Configuration for validate_gyms.py
+# 
+# To use:
+# 1. Get a Google Places API key from https://console.cloud.google.com/
+# 2. Enable "Places API" in your project
+# 3. Run: python validate_gyms.py --api-key YOUR_KEY_HERE
+
+# Example commands:
+
+# Test with 10 gyms
+python validate_gyms.py --api-key YOUR_API_KEY --limit 10
+
+# Validate all gyms (dry run)
+python validate_gyms.py --api-key YOUR_API_KEY --dry-run
+
+# Validate and update
+python validate_gyms.py --api-key YOUR_API_KEY --auto-update
+
+# Use free Nominatim API (slower)
+python validate_gyms.py --api-type nominatim --rate-limit 1.0
+

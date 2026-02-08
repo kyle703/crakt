@@ -62,7 +62,7 @@ enum GradeSystem: Int16, CustomStringConvertible, Codable {
         }
     }
     
-    var climbType : ClimbType {
+    var climbType: ClimbType {
         switch self {
         case .circuit, .vscale, .font:
             return .boulder
@@ -73,10 +73,31 @@ enum GradeSystem: Int16, CustomStringConvertible, Codable {
     
     static let allCases: [GradeSystem] = [.circuit, .vscale, .font, .french, .yds]
     
-    var _protocol : any GradeProtocol{
+    /// Grade systems valid for bouldering
+    static let boulderSystems: [GradeSystem] = [.circuit, .vscale, .font]
+    
+    /// Grade systems valid for rope climbing
+    static let ropeSystems: [GradeSystem] = [.yds, .french]
+    
+    /// Whether this system is a circuit (requires CustomCircuitGrade)
+    var isCircuit: Bool {
+        self == .circuit
+    }
+    
+    /// Whether this is a concrete grade system (not circuit)
+    var isConcrete: Bool {
+        self != .circuit
+    }
+    
+    /// Get grade protocol for non-circuit systems.
+    /// For circuit grades, use GradeSystemFactory.gradeProtocol() instead.
+    var _protocol: any GradeProtocol {
         switch self {
-        case.circuit:
-            return UserConfiguredCircuitGrade()
+        case .circuit:
+            // Return a placeholder - actual circuit grades should use GradeSystemFactory
+            // This maintains backward compatibility but logs a warning
+            print("⚠️ GradeSystem._protocol called for circuit - use GradeSystemFactory.gradeProtocol() instead")
+            return CircuitGrade(customCircuit: GradeSystemFactory.createVScaleDefaultCircuit())
         case .vscale:
             return VGrade()
         case .font:

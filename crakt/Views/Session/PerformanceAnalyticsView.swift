@@ -14,34 +14,38 @@ struct PerformanceAnalyticsView: View {
     // MARK: - Performance Data Processing
     private var gradeDistribution: [GradeData] {
         var distribution: [String: Int] = [:]
-
+        
         for attempt in session.allAttempts {
-            if let grade = attempt.route?.grade {
-                distribution[grade, default: 0] += 1
+            // Use gradeDescription to avoid UUIDs
+            if let route = attempt.route,
+               let gradeLabel = route.gradeDescription ?? route.grade {
+                distribution[gradeLabel, default: 0] += 1
             }
         }
-
-        return distribution.map { grade, count in
-            GradeData(grade: grade, attempts: count, successRate: successRateForGrade(grade))
+        
+        return distribution.map { gradeLabel, count in
+            GradeData(grade: gradeLabel, attempts: count, successRate: successRateForGrade(gradeLabel))
         }.sorted { $0.attempts > $1.attempts }
     }
-
+    
     private var attemptEfficiency: [EfficiencyData] {
         var efficiency: [String: (total: Int, successful: Int)] = [:]
-
+        
         for attempt in session.allAttempts {
-            guard let grade = attempt.route?.grade else { continue }
+            // Use gradeDescription to avoid UUIDs
+            guard let route = attempt.route,
+                  let gradeLabel = route.gradeDescription ?? route.grade else { continue }
             let isSuccessful = attempt.status == .send || attempt.status == .flash || attempt.status == .topped
-
-            var stats = efficiency[grade] ?? (total: 0, successful: 0)
+            
+            var stats = efficiency[gradeLabel] ?? (total: 0, successful: 0)
             stats.total += 1
             if isSuccessful { stats.successful += 1 }
-            efficiency[grade] = stats
+            efficiency[gradeLabel] = stats
         }
-
-        return efficiency.map { grade, stats in
+        
+        return efficiency.map { gradeLabel, stats in
             EfficiencyData(
-                grade: grade,
+                grade: gradeLabel,
                 efficiency: Double(stats.successful) / Double(stats.total),
                 attempts: stats.total
             )
@@ -78,12 +82,15 @@ struct PerformanceAnalyticsView: View {
         for (index, attempt) in attempts.enumerated() {
             let timeFromStart = attempt.date.timeIntervalSince(sessionStart)
             let success = attempt.status == .send || attempt.status == .flash || attempt.status == .topped
-
+            
+            // Use gradeDescription to avoid UUIDs
+            let gradeLabel = attempt.route?.gradeDescription ?? attempt.route?.grade
+            
             pacingPoints.append(PacingData(
                 attemptNumber: index + 1,
                 timeFromStart: timeFromStart,
                 successful: success,
-                grade: attempt.route?.grade
+                grade: gradeLabel
             ))
         }
 
@@ -112,8 +119,13 @@ struct PerformanceAnalyticsView: View {
         return Double(totalAttempts) / Double(routesWithAttempts.count)
     }
 
-    private func successRateForGrade(_ grade: String) -> Double {
-        let gradeAttempts = session.allAttempts.filter { $0.route?.grade == grade }
+    private func successRateForGrade(_ gradeLabel: String) -> Double {
+        // Match by gradeDescription first, then fall back to grade for compatibility
+        let gradeAttempts = session.allAttempts.filter { attempt in
+            guard let route = attempt.route else { return false }
+            let routeGradeLabel = route.gradeDescription ?? route.grade ?? ""
+            return routeGradeLabel == gradeLabel
+        }
         let successful = gradeAttempts.filter { $0.status == .send || $0.status == .flash || $0.status == .topped }
         let successfulCount = successful.count
         return gradeAttempts.isEmpty ? 0 : Double(successfulCount) / Double(gradeAttempts.count)

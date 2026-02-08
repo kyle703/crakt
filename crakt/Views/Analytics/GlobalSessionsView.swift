@@ -16,220 +16,304 @@ struct GlobalSessionsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
-                    // Top Summary
-                    topSummarySection
-
-                    // Charts Section
-                    chartsSection
-
-                    // Highlights Section
-                    highlightsSection
+                if sessions.isEmpty {
+                    emptyState
+                } else {
+                    VStack(spacing: 24) {
+                        heroSection
+                        scoreRow
+                        trendsSection
+                        focusCardsSection
+                        insightsSection
+                    }
+                    .padding(.vertical)
                 }
-                .padding()
             }
             .navigationTitle("Analytics")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
 
-    // MARK: - Top Summary Section
-
-    private var topSummarySection: some View {
+    private var emptyState: some View {
         VStack(spacing: 16) {
-            HStack {
-                Image(systemName: "chart.bar.fill")
-                    .font(.title3)
-                    .foregroundColor(.primary)
-                Text("This Month vs Last 3 Months")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
+            Image(systemName: "figure.climbing")
+                .font(.system(size: 48))
+                .foregroundColor(.blue)
+
+            Text("No climbs yet")
+                .font(.title2)
+                .fontWeight(.bold)
+
+            Text("Start a session or find a gym to see your lifetime trends.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+            HStack(spacing: 12) {
+                NavigationLink(destination: SessionConfigView()) {
+                    Text("Start Session")
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+
+                NavigationLink(destination: GymFinderView()) {
+                    Text("Find a Gym")
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color.blue.opacity(0.1))
+                        .foregroundColor(.blue)
+                        .cornerRadius(10)
+                }
             }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.vertical, 60)
+    }
 
-            HStack(spacing: 16) {
-                // Hardest Grade Comparison
-                hardestGradeCard
+    // MARK: - Hero & Scores
 
-                // Success % Comparison
-                successPercentCard
-
-                // Total Attempts
-                totalAttemptsCard
-            }
+    private var heroSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Overall Momentum")
+                .font(.title2)
+                .fontWeight(.bold)
+            Text(heroSubtitle)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            HeroTrendCard(
+                title: "Momentum trend",
+                sparkline: momentumSparkline,
+                currentValue: String(format: "%.0f", momentumScore),
+                deltaText: momentumDeltaText
+            )
         }
         .padding(.horizontal)
     }
 
-    private func formatDIAsGrade(_ di: Int) -> String {
-        if let grade = DifficultyIndex.gradeForDI(di, system: .vscale, climbType: .boulder) {
-            return grade
+    private var scoreRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ScoreCard(
+                    title: "Momentum",
+                    value: momentumScoreText,
+                    subtitle: momentumDeltaText,
+                    color: .blue,
+                    icon: "arrow.triangle.2.circlepath",
+                    isDisabled: !hasSufficientMomentumData
+                )
+                ScoreCard(
+                    title: "Consistency",
+                    value: consistencyScoreText,
+                    subtitle: consistencyDetail,
+                    color: .green,
+                    icon: "waveform.path.ecg",
+                    isDisabled: !hasSufficientConsistencyData
+                )
+                ScoreCard(
+                    title: "Session streak",
+                    value: "\(streakCount)",
+                    subtitle: streakSubtitle,
+                    color: .orange,
+                    icon: "flame.fill"
+                )
+            }
+            .padding(.horizontal)
         }
-        return "V\(di / 10)" // Fallback
     }
 
-    private var hardestGradeCard: some View {
-        let thisMonthDI = getThisMonthMaxDI()
-        let last3MonthsDI = getLast3MonthsAverageDI()
+    // MARK: - Trends Section
 
-        return StatCardView(
-            icon: "mountain.2.fill",
-            title: formatDIAsGrade(thisMonthDI),
-            subtitle: "Hardest Grade",
-            color: .red,
-            trend: calculateTrend(current: Double(thisMonthDI), historical: Double(last3MonthsDI))
-        )
-    }
-
-    private var successPercentCard: some View {
-        let thisMonthPercent = getThisMonthAverageSendPercent()
-        let last3MonthsPercent = getLast3MonthsAverageSendPercent()
-
-        return StatCardView(
-            icon: "checkmark.circle.fill",
-            title: String(format: "%.1f%%", thisMonthPercent),
-            subtitle: "Success Rate",
-            color: .green,
-            trend: calculateTrend(current: thisMonthPercent, historical: last3MonthsPercent)
-        )
-    }
-
-    private var totalAttemptsCard: some View {
-        let thisMonthAttempts = getThisMonthTotalAttempts()
-        let last3MonthsAttempts = getLast3MonthsAverageAttempts()
-
-        return StatCardView(
-            icon: "bolt.fill",
-            title: "\(thisMonthAttempts)",
-            subtitle: "Total Attempts",
-            color: .orange,
-            trend: calculateTrend(current: Double(thisMonthAttempts), historical: last3MonthsAttempts)
-        )
-    }
-
-    // MARK: - Charts Section
-
-    private var chartsSection: some View {
-        VStack(spacing: 24) {
-            // Volume Trend Chart
-            VStack(spacing: 16) {
-                HStack {
-                    Image(systemName: "chart.bar.fill")
-                        .font(.title3)
-                        .foregroundColor(.primary)
-                    Text("Weekly Volume")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Text("Last 8 weeks")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                VolumeBarChart(sessions: sessions)
-                    .frame(height: 120)
-            }
-
-            // Grade Progression Chart
-            VStack(spacing: 16) {
-                HStack {
-                    Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.title3)
-                        .foregroundColor(.primary)
-                    Text("Grade Progression")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Text("Last 12 sessions")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                GradeProgressionChart(sessions: sessions)
-                    .frame(height: 120)
-            }
-
-            // Efficiency Chart
-            VStack(spacing: 16) {
-                HStack {
-                    Image(systemName: "target")
-                        .font(.title3)
-                        .foregroundColor(.primary)
-                    Text("Send Efficiency")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Text("Last 10 sessions")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                EfficiencyChart(sessions: sessions)
-                    .frame(height: 120)
-            }
-        }
-        .padding(.horizontal)
-    }
-
-    // MARK: - Highlights Section
-
-    private var highlightsSection: some View {
-        VStack(spacing: 16) {
+    private var trendsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Image(systemName: "star.fill")
-                    .font(.title3)
-                    .foregroundColor(.primary)
-                Text("Highlights")
-                    .font(.title3)
+                Text("Trends")
+                    .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(.primary)
+                Spacer()
+                Text("Last 12 weeks")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
+            .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    TrendCard(title: "Grade ladder", subtitle: "Hardest & median", chart: AnyView(GradeProgressionChart(sessions: sessions).frame(height: 140)))
+                    TrendCard(title: "Send rate", subtitle: "Sends & flash", chart: AnyView(EfficiencyChart(sessions: sessions).frame(height: 140)))
+                    TrendCard(title: "Weekly volume", subtitle: "Attempts by week", chart: AnyView(VolumeBarChart(sessions: sessions).frame(height: 140)))
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    // MARK: - Focus Section
+
+    private var focusCardsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Focus areas")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                Spacer()
+            }
+            .padding(.horizontal)
 
             VStack(spacing: 12) {
-                // PR Badge
-                if let prGrade = getRecentPRGrade() {
-                    HighlightCard(
-                        icon: "trophy.fill",
-                        title: "New Personal Record!",
-                        subtitle: "Sent \(prGrade)",
-                        color: .yellow
-                    )
-                }
-
-                // Consistency Streak
-                let streak = GlobalAnalytics.calculateConsistencyStreak(sessions: sessions)
-                if streak > 0 {
-                    HighlightCard(
-                        icon: "flame.fill",
-                        title: "\(streak) Week Streak",
-                        subtitle: "Consistent climbing",
-                        color: .orange
-                    )
-                }
-
-                // Recent Performance
-                if sessions.count >= 3 {
-                    let recentSessions = Array(sessions.prefix(3))
-                    let avgSendPercent = GlobalAnalytics.rollingAverage(
-                        values: recentSessions.compactMap { $0.computeSummaryMetrics()?.sendPercent }
-                    )
-
-                    HighlightCard(
-                        icon: "target",
-                        title: String(format: "%.1f%%", avgSendPercent),
-                        subtitle: "Recent send rate",
-                        color: avgSendPercent >= 60 ? .green : avgSendPercent >= 40 ? .blue : .red
-                    )
-                }
+                FocusCard(
+                    icon: "rectangle.3.group.bubble.left.fill",
+                    title: "Grade variety",
+                    detail: varietyDetail,
+                    action: "Add 2 new grades next week",
+                    color: .purple
+                )
+                FocusCard(
+                    icon: "bolt.fill",
+                    title: "Power vs endurance",
+                    detail: powerEnduranceDetail,
+                    action: "Balance high grades with volume sets",
+                    color: .orange
+                )
+                FocusCard(
+                    icon: "timer",
+                    title: "Pacing",
+                    detail: pacingDetail,
+                    action: "Aim for steady rest and attempt rhythm",
+                    color: .blue
+                )
+                FocusCard(
+                    icon: "chart.line.uptrend.xyaxis",
+                    title: "Plateau check",
+                    detail: plateauDetail,
+                    action: "Push one harder climb next session",
+                    color: .red
+                )
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 
-    // MARK: - Helper Methods
+    // MARK: - Insights Section
+
+    private var insightsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Insights")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                Spacer()
+                Text("\(insights.count) notes")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal)
+
+            VStack(spacing: 10) {
+                ForEach(insights, id: \.self) { insight in
+                    AnalyticsInsightRow(text: insight)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    // MARK: - Helper Methods & Derived Metrics
+
+    private var last12WeeksSessions: [Session] {
+        let twelveWeeksAgo = Calendar.current.date(byAdding: .weekOfYear, value: -12, to: Date())!
+        return sessions.filter { $0.startDate >= twelveWeeksAgo }
+    }
+
+    private var momentumScore: Double {
+        guard hasSufficientMomentumData else { return 0 }
+        let sendDelta = percentChangeSafe(current: getRecentSendRate(), historical: getHistoricalSendRate())
+        let gradeDelta = percentChangeSafe(current: Double(getRecentHardestDI()), historical: Double(getHistoricalHardestDI()))
+        let effortDelta = percentChangeSafe(current: getHistoricalAttemptsPerRoute(), historical: getRecentAttemptsPerRoute(), invert: true)
+
+        let score = 50
+            + 20 * sendDelta
+            + 20 * gradeDelta
+            + 10 * effortDelta
+        return max(0, min(100, score))
+    }
+
+    private var consistencyScore: Double {
+        guard hasSufficientConsistencyData else { return 0 }
+        let freqScore = min(1.0, Double(last12WeeksSessions.count) / 12.0) // aiming for 2/wk over 6 weeks
+        let effortVarScore = max(0, 1 - normalizedVariance(values: attemptsPerRouteHistory))
+        let score = 100 * (0.6 * freqScore + 0.4 * effortVarScore)
+        return max(0, min(100, score))
+    }
+
+    private var streakCount: Int {
+        GlobalAnalytics.calculateConsistencyStreak(sessions: sessions)
+    }
+
+    private var attemptsVariance: Double {
+        let values = last12WeeksSessions.compactMap { $0.computeSummaryMetrics()?.attemptCount }
+        guard values.count > 1 else { return 0 }
+        let mean = Double(values.reduce(0, +)) / Double(values.count)
+        let variance = values.map { pow(Double($0) - mean, 2) }.reduce(0, +) / Double(values.count)
+        return sqrt(variance)
+    }
+
+    private var heroSubtitle: String {
+        "Tracking your send rate, hardest grade, and pacing over the last 12 weeks."
+    }
+
+    private var momentumSparkline: [Double] {
+        rollingSendRates
+    }
+
+    private var momentumDeltaText: String {
+        let delta = percentChangeSafe(current: getRecentSendRate(), historical: getHistoricalSendRate()) * 100
+        return hasSufficientMomentumData ? String(format: "%+.0f pts vs baseline", delta) : "Not enough data"
+    }
+
+    private var consistencyDetail: String {
+        hasSufficientConsistencyData ? "\(last12WeeksSessions.count) sessions in 12 weeks" : "Not enough data"
+    }
+
+    private var streakSubtitle: String {
+        streakCount > 0 ? "Week streak" : "Start a streak"
+    }
+
+    private var varietyDetail: String {
+        let uniqueGrades = Set(last12WeeksSessions.flatMap { $0.routes.compactMap { $0.grade } }).count
+        return uniqueGrades < 4 ? "Low variety (\(uniqueGrades) grades)" : "Healthy variety (\(uniqueGrades) grades)"
+    }
+
+    private var powerEnduranceDetail: String {
+        let avgAttempts = last12WeeksSessions.compactMap { $0.computeSummaryMetrics()?.attemptCount }.averageValue
+        return avgAttempts > 15 ? "High volume focus" : "Push a harder project"
+    }
+
+    private var pacingDetail: String {
+        let avgAttemptsPerSend = last12WeeksSessions.compactMap { $0.computeSummaryMetrics()?.attemptsPerSend }.averageValue
+        if avgAttemptsPerSend > 3 { return "Pacing: heavy attempts per send" }
+        return "Pacing: efficient sends"
+    }
+
+    private var plateauDetail: String {
+        let recent = getRecentHardestDI()
+        let historical = getHistoricalHardestDI()
+        return recent <= historical ? "Hardest grade is flat" : "Trending up"
+    }
+
+    private var insights: [String] {
+        var items: [String] = []
+        let sendRate = getRecentSendRate()
+        if sendRate < 40 { items.append("Send rate is low. Try more beta review.") }
+        if varietyDetail.contains("Low variety") { items.append("Add more grade variety next week.") }
+        if plateauDetail.contains("flat") { items.append("Push one harder climb to break plateau.") }
+        return items.isEmpty ? ["Keep the momentum going."] : items
+    }
 
     private func getThisMonthMaxDI() -> Int {
         let thisMonth = Calendar.current.dateInterval(of: .month, for: Date())!
@@ -324,40 +408,257 @@ struct GlobalSessionsView: View {
         // For now, return nil to disable PR display
         return nil
     }
+
+    private func getRecentSendRate() -> Double {
+        let recent = Array(last12WeeksSessions.prefix(6))
+        let values = recent.compactMap { $0.computeSummaryMetrics()?.sendPercent }
+        return GlobalAnalytics.rollingAverage(values: values)
+    }
+
+    private func getHistoricalSendRate() -> Double {
+        let history = Array(last12WeeksSessions.dropFirst(6))
+        let values = history.compactMap { $0.computeSummaryMetrics()?.sendPercent }
+        return GlobalAnalytics.rollingAverage(values: values)
+    }
+
+    private func getRecentHardestDI() -> Int {
+        let recent = Array(last12WeeksSessions.prefix(6))
+        return recent.compactMap { $0.computeSummaryMetrics()?.hardestGradeDI }.max() ?? 0
+    }
+
+    private func getHistoricalHardestDI() -> Int {
+        let history = Array(last12WeeksSessions.dropFirst(6))
+        let values = history.compactMap { $0.computeSummaryMetrics()?.hardestGradeDI }
+        return values.max() ?? 0
+    }
+
+    private func percentChangeSafe(current: Double, historical: Double, invert: Bool = false) -> Double {
+        let epsilon = 0.0001
+        let base = max(abs(historical), epsilon)
+        let delta = (current - historical) / base
+        let clamped = max(-0.5, min(0.5, delta))
+        return invert ? -clamped : clamped
+    }
+
+    private func normalizedVariance(values: [Double]) -> Double {
+        guard values.count > 1 else { return 0 }
+        let mean = values.reduce(0, +) / Double(values.count)
+        if mean == 0 { return 0 }
+        let variance = values.map { pow($0 - mean, 2) }.reduce(0, +) / Double(values.count)
+        let std = sqrt(variance)
+        return min(1, std / mean) // normalize variance to 0-1 range
+    }
+
+    private var rollingSendRates: [Double] {
+        let sortedSessions = last12WeeksSessions.sorted { $0.startDate < $1.startDate }
+        return sortedSessions.compactMap { $0.computeSummaryMetrics()?.sendPercent }
+    }
+
+    private func getRecentAttemptsPerRoute() -> Double {
+        let recent = Array(last12WeeksSessions.prefix(6))
+        let values = recent.compactMap { $0.computeSummaryMetrics()?.attemptsPerSend }
+        return values.averageValue
+    }
+
+    private func getHistoricalAttemptsPerRoute() -> Double {
+        let history = Array(last12WeeksSessions.dropFirst(6)).prefix(6)
+        let values = history.compactMap { $0.computeSummaryMetrics()?.attemptsPerSend }
+        return values.averageValue
+    }
+
+    private var attemptsPerRouteHistory: [Double] {
+        last12WeeksSessions.compactMap { $0.computeSummaryMetrics()?.attemptsPerSend }
+    }
+
+    private var hasSufficientMomentumData: Bool {
+        let recentCount = Array(last12WeeksSessions.prefix(6)).count
+        let baselineCount = Array(last12WeeksSessions.dropFirst(6)).prefix(6).count
+        return recentCount >= 3 && baselineCount >= 3
+    }
+
+    private var hasSufficientConsistencyData: Bool {
+        last12WeeksSessions.count >= 3
+    }
+
+    private var momentumScoreText: String {
+        hasSufficientMomentumData ? String(format: "%.0f", momentumScore) : "—"
+    }
+
+    private var consistencyScoreText: String {
+        hasSufficientConsistencyData ? String(format: "%.0f", consistencyScore) : "—"
+    }
 }
 
 // MARK: - Supporting Views
 
-struct HighlightCard: View {
+struct HeroTrendCard: View {
+    let title: String
+    let sparkline: [Double]
+    let currentValue: String
+    let deltaText: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(title)
+                    .font(.headline)
+                Spacer()
+                Text(deltaText)
+                    .font(.caption)
+                    .foregroundColor(.blue)
+            }
+            Chart {
+                ForEach(Array(sparkline.enumerated()), id: \.0) { index, value in
+                    LineMark(
+                        x: .value("Index", index),
+                        y: .value("Value", value)
+                    )
+                    .foregroundStyle(.blue)
+                }
+            }
+            .chartXAxis(.hidden)
+            .chartYAxis(.hidden)
+            .frame(height: 100)
+
+            HStack {
+                Text(currentValue)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                Spacer()
+                Text("Momentum score")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(14)
+        .shadow(color: Color.black.opacity(0.05), radius: 4)
+    }
+}
+
+struct ScoreCard: View {
+    let title: String
+    let value: String
+    let subtitle: String
+    let color: Color
     let icon: String
+    var isDisabled: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+            }
+            Text(value)
+                .font(.title2)
+                .fontWeight(.bold)
+            Text(subtitle)
+                .font(.caption)
+                .foregroundColor(isDisabled ? .secondary.opacity(0.6) : .secondary)
+        }
+        .padding()
+        .frame(width: 180, alignment: .leading)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
+    }
+}
+
+struct TrendCard: View {
     let title: String
     let subtitle: String
+    let chart: AnyView
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+            Text(subtitle)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            chart
+        }
+        .padding()
+        .frame(width: 260, alignment: .leading)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
+    }
+}
+
+struct FocusCard: View {
+    let icon: String
+    let title: String
+    let detail: String
+    let action: String
     let color: Color
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-                .frame(width: 40, height: 40)
-                .background(color.opacity(0.1))
-                .clipShape(Circle())
-
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .foregroundColor(color)
                 Text(title)
                     .font(.headline)
-                    .foregroundColor(.primary)
-                Text(subtitle)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                Spacer()
             }
-
-            Spacer()
+            Text(detail)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            Text(action)
+                .font(.caption)
+                .foregroundColor(.blue)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(8)
         }
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.05), radius: 4)
+        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
+    }
+}
+
+struct AnalyticsInsightRow: View {
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "lightbulb.fill")
+                .foregroundColor(.blue)
+            Text(text)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+            Spacer()
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(10)
+        .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
+    }
+}
+
+// MARK: - Helpers
+
+extension Array where Element: BinaryInteger {
+    var averageValue: Double {
+        guard !isEmpty else { return 0 }
+        let total = self.reduce(0, +)
+        return Double(total) / Double(count)
+    }
+}
+
+extension Array where Element: BinaryFloatingPoint {
+    var averageValue: Double {
+        guard !isEmpty else { return 0 }
+        let total = self.reduce(0, +)
+        return Double(total) / Double(count)
     }
 }
 

@@ -34,10 +34,8 @@ struct SessionChartsControllerView: View {
     }
 
     private var hardestGradeSent: String? {
-        let attempts = session.allAttempts
-        let successfulAttempts = attempts.filter { $0.status == .send || $0.status == .flash || $0.status == .topped }
-        let grades = successfulAttempts.compactMap { $0.route?.grade }
-        return grades.max { gradeIndex(for: $0) < gradeIndex(for: $1) }
+        // Use session's built-in method which already handles gradeDescription
+        return session.hardestGradeSent
     }
 
     private var averageAttemptsPerRoute: Double {

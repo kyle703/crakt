@@ -395,46 +395,5 @@ struct YDS: GradeProtocol {
 
 
 
-protocol CircuitGradeProtocol: GradeProtocol {
-    var orderedColors: [Color] { get set }
-}
-
-let DEFAULT_CIRCUIT = [Color.blue, Color.green, Color.yellow, Color.orange, Color.red, Color.purple, Color.black]
-class UserConfiguredCircuitGrade: CircuitGradeProtocol {
-    static func == (lhs: UserConfiguredCircuitGrade, rhs: UserConfiguredCircuitGrade) -> Bool {
-        lhs.system == rhs.system
-    }
-    
-    let system: GradeSystem = .circuit
-    var orderedColors: [Color]
-    
-    var grades: [String] {
-        // Convert Colors to their String names as grades
-        return orderedColors.map { "\($0.description)" }
-    }
-    
-    init(orderedColors: [Color] = DEFAULT_CIRCUIT) {
-        self.orderedColors = orderedColors
-    }
-    
-    func colors(for grade: String) -> [Color] {
-        // Convert the grade back to Color
-        if let color = Color(colorName: grade) {
-            return [color]
-        }
-        return [Color.clear]  // Default if grade is not found
-    }
-    
-    var colorMap: [String : Color] {
-            var map = [String: Color]()
-            for color in orderedColors {
-                let colorName = "\(color.description)" // Simplification
-                map[colorName] = color
-            }
-            return map
-        }
-    
-    func description(for grade: String) -> String? {
-        return nil
-    }
-}
+// MARK: - Circuit Grade Support
+// See: CustomCircuitGrade.swift, CircuitColorMapping.swift, CircuitGrade.swift for new implementation

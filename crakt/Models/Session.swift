@@ -60,10 +60,14 @@ class Session {
     var climbType: ClimbType?
     var gradeSystem: GradeSystem?
     var gymName: String?
+    
+    /// For circuit grade sessions: reference to the circuit being used
+    @Relationship(deleteRule: .nullify)
+    var customCircuit: CustomCircuitGrade?
 
     // Warm-up state
     var currentPhase: SessionPhase?
-    var warmupExercises: [WarmupExercise] = []
+    @Transient var warmupExercises: [WarmupExercise] = []
     var currentWarmupExerciseIndex: Int = 0
     var warmupStartTime: Date?
     var warmupCompleted: Bool = false

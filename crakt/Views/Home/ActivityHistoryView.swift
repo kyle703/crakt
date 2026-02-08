@@ -19,32 +19,34 @@ struct ActivityHistoryView: View {
     var body: some View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 15) {
-
-                    // List View of Sessions
-                    LazyVStack(spacing: 10) {
-                        ForEach(sessions, id: \.id) { session in
-                            if session.status == .active {
-                                Button(action: {
-                                    activeSession = session
-                                    showActiveSession = true
-                                }) {
-                                    SessionRowCardView(session: session)
-                                        .padding(.horizontal)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            } else {
-                                NavigationLink {
-                                    SessionDetailView(session: session)
-                                } label: {
-                                    SessionRowCardView(session: session)
-                                        .padding(.horizontal)
+                if sessions.isEmpty {
+                    emptyState
+                } else {
+                    VStack(spacing: 15) {
+                        LazyVStack(spacing: 10) {
+                            ForEach(sessions, id: \.id) { session in
+                                if session.status == .active {
+                                    Button(action: {
+                                        activeSession = session
+                                        showActiveSession = true
+                                    }) {
+                                        SessionRowCardView(session: session)
+                                            .padding(.horizontal)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                } else {
+                                    NavigationLink {
+                                        SessionDetailView(session: session)
+                                    } label: {
+                                        SessionRowCardView(session: session)
+                                            .padding(.horizontal)
+                                    }
                                 }
                             }
                         }
                     }
+                    .padding(.vertical)
                 }
-                .padding(.vertical)
             }
             .navigationTitle("Activity History")
         }
@@ -54,6 +56,48 @@ struct ActivityHistoryView: View {
                 activeSession = nil
             }
         }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "figure.climbing")
+                .font(.system(size: 48))
+                .foregroundColor(.blue)
+
+            Text("No history yet")
+                .font(.title2)
+                .fontWeight(.bold)
+
+            Text("Start a session or find a gym to log your first climb.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+            HStack(spacing: 12) {
+                NavigationLink(destination: SessionConfigView()) {
+                    Text("Start Session")
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+
+                NavigationLink(destination: GymFinderView()) {
+                    Text("Find a Gym")
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color.blue.opacity(0.1))
+                        .foregroundColor(.blue)
+                        .cornerRadius(10)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.vertical, 60)
     }
 }
 

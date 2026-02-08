@@ -11,20 +11,33 @@ struct RouteSummaryView: View {
     var route: Route
     
     var body: some View {
-        // (Assumes you have logic to get the system, color, and text from route.gradeSystem and route.grade)
-        let gradeSystem = GradeSystems.systems[route.gradeSystem]!
-        let gradeLabel = route.grade.flatMap { gradeSystem.description(for: $0) }
-        
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                // Grade label in a white pill
-                Text(gradeLabel ?? "Unknown")
-                    .font(.headline)
-                    .foregroundColor(.black)
+                // Grade display - color swatch + text for circuit grades, just text for others
+                if route.gradeSystem == .circuit {
+                    // Circuit grade: show color swatch with name
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(route.gradeColor)
+                            .frame(width: 20, height: 20)
+                        Text(route.circuitColorName ?? "Unknown")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                    }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
                     .background(Color(.systemBackground))
                     .cornerRadius(8)
+                } else {
+                    // Standard grade: text only
+                    Text(route.gradeDescription ?? "Unknown")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color(.systemBackground))
+                        .cornerRadius(8)
+                }
                 
                 Spacer()
                 

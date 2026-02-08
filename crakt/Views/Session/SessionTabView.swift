@@ -19,12 +19,37 @@ struct SessionTabView: View {
     @State var selectedClimbType: ClimbType
     @State var selectedGrade: String?
     @State private var selectedTab: UnifiedSessionHeader.Tab = .routes
+    
+    // Feedback popover state (shown at this level to overlay header)
+    @State private var showFeedbackPopover = false
+    @State private var feedbackPopoverRoute: Route?
+    @State private var feedbackPopoverAttempt: RouteAttempt?
+    
+    // Route review sheet state (triggered from popover accept)
+    @State private var showRouteReviewSheet = false
+    @State private var reviewSheetRoute: Route?
+    @State private var reviewSheetAttempt: RouteAttempt?
 
     private var initialWorkoutType: WorkoutType?
     private var initialSelectedGrades: [String]?
     private var defaultClimbType: ClimbType
     private var defaultGradeSystem: GradeSystem
     private var onSessionEnd: ((Session?) -> Void)?
+    
+    private var activeRouteCardView: some View {
+        ActiveRouteCardView(
+            session: session,
+            stopwatch: stopwatch,
+            workoutOrchestrator: workoutOrchestrator,
+            selectedGrade: $selectedGrade,
+            selectedGradeSystem: $selectedGradeSystem,
+            onShowFeedbackPopover: { route, attempt in
+                feedbackPopoverRoute = route
+                feedbackPopoverAttempt = attempt
+                showFeedbackPopover = true
+            }
+        )
+    }
 
     init(session: Session,
          initialWorkoutType: WorkoutType? = nil,
@@ -72,7 +97,24 @@ struct SessionTabView: View {
                                     onSessionEnd: onSessionEnd,
                                     selectedClimbType: $selectedClimbType,
                                     selectedGradeSystem: $selectedGradeSystem,
-                                    selectedTab: $selectedTab)
+                                    selectedTab: $selectedTab,
+                                    showFeedbackBanner: $showFeedbackPopover,
+                                    feedbackRoute: feedbackPopoverRoute,
+                                    feedbackAttempt: feedbackPopoverAttempt,
+                                    onFeedbackAccept: {
+                                        // Show full review sheet
+                                        if let route = feedbackPopoverRoute {
+                                            reviewSheetRoute = route
+                                            reviewSheetAttempt = feedbackPopoverAttempt
+                                            showRouteReviewSheet = true
+                                        }
+                                        feedbackPopoverRoute = nil
+                                        feedbackPopoverAttempt = nil
+                                    },
+                                    onFeedbackDismiss: {
+                                        feedbackPopoverRoute = nil
+                                        feedbackPopoverAttempt = nil
+                                    })
                 .onAppear {
                     // Set up background/foreground notifications for timer persistence
                     NotificationCenter.default.addObserver(
@@ -109,9 +151,21 @@ struct SessionTabView: View {
                         }
                     }
 
-                    // Create initial route if none exists
+                    // Create initial route if none exists, or sync state with existing route
                     if session.activeRoute == nil {
                         createInitialRoute()
+                    } else {
+                        // Sync selected state with existing route's configuration
+                        if let route = session.activeRoute {
+                            if route.gradeSystem != selectedGradeSystem {
+                                print("🔄 Syncing selectedGradeSystem to match existing route: \(route.gradeSystem)")
+                                selectedGradeSystem = route.gradeSystem
+                            }
+                            if route.climbType != selectedClimbType {
+                                print("🔄 Syncing selectedClimbType to match existing route: \(route.climbType)")
+                                selectedClimbType = route.climbType
+                            }
+                        }
                     }
                 }
                 .onDisappear {
@@ -130,21 +184,39 @@ struct SessionTabView: View {
             switch selectedTab {
             case .routes:
                 // Always show ActiveRouteCardView (auto-creates route if needed)
-                ActiveRouteCardView(
-                    session: session,
-                    stopwatch: stopwatch,
-                    workoutOrchestrator: workoutOrchestrator,
-                    selectedGrade: $selectedGrade,
-                    selectedGradeSystem: $selectedGradeSystem
-                )
+                activeRouteCardView
 
             case .progress:
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Grade Pyramid - Sends breakdown by grade
+                        GradePyramidChartView(
+                            session: session,
+                            currentGradeSystem: selectedGradeSystem
+                        )
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.05), radius: 4)
+                        .padding(.horizontal)
+                        
+                        // Session Activity Chart - Shows routes and attempts over time
+                        DifficultyTimelineChartView(
+                            session: session,
+                            currentGradeSystem: selectedGradeSystem
+                        )
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.05), radius: 4)
+                        .padding(.horizontal)
+
                         // Session Volume Stats
                         VStack(spacing: 16) {
                             HStack(spacing: 8) {
-                                Image(systemName: "chart.bar.fill")
+                                Image(systemName: "number.circle.fill")
                                     .font(.title3)
                                     .foregroundColor(.primary)
                                 Text("Session Volume")
@@ -253,85 +325,6 @@ struct SessionTabView: View {
                                     color: .gray
                                 )
                             }
-
-                        // Efficiency comparison
-                            HStack(spacing: 8) {
-                                Text("Efficiency vs baseline:")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-
-                                Text(String(format: "%.1f attempts/send today (baseline: 2.5)", session.attemptsPerSend))
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-
-                                let trend = session.calculateTrend(current: session.attemptsPerSend, historical: 2.5)
-                                Text(trend)
-                                    .font(.subheadline)
-                                    .foregroundColor(trend == "↑" ? .red : trend == "↓" ? .green : .gray)
-                            }
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                            .background(Color(.systemBackground))
-                            .cornerRadius(8)
-                            .shadow(color: .black.opacity(0.05), radius: 4)
-                        }
-                        .padding(.horizontal)
-
-                        // Volume Distribution
-                        VStack(spacing: 16) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "chart.pie.fill")
-                                    .font(.title3)
-                                    .foregroundColor(.primary)
-                                Text("Volume Distribution")
-                                    .font(.title3)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                            }
-
-                            VStack(spacing: 12) {
-                                ForEach(session.formattedGradeDistribution, id: \.band) { distribution in
-                                    HStack {
-                                        Text(distribution.band)
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .frame(width: 60, alignment: .leading)
-
-                                        Text("\(distribution.attempts) attempts")
-                                            .font(.subheadline)
-                                            .foregroundColor(.secondary)
-
-                                        Spacer()
-
-                                        Text(String(format: "%.1f%%", distribution.percentage))
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.primary)
-
-                                        // Progress bar
-                                        GeometryReader { geometry in
-                                            ZStack(alignment: .leading) {
-                                                Rectangle()
-                                                    .fill(Color.gray.opacity(0.2))
-                                                    .frame(height: 6)
-                                                    .cornerRadius(3)
-
-                                                Rectangle()
-                                                    .fill(Color.blue)
-                                                    .frame(width: geometry.size.width * distribution.percentage / 100.0, height: 6)
-                                                    .cornerRadius(3)
-                                            }
-                                        }
-                                        .frame(height: 6)
-                                        .frame(width: 60)
-                                    }
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 16)
-                                    .background(Color(.systemBackground))
-                                    .cornerRadius(8)
-                                    .shadow(color: .black.opacity(0.05), radius: 4)
-                                }
-                            }
                         }
                         .padding(.horizontal)
                     }
@@ -341,67 +334,88 @@ struct SessionTabView: View {
             case .menu:
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Session controls
-                        VStack(spacing: 16) {
-                            Text("Session Controls")
-                                .font(.title2)
-                                .fontWeight(.bold)
-
-                            // Grade system picker
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Grade System")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-
-                                GradeSystemSelectionView(selectedClimbType: $selectedClimbType, selectedGradeSystem: $selectedGradeSystem)
-                            }
-                            .padding(.horizontal)
-
-                            // End Session button
-                            Button(action: {
-                                // Mark session as complete and persist using helper
-                                let elapsed: TimeInterval
-                                if stopwatch.isRunning {
-                                    stopwatch.stop()
-                                }
-                                elapsed = stopwatch.totalTime > 0 ? stopwatch.totalTime : Date().timeIntervalSince(session.startDate)
-
-                                session.completeSession(context: modelContext, elapsedTime: elapsed)
-
-                                do {
-                                    try modelContext.save()
-                                } catch {
-                                    print("❌ Failed to save completed session: \(error)")
-                                }
-
-                                // Call completion callback with the session
-                                onSessionEnd?(session)
-                            }) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "stop.circle.fill")
-                                        .font(.title2)
-                                    Text("End Session")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                }
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .background(Color.red.opacity(0.8))
-                                .cornerRadius(12)
-                            }
-                            .padding(.horizontal)
-
-                            // Workout selector
-                            WorkoutSelectorView(orchestrator: workoutOrchestrator)
+                        // Grade System Picker (top)
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Grade System")
+                                .font(.headline)
                                 .padding(.horizontal)
+                            
+                            SessionGradeSystemPicker(
+                                selectedClimbType: $selectedClimbType,
+                                selectedGradeSystem: $selectedGradeSystem
+                            )
+                            .padding(.horizontal)
                         }
-
                         
+                        // Session Info Cards
+                        SessionInfoCardsView(
+                            session: session,
+                            selectedGradeSystem: selectedGradeSystem
+                        )
+                        .padding(.horizontal)
+                        
+                        // End Session button
+                        Button(action: {
+                            let elapsed: TimeInterval
+                            if stopwatch.isRunning {
+                                stopwatch.stop()
+                            }
+                            elapsed = stopwatch.totalTime > 0 ? stopwatch.totalTime : Date().timeIntervalSince(session.startDate)
+
+                            session.completeSession(context: modelContext, elapsedTime: elapsed)
+
+                            do {
+                                try modelContext.save()
+                            } catch {
+                                print("❌ Failed to save completed session: \(error)")
+                            }
+
+                            onSessionEnd?(session)
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "stop.circle.fill")
+                                    .font(.title2)
+                                Text("End Session")
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.red)
+                            .cornerRadius(12)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 8)
                     }
                     .padding(.vertical, 16)
                 }
             }
+            }
+        }
+        .sheet(isPresented: $showRouteReviewSheet) {
+            if let route = reviewSheetRoute {
+                RouteReviewView(
+                    route: route,
+                    attempt: reviewSheetAttempt,
+                    isAutoPresented: true,
+                    onSave: { rating, wallAngles, holdTypes, movementStyles, experiences in
+                        // Save difficulty rating to attempt if provided
+                        if let rating = rating, let attempt = reviewSheetAttempt {
+                            attempt.difficultyRating = rating
+                        }
+                        // Save route characteristics
+                        route.wallAngles = wallAngles
+                        route.holdTypes = holdTypes
+                        route.movementStyles = movementStyles
+                        route.experiences = experiences
+                        
+                        do {
+                            try modelContext.save()
+                        } catch {
+                            print("Failed to save route review: \(error)")
+                        }
+                    }
+                )
             }
         }
     }
@@ -460,8 +474,10 @@ struct SessionTabView: View {
             print("⚠️ Direct conversion failed, trying fallback")
 
             // Fallback: Try to convert via normalized difficulty
-            let normalized = activeRoute.gradeSystem._protocol.normalizedDifficulty(for: currentGrade)
-            let fallbackGrade = newGradeSystem._protocol.grade(forNormalizedDifficulty: normalized)
+            let fromProtocol = GradeSystemFactory.gradeProtocol(for: activeRoute.gradeSystem, modelContext: modelContext, customCircuitId: activeRoute.customCircuitId)
+            let toProtocol = GradeSystemFactory.gradeProtocol(for: newGradeSystem, modelContext: modelContext)
+            let normalized = fromProtocol.normalizedDifficulty(for: currentGrade)
+            let fallbackGrade = toProtocol.grade(forNormalizedDifficulty: normalized)
 
             print("🔄 Fallback conversion: normalized=\(normalized) -> '\(fallbackGrade)'")
 
@@ -485,12 +501,29 @@ struct SessionTabView: View {
             print("ℹ️ No active route to convert")
             return
         }
+        
+        // Get circuit reference for circuit grade system
+        let circuitForRoute: CustomCircuitGrade? = selectedGradeSystem == .circuit 
+            ? (session.customCircuit ?? GradeSystemFactory.defaultCircuit(modelContext))
+            : nil
 
         // If route has no grade, just update the grade system
         guard let currentGrade = activeRoute.grade else {
             print("📝 Route has no grade, just updating grade system")
             activeRoute.gradeSystem = selectedGradeSystem
             activeRoute.climbType = selectedClimbType
+            
+            // Update circuit reference
+            if let circuit = circuitForRoute {
+                activeRoute.customCircuit = circuit
+                activeRoute.customCircuitId = circuit.id
+                // Set initial grade for circuit
+                activeRoute.grade = circuit.orderedMappings.first?.id.uuidString
+            } else {
+                activeRoute.customCircuit = nil
+                activeRoute.customCircuitId = nil
+            }
+            
             do {
                 try modelContext.save()
                 print("💾 Updated route grade system")
@@ -501,6 +534,33 @@ struct SessionTabView: View {
         }
 
         print("📝 Converting grade '\(currentGrade)' from \(activeRoute.gradeSystem.description) to \(selectedGradeSystem.description)")
+        
+        // Special handling for circuit grades
+        if selectedGradeSystem == .circuit, let circuit = circuitForRoute {
+            // For circuit, find the closest matching color based on difficulty
+            let fromProtocol = GradeSystemFactory.gradeProtocol(for: activeRoute.gradeSystem, modelContext: modelContext, customCircuitId: activeRoute.customCircuitId)
+            let normalized = fromProtocol.normalizedDifficulty(for: currentGrade)
+            let circuitGrade = CircuitGrade(customCircuit: circuit)
+            let circuitGradeId = circuitGrade.grade(forNormalizedDifficulty: normalized)
+            
+            activeRoute.grade = circuitGradeId
+            activeRoute.gradeSystem = selectedGradeSystem
+            activeRoute.climbType = selectedClimbType
+            activeRoute.customCircuit = circuit
+            activeRoute.customCircuitId = circuit.id
+            
+            do {
+                try modelContext.save()
+                print("💾 Updated route to circuit grade")
+            } catch {
+                print("❌ Failed to update route: \(error)")
+            }
+            return
+        }
+        
+        // Clear circuit reference if not using circuit
+        activeRoute.customCircuit = nil
+        activeRoute.customCircuitId = nil
 
         // Try direct conversion first
         let convertedGrade = DifficultyIndex.convertGrade(
@@ -529,8 +589,10 @@ struct SessionTabView: View {
             print("⚠️ Direct conversion failed, trying fallback")
 
             // Fallback: Try to convert via normalized difficulty
-            let normalized = activeRoute.gradeSystem._protocol.normalizedDifficulty(for: currentGrade)
-            let fallbackGrade = selectedGradeSystem._protocol.grade(forNormalizedDifficulty: normalized)
+            let fromProtocol = GradeSystemFactory.gradeProtocol(for: activeRoute.gradeSystem, modelContext: modelContext, customCircuitId: activeRoute.customCircuitId)
+            let toProtocol = GradeSystemFactory.gradeProtocol(for: selectedGradeSystem, modelContext: modelContext)
+            let normalized = fromProtocol.normalizedDifficulty(for: currentGrade)
+            let fallbackGrade = toProtocol.grade(forNormalizedDifficulty: normalized)
 
             print("🔄 Fallback conversion: normalized=\(normalized) -> '\(fallbackGrade)'")
 
@@ -550,6 +612,12 @@ struct SessionTabView: View {
     private func createInitialRoute() {
         // Determine the grade for the initial route
         var initialGrade: String
+        var circuitForRoute: CustomCircuitGrade?
+
+        // Get the session's circuit if available, or fetch default
+        if selectedGradeSystem == .circuit {
+            circuitForRoute = session.customCircuit ?? GradeSystemFactory.defaultCircuit(modelContext)
+        }
 
         // Priority 1: Use workout's selected grade if workout is active
         if workoutOrchestrator.isWorkoutActive,
@@ -562,7 +630,13 @@ struct SessionTabView: View {
         }
         // Priority 3: Use sensible defaults based on grade system
         else {
-            initialGrade = selectedGradeSystem._protocol.grades.first ?? "V0"
+            // For circuit grades, use the first mapping from the circuit
+            if selectedGradeSystem == .circuit, let circuit = circuitForRoute {
+                initialGrade = circuit.orderedMappings.first?.id.uuidString ?? ""
+            } else {
+                let gradeProtocol = GradeSystemFactory.gradeProtocol(for: selectedGradeSystem, modelContext: modelContext)
+                initialGrade = gradeProtocol.grades.first ?? "V0"
+            }
         }
 
         // Create the initial route
@@ -573,9 +647,22 @@ struct SessionTabView: View {
         )
         newRoute.status = .active
         newRoute.climbType = selectedClimbType
+        
+        // For circuit grades, set the circuit reference
+        if selectedGradeSystem == .circuit, let circuit = circuitForRoute {
+            newRoute.customCircuit = circuit
+            newRoute.customCircuitId = circuit.id
+        }
 
         modelContext.insert(newRoute)
         session.activeRoute = newRoute
+        
+        // Also update session's configuration to stay in sync
+        session.gradeSystem = selectedGradeSystem
+        session.climbType = selectedClimbType
+        if selectedGradeSystem == .circuit {
+            session.customCircuit = circuitForRoute
+        }
 
         // Save the context
         do {
@@ -587,8 +674,234 @@ struct SessionTabView: View {
 
 }
 
+// MARK: - Session Info Cards
+
+struct SessionInfoCardsView: View {
+    let session: Session
+    let selectedGradeSystem: GradeSystem
+    @Query private var circuits: [CustomCircuitGrade]
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Gym Info Card
+            InfoCard(
+                icon: "building.2.fill",
+                iconColor: .orange,
+                title: "Gym",
+                value: session.gymName ?? "Not selected",
+                subtitle: nil
+            )
+            
+            // Grade System Info Card
+            InfoCard(
+                icon: "number.circle.fill",
+                iconColor: .blue,
+                title: "Grade System",
+                value: selectedGradeSystem.description,
+                subtitle: gradeSystemSubtitle
+            )
+            
+            // If using circuit, show circuit info
+            if selectedGradeSystem == .circuit, let circuit = defaultCircuit {
+                CircuitInfoCard(circuit: circuit)
+            }
+        }
+    }
+    
+    private var defaultCircuit: CustomCircuitGrade? {
+        circuits.first(where: { $0.isDefault })
+    }
+    
+    private var gradeSystemSubtitle: String? {
+        if selectedGradeSystem == .circuit, let circuit = defaultCircuit {
+            return circuit.name
+        }
+        return nil
+    }
+}
+
+struct InfoCard: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    let value: String
+    let subtitle: String?
+    
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(iconColor)
+                .frame(width: 32)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .textCase(.uppercase)
+                
+                Text(value)
+                    .font(.headline)
+                
+                if let subtitle = subtitle {
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            Spacer()
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+}
+
+struct CircuitInfoCard: View {
+    let circuit: CustomCircuitGrade
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 14) {
+                Image(systemName: "paintpalette.fill")
+                    .font(.title2)
+                    .foregroundColor(.purple)
+                    .frame(width: 32)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Circuit")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
+                    
+                    Text(circuit.name)
+                        .font(.headline)
+                }
+                
+                Spacer()
+            }
+            
+            // Color preview with grade ranges
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(circuit.orderedMappings) { mapping in
+                        VStack(spacing: 4) {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(mapping.swiftUIColor)
+                                .frame(width: 40, height: 32)
+                            
+                            Text(mapping.gradeRangeDescription)
+                                .font(.system(size: 9))
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+}
+
+// MARK: - Session Grade System Picker
+
+struct SessionGradeSystemPicker: View {
+    @Binding var selectedClimbType: ClimbType
+    @Binding var selectedGradeSystem: GradeSystem
+    
+    private var isBouldering: Bool {
+        selectedClimbType == .boulder
+    }
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            // Climb Type Toggle (top) - simplified to Boulder vs Ropes
+            HStack(spacing: 8) {
+                PillButton(
+                    title: "Boulder",
+                    isSelected: isBouldering,
+                    color: .blue
+                ) {
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedClimbType = .boulder
+                        validateGradeSystem()
+                    }
+                }
+                
+                PillButton(
+                    title: "Ropes",
+                    isSelected: !isBouldering,
+                    color: .blue
+                ) {
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedClimbType = .toprope // Default to toprope for ropes
+                        validateGradeSystem()
+                    }
+                }
+            }
+            
+            // Grade System Pills (bottom)
+            HStack(spacing: 8) {
+                ForEach(validGradeSystems, id: \.self) { system in
+                    PillButton(
+                        title: system.description,
+                        isSelected: selectedGradeSystem == system,
+                        color: .orange
+                    ) {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedGradeSystem = system
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private var validGradeSystems: [GradeSystem] {
+        if isBouldering {
+            return [.circuit, .vscale, .font]
+        } else {
+            return [.yds, .french]
+        }
+    }
+    
+    private func validateGradeSystem() {
+        if !validGradeSystems.contains(selectedGradeSystem) {
+            selectedGradeSystem = isBouldering ? .vscale : .yds
+        }
+    }
+}
+
+// MARK: - Pill Button Component
+
+struct PillButton: View {
+    let title: String
+    let isSelected: Bool
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(isSelected ? .semibold : .regular)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? color : Color(.systemGray5))
+                )
+                .foregroundColor(isSelected ? .white : .primary)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 #Preview {
     let session = Session.active_preview
     SessionTabView(session: session)
-        .modelContainer(for: [Route.self, RouteAttempt.self, Session.self])
+        .modelContainer(for: [Route.self, RouteAttempt.self, Session.self, CustomCircuitGrade.self, CircuitColorMapping.self])
 }

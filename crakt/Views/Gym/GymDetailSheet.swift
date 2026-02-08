@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import MapKit
 import CoreLocation
 
@@ -14,6 +15,10 @@ struct GymDetailSheet: View {
     let userLocation: CLLocation?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.modelContext) private var modelContext
+    
+    @State private var showGradeConfiguration = false
+    @State private var gradeConfiguration: GymGradeConfiguration?
     
     var body: some View {
         NavigationStack {
@@ -90,6 +95,12 @@ struct GymDetailSheet: View {
                         .cornerRadius(12)
                     }
                     
+                    // Grade Configuration Section
+                    GradeConfigurationSection(
+                        configuration: gradeConfiguration,
+                        onEdit: { showGradeConfiguration = true }
+                    )
+                    
                     // Action Buttons
                     HStack(spacing: 12) {
                         Button {
@@ -124,6 +135,29 @@ struct GymDetailSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .onAppear {
+            loadGradeConfiguration()
+        }
+        .sheet(isPresented: $showGradeConfiguration) {
+            GymGradeConfigurationView(
+                gymId: UUID(uuidString: String(gym.id)) ?? UUID(),
+                gymName: gym.name,
+                countryCode: gym.address.country
+            )
+        }
+    }
+    
+    // MARK: - Load Configuration
+    
+    private func loadGradeConfiguration() {
+        // Use gym.id as string for UUID since Gym.id is Int
+        let gymUUID = UUID(uuidString: String(gym.id)) ?? UUID()
+        
+        let descriptor = FetchDescriptor<GymGradeConfiguration>(
+            predicate: #Predicate { $0.gymId == gymUUID }
+        )
+        
+        gradeConfiguration = try? modelContext.fetch(descriptor).first
     }
     
     // MARK: - Private Methods
@@ -212,6 +246,82 @@ struct DetailRow: View {
     }
 }
 
+// MARK: - Grade Configuration Section
+
+struct GradeConfigurationSection: View {
+    let configuration: GymGradeConfiguration?
+    let onEdit: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                Image(systemName: "number.circle.fill")
+                    .foregroundColor(.orange)
+                    .frame(width: 24)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Grade Systems")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    if let config = configuration {
+                        HStack(spacing: 16) {
+                            // Boulder system
+                            HStack(spacing: 4) {
+                                Image(systemName: "mountain.2.fill")
+                                    .font(.caption)
+                                Text(config.boulderGradeSystem.description)
+                                    .font(.subheadline)
+                            }
+                            
+                            // Rope system
+                            HStack(spacing: 4) {
+                                Image(systemName: "figure.climbing")
+                                    .font(.caption)
+                                Text(config.ropeGradeSystem.description)
+                                    .font(.subheadline)
+                            }
+                        }
+                    } else {
+                        Text("Not configured")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Spacer()
+                
+                Button {
+                    onEdit()
+                } label: {
+                    Text(configuration == nil ? "Set Up" : "Edit")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.blue)
+                }
+            }
+            
+            // Show circuit preview if using circuit grades
+            if let config = configuration,
+               config.boulderGradeSystem == .circuit,
+               let circuit = config.boulderCircuit {
+                HStack(spacing: 4) {
+                    ForEach(circuit.orderedMappings.prefix(7)) { mapping in
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(mapping.swiftUIColor)
+                            .frame(height: 16)
+                    }
+                }
+                .padding(.leading, 36)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+    }
+}
+
 // MARK: - Preview
 
 #Preview {
@@ -219,5 +329,6 @@ struct DetailRow: View {
         gym: .preview,
         userLocation: CLLocation(latitude: 37.0, longitude: -122.0)
     )
+    .modelContainer(for: [GymGradeConfiguration.self, CustomCircuitGrade.self, CircuitColorMapping.self])
 }
 

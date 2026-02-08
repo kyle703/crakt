@@ -26,31 +26,45 @@ struct ClimbingGradeSelector<GS: GradeProtocol>: View {
     }
 
     
+    /// For circuit grades, don't show text - just color
+    private var isCircuitGrade: Bool {
+        gradeSystem.system == .circuit
+    }
+    
     var items: [AnyView] {
-            gradeSystem.grades.map { grade in
-                let colors = gradeSystem.colors(for: grade)
-                return AnyView(ZStack {
+        gradeSystem.grades.map { grade in
+            let colors = gradeSystem.colors(for: grade)
+            return AnyView(
+                ZStack {
                     if colors.count == 1 {
                         RoundedRectangle(cornerRadius: 10)
                             .fill(colors.first!)
                             .frame(width: 60, height: 60)
                     } else if colors.count == 2 {
-                        // Handle the case with a linear gradient or similar if you expect two colors.
                         LinearGradient(gradient: Gradient(colors: colors), startPoint: .leading, endPoint: .trailing)
                             .frame(width: 60, height: 60)
                             .cornerRadius(10)
                     } else {
-                        // Handle other cases if necessary, or display a default.
                         RoundedRectangle(cornerRadius: 10)
                             .fill(Color.gray)
                             .frame(width: 60, height: 60)
                     }
-                }.overlay(
-                    Text(gradeSystem.description(for: grade) ?? "")
-                        .foregroundColor(.white)
-                ))
-            }
+                }
+                .overlay(
+                    // Only show text for non-circuit grades
+                    Group {
+                        if !isCircuitGrade {
+                            Text(gradeSystem.description(for: grade) ?? "")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                        }
+                    }
+                )
+            )
         }
+    }
 
     // Type 'any View' cannot conform to 'View'
     var body: some View {
@@ -81,7 +95,8 @@ struct ClimbingGradeSelector_Previews: PreviewProvider {
             ClimbingGradeSelector(gradeSystem: FontGrade(), selectedGrade: .constant(""))
             ClimbingGradeSelector(gradeSystem: VGrade(), selectedGrade: .constant(""))
             ClimbingGradeSelector(gradeSystem: FrenchGrade(), selectedGrade: .constant(""))
-            ClimbingGradeSelector(gradeSystem: UserConfiguredCircuitGrade(), selectedGrade: .constant(""))
+            // For circuit grades, use GradeSystemFactory.gradeProtocol() with ModelContext
+            ClimbingGradeSelector(gradeSystem: CircuitGrade(customCircuit: GradeSystemFactory.createVScaleDefaultCircuit()), selectedGrade: .constant(""))
         }
         
     }

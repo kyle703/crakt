@@ -164,21 +164,24 @@ extension Session {
         let routesWithAttempts = allRoutesIncludingActive.filter { !$0.attempts.isEmpty && $0.grade != nil }
         guard !routesWithAttempts.isEmpty else { return [] }
         
-        // Aggregate attempts by unique grade
+        // Aggregate attempts by unique grade (use gradeDescription to avoid UUIDs)
         var gradeData: [(grade: String, normalized: Double, attempts: Int)] = []
         var seen: Set<String> = []
         
         for route in routesWithAttempts {
-            guard let grade = route.grade, !seen.contains(grade) else {
-                if let grade = route.grade, let idx = gradeData.firstIndex(where: { $0.grade == grade }) {
+            // Use gradeDescription instead of grade to get human-readable labels
+            guard let gradeLabel = route.gradeDescription ?? route.grade, !seen.contains(gradeLabel) else {
+                // If we've seen this grade label, aggregate attempts
+                if let gradeLabel = route.gradeDescription ?? route.grade,
+                   let idx = gradeData.firstIndex(where: { $0.grade == gradeLabel }) {
                     gradeData[idx].attempts += route.attempts.count
                 }
                 continue
             }
             
-            seen.insert(grade)
+            seen.insert(gradeLabel)
             gradeData.append((
-                grade: grade,
+                grade: gradeLabel,
                 normalized: route.normalizedGrade,
                 attempts: route.attempts.count
             ))

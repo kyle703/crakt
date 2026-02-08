@@ -16,13 +16,17 @@ struct RoutePickerView: View {
     @State private var searchText = ""
     @State private var availableGrades: [String] = []
 
+    private var gradeProtocol: any GradeProtocol {
+        GradeSystemFactory.safeProtocol(for: gradeSystem)
+    }
+    
     private var filteredGrades: [String] {
         if searchText.isEmpty {
             return availableGrades
         } else {
             return availableGrades.filter { grade in
                 grade.localizedCaseInsensitiveContains(searchText) ||
-                (gradeSystem._protocol.description(for: grade)?.localizedCaseInsensitiveContains(searchText) ?? false)
+                (gradeProtocol.description(for: grade)?.localizedCaseInsensitiveContains(searchText) ?? false)
             }
         }
     }
@@ -36,14 +40,14 @@ struct RoutePickerView: View {
                         ForEach(availableGrades, id: \.self) { grade in
                             let isSelected = selectedGrade == grade
 
-                            Text(gradeSystem._protocol.description(for: grade) ?? grade)
+                            Text(gradeProtocol.description(for: grade) ?? grade)
                                 .font(.system(size: isSelected ? 18 : 16, weight: isSelected ? .bold : .medium))
-                                .foregroundColor(isSelected ? .white : gradeSystem._protocol.colors(for: grade).first ?? .primary)
+                                .foregroundColor(isSelected ? .white : gradeProtocol.colors(for: grade).first ?? .primary)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
                                 .background(
                                     RoundedRectangle(cornerRadius: 20)
-                                        .fill(isSelected ? (gradeSystem._protocol.colors(for: grade).first ?? .blue) : Color.gray.opacity(0.2))
+                                        .fill(isSelected ? (gradeProtocol.colors(for: grade).first ?? .blue) : Color.gray.opacity(0.2))
                                 )
                                 .onTapGesture {
                                     selectedGrade = grade
