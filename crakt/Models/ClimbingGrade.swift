@@ -62,7 +62,7 @@ struct DifficultyIndex {
     }
 
     /// Normalize any grade to DI
-    static func normalizeToDI(grade: String, system: GradeSystem, climbType: ClimbType) -> Int? {
+    static func normalizeToDI(grade: String, system: GradeSystem, climbType _: ClimbType) -> Int? {
         switch system {
         case .french:
             return diForFrenchGrade(grade)
@@ -88,7 +88,7 @@ struct DifficultyIndex {
     }
 
     /// Convert from DI to target system
-    static func gradeForDI(_ di: Int, system: GradeSystem, climbType: ClimbType) -> String? {
+    static func gradeForDI(_ di: Int, system: GradeSystem, climbType _: ClimbType) -> String? {
         let frenchGrade = frenchGradeForDI(di)
 
         switch system {
@@ -201,12 +201,6 @@ extension GradeProtocol {
         let clampedIndex = max(0, min(grades.count - 1, gradeIndex))
         return grades[clampedIndex]
     }
-    
-    func color(forNormalizedDifficulty difficulty: Double) -> Color {
-            // Use the reverse lookup function to get the closest grade for the normalized difficulty
-            // Default to gray if no color is found
-            return colors(for: grade(forNormalizedDifficulty: difficulty)).first ?? .gray
-        }
     
     func gradeIndex(for grade: String?) -> Int {
         if let grade = grade {

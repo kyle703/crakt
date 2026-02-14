@@ -32,8 +32,6 @@ struct SessionTabView: View {
 
     private var initialWorkoutType: WorkoutType?
     private var initialSelectedGrades: [String]?
-    private var defaultClimbType: ClimbType
-    private var defaultGradeSystem: GradeSystem
     private var onSessionEnd: ((Session?) -> Void)?
     
     private var activeRouteCardView: some View {
@@ -61,8 +59,6 @@ struct SessionTabView: View {
         self.session = session
         self.initialWorkoutType = initialWorkoutType
         self.initialSelectedGrades = initialSelectedGrades
-        self.defaultClimbType = defaultClimbType
-        self.defaultGradeSystem = defaultGradeSystem
         self.onSessionEnd = onSessionEnd
 
         // Debug logging
@@ -94,13 +90,11 @@ struct SessionTabView: View {
                 UnifiedSessionHeader(session: session,
                                     stopwatch: stopwatch,
                                     workoutOrchestrator: workoutOrchestrator,
-                                    onSessionEnd: onSessionEnd,
                                     selectedClimbType: $selectedClimbType,
                                     selectedGradeSystem: $selectedGradeSystem,
                                     selectedTab: $selectedTab,
                                     showFeedbackBanner: $showFeedbackPopover,
                                     feedbackRoute: feedbackPopoverRoute,
-                                    feedbackAttempt: feedbackPopoverAttempt,
                                     onFeedbackAccept: {
                                         // Show full review sheet
                                         if let route = feedbackPopoverRoute {
@@ -362,7 +356,7 @@ struct SessionTabView: View {
                             }
                             elapsed = stopwatch.totalTime > 0 ? stopwatch.totalTime : Date().timeIntervalSince(session.startDate)
 
-                            session.completeSession(context: modelContext, elapsedTime: elapsed)
+                            session.completeSession(elapsedTime: elapsed)
 
                             do {
                                 try modelContext.save()

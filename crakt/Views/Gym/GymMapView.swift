@@ -12,7 +12,6 @@ struct GymMapView: View {
     let gyms: [Gym]
     @Binding var region: MKCoordinateRegion
     @Binding var selectedGym: Gym?
-    let userLocation: CLLocation?
     
     var body: some View {
         Map(coordinateRegion: $region,
@@ -21,7 +20,6 @@ struct GymMapView: View {
             annotationItems: gyms) { gym in
             MapAnnotation(coordinate: gym.coordinate) {
                 GymAnnotationView(
-                    gym: gym,
                     isSelected: selectedGym?.id == gym.id
                 )
                 .onTapGesture {
@@ -38,7 +36,6 @@ struct GymMapView: View {
 // MARK: - Gym Annotation View
 
 struct GymAnnotationView: View {
-    let gym: Gym
     let isSelected: Bool
     
     var body: some View {
@@ -88,8 +85,6 @@ struct Triangle: Shape {
             center: CLLocationCoordinate2D(latitude: 36.9741, longitude: -122.0308),
             span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
         )),
-        selectedGym: .constant(nil),
-        userLocation: nil
+        selectedGym: .constant(nil)
     )
 }
-

@@ -13,7 +13,6 @@ struct GymGradeConfigurationView: View {
     @Environment(\.dismiss) private var dismiss
     
     let gymId: UUID
-    let gymName: String
     let countryCode: String?
     
     @Query private var circuits: [CustomCircuitGrade]
@@ -24,9 +23,8 @@ struct GymGradeConfigurationView: View {
     @State private var showCircuitBuilder = false
     @State private var isLoading = true
     
-    init(gymId: UUID, gymName: String, countryCode: String?) {
+    init(gymId: UUID, countryCode: String?) {
         self.gymId = gymId
-        self.gymName = gymName
         self.countryCode = countryCode
     }
     
@@ -278,9 +276,7 @@ struct CircuitPreviewRow: View {
 #Preview {
     GymGradeConfigurationView(
         gymId: UUID(),
-        gymName: "Pacific Edge",
         countryCode: "US"
     )
     .modelContainer(for: [CustomCircuitGrade.self, CircuitColorMapping.self, GymGradeConfiguration.self])
 }
-

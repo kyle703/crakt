@@ -75,20 +75,20 @@ class Session {
     // ----
     var sessionDescription = "Peak RVA"
     
-    public init(user: User) {
+    init(user: User) {
         self.id = UUID()
         self.startDate = Date()
         self.user = user
     }
     
-    public init() {
+    init() {
         self.id = UUID()
         self.startDate = Date()
         self.routes = []
         self.user = User()
     }
     
-    public init(routes: [Route], startDate: Date) {
+    init(routes: [Route], startDate: Date) {
         self.id = UUID()
         self.startDate = startDate
         self.routes = routes
@@ -150,28 +150,13 @@ extension Session {
     var tries: Int {
         return allAttempts.count
     }
-    
-    func clearRoute(context: ModelContext) -> Void {
-        // find active route
-        // remove active route from
-        if activeRoute != nil {
-            context.delete(activeRoute!)
-        }
-        activeRoute = nil
-        
-    }
-    
-    func completeSession(context: ModelContext, elapsedTime: TimeInterval) {
+
+    func completeSession(elapsedTime: TimeInterval) {
         logRoute()
         self.status = .complete
         self.endDate = Date()
         self.elapsedTime = elapsedTime
         
-    }
-    
-    func cancelSession() {
-        logRoute()
-        self.status = .cancelled
     }
     
     func logRoute() -> Void {

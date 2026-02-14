@@ -51,11 +51,6 @@ class SessionManager: ObservableObject {
         activeSessionId = nil
     }
 
-    /// Resume an unfinished session by id
-    func resumeSession(sessionId: UUID) {
-        startSession(sessionId: sessionId)
-    }
-
     /// Update idle timer based on session state
     private func updateIdleTimer() {
         // Only disable idle timer if session is active and app is in foreground

@@ -10,7 +10,6 @@ import SwiftData
 import Charts
 
 struct GlobalSessionsView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Session.startDate, order: .reverse) private var sessions: [Session]
 
     var body: some View {
@@ -255,14 +254,6 @@ struct GlobalSessionsView: View {
         GlobalAnalytics.calculateConsistencyStreak(sessions: sessions)
     }
 
-    private var attemptsVariance: Double {
-        let values = last12WeeksSessions.compactMap { $0.computeSummaryMetrics()?.attemptCount }
-        guard values.count > 1 else { return 0 }
-        let mean = Double(values.reduce(0, +)) / Double(values.count)
-        let variance = values.map { pow(Double($0) - mean, 2) }.reduce(0, +) / Double(values.count)
-        return sqrt(variance)
-    }
-
     private var heroSubtitle: String {
         "Tracking your send rate, hardest grade, and pacing over the last 12 weeks."
     }
@@ -313,100 +304,6 @@ struct GlobalSessionsView: View {
         if varietyDetail.contains("Low variety") { items.append("Add more grade variety next week.") }
         if plateauDetail.contains("flat") { items.append("Push one harder climb to break plateau.") }
         return items.isEmpty ? ["Keep the momentum going."] : items
-    }
-
-    private func getThisMonthMaxDI() -> Int {
-        let thisMonth = Calendar.current.dateInterval(of: .month, for: Date())!
-        let thisMonthSessions = sessions.filter {
-            thisMonth.contains($0.startDate) && ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        return thisMonthSessions.compactMap { $0.computeSummaryMetrics()?.hardestGradeDI }.max() ?? 0
-    }
-
-    private func getLast3MonthsAverageDI() -> Int {
-        let threeMonthsAgo = Calendar.current.date(byAdding: .month, value: -3, to: Date())!
-        let last3MonthsSessions = sessions.filter {
-            $0.startDate >= threeMonthsAgo && $0.startDate < Calendar.current.dateInterval(of: .month, for: Date())!.start &&
-            ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        let values = last3MonthsSessions.compactMap { $0.computeSummaryMetrics()?.hardestGradeDI }
-        return values.isEmpty ? 0 : Int(values.reduce(0, +) / values.count)
-    }
-
-    private func getThisMonthAverageSendPercent() -> Double {
-        let thisMonth = Calendar.current.dateInterval(of: .month, for: Date())!
-        let thisMonthSessions = sessions.filter {
-            thisMonth.contains($0.startDate) && ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        let values = thisMonthSessions.compactMap { $0.computeSummaryMetrics()?.sendPercent }
-        return GlobalAnalytics.rollingAverage(values: values)
-    }
-
-    private func getLast3MonthsAverageSendPercent() -> Double {
-        let threeMonthsAgo = Calendar.current.date(byAdding: .month, value: -3, to: Date())!
-        let last3MonthsSessions = sessions.filter {
-            $0.startDate >= threeMonthsAgo && $0.startDate < Calendar.current.dateInterval(of: .month, for: Date())!.start &&
-            ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        let values = last3MonthsSessions.compactMap { $0.computeSummaryMetrics()?.sendPercent }
-        return GlobalAnalytics.rollingAverage(values: values)
-    }
-
-    private func getThisMonthTotalAttempts() -> Int {
-        let thisMonth = Calendar.current.dateInterval(of: .month, for: Date())!
-        let thisMonthSessions = sessions.filter {
-            thisMonth.contains($0.startDate) && ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        return thisMonthSessions.compactMap { $0.computeSummaryMetrics()?.attemptCount }.reduce(0, +)
-    }
-
-    private func getLast3MonthsAverageAttempts() -> Double {
-        let threeMonthsAgo = Calendar.current.date(byAdding: .month, value: -3, to: Date())!
-        let last3MonthsSessions = sessions.filter {
-            $0.startDate >= threeMonthsAgo && $0.startDate < Calendar.current.dateInterval(of: .month, for: Date())!.start &&
-            ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        let values = last3MonthsSessions.compactMap { $0.computeSummaryMetrics()?.attemptCount }
-        return values.isEmpty ? 0.0 : Double(values.reduce(0, +)) / Double(values.count)
-    }
-
-    private func getThisMonthAverageAttemptsPerSend() -> Double {
-        let thisMonth = Calendar.current.dateInterval(of: .month, for: Date())!
-        let thisMonthSessions = sessions.filter {
-            thisMonth.contains($0.startDate) && ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        let values = thisMonthSessions.compactMap { $0.computeSummaryMetrics()?.attemptsPerSend }
-        return GlobalAnalytics.rollingAverage(values: values)
-    }
-
-    private func getLast3MonthsAverageAttemptsPerSend() -> Double {
-        let threeMonthsAgo = Calendar.current.date(byAdding: .month, value: -3, to: Date())!
-        let last3MonthsSessions = sessions.filter {
-            $0.startDate >= threeMonthsAgo && $0.startDate < Calendar.current.dateInterval(of: .month, for: Date())!.start &&
-            ($0.status == .complete || $0.status == .cancelled || $0.status == .active)
-        }
-
-        let values = last3MonthsSessions.compactMap { $0.computeSummaryMetrics()?.attemptsPerSend }
-        return GlobalAnalytics.rollingAverage(values: values)
-    }
-
-    private func calculateTrend(current: Double, historical: Double) -> String {
-        if current > historical { return "↑" }
-        if current < historical { return "↓" }
-        return "→"
-    }
-
-    private func getRecentPRGrade() -> String? {
-        // PR detection requires SwiftUI Charts integration
-        // For now, return nil to disable PR display
-        return nil
     }
 
     private func getRecentSendRate() -> Double {

@@ -57,11 +57,6 @@ class CustomCircuitGrade: Identifiable {
         colorMappings.count
     }
     
-    /// Preview of circuit colors
-    var colorPreview: [Color] {
-        orderedMappings.map { $0.swiftUIColor }
-    }
-    
     // MARK: - Management Methods
     
     /// Set this circuit as the default, clearing others
@@ -78,76 +73,12 @@ class CustomCircuitGrade: Identifiable {
         try context.save()
     }
     
-    /// Reorder a mapping from one position to another
-    func reorderMapping(from sourceIndex: Int, to destinationIndex: Int) {
-        var ordered = orderedMappings
-        guard sourceIndex >= 0, sourceIndex < ordered.count,
-              destinationIndex >= 0, destinationIndex < ordered.count else {
-            return
-        }
-        
-        let item = ordered.remove(at: sourceIndex)
-        ordered.insert(item, at: destinationIndex)
-        
-        // Reassign sortOrder
-        for (index, mapping) in ordered.enumerated() {
-            mapping.sortOrder = index
-        }
-    }
-    
     /// Add a new color mapping at the end
     func addMapping(_ mapping: CircuitColorMapping) {
         mapping.sortOrder = colorMappings.count
         mapping.circuit = self
         colorMappings.append(mapping)
         lastModifiedDate = Date()
-    }
-    
-    /// Remove a mapping and reindex
-    func removeMapping(_ mapping: CircuitColorMapping) {
-        colorMappings.removeAll { $0.id == mapping.id }
-        
-        // Reindex remaining mappings
-        for (index, m) in orderedMappings.enumerated() {
-            m.sortOrder = index
-        }
-        lastModifiedDate = Date()
-    }
-    
-    // MARK: - Validation
-    
-    func validate() throws {
-        // Validate name
-        guard !name.isEmpty else {
-            throw CircuitValidationError.emptyName
-        }
-        
-        // Validate has mappings
-        guard !colorMappings.isEmpty else {
-            throw CircuitValidationError.noMappings
-        }
-        
-        // Validate sort order is sequential
-        let sortOrders = orderedMappings.map { $0.sortOrder }
-        let expectedOrders = Array(0..<colorMappings.count)
-        guard sortOrders == expectedOrders else {
-            throw CircuitValidationError.invalidSortOrder
-        }
-        
-        // Validate no duplicate colors
-        let colors = colorMappings.map { $0.color.uppercased() }
-        let uniqueColors = Set(colors)
-        guard colors.count == uniqueColors.count else {
-            let duplicate = colors.first { color in
-                colors.filter { $0 == color }.count > 1
-            }
-            throw CircuitValidationError.duplicateColor(duplicate ?? "unknown")
-        }
-        
-        // Validate each mapping
-        for mapping in colorMappings {
-            try mapping.validate()
-        }
     }
     
     // MARK: - Lookup Methods
@@ -163,4 +94,3 @@ class CustomCircuitGrade: Identifiable {
         return mapping(forId: uuid)
     }
 }
-

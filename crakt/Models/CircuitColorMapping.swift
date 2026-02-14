@@ -68,84 +68,8 @@ class CircuitColorMapping: Identifiable {
         return "\(minDesc) - \(maxDesc)"
     }
     
-    /// DI value at midpoint of grade range
-    var midpointDI: Int? {
-        guard let minDI = DifficultyIndex.normalizeToDI(grade: minGrade, 
-                                                        system: baseGradeSystem, 
-                                                        climbType: baseGradeSystem.climbType),
-              let maxDI = DifficultyIndex.normalizeToDI(grade: maxGrade, 
-                                                        system: baseGradeSystem, 
-                                                        climbType: baseGradeSystem.climbType) else {
-            return nil
-        }
-        return (minDI + maxDI) / 2
-    }
-    
     /// SwiftUI Color from hex
     var swiftUIColor: Color {
         Color(hex: color)
     }
-    
-    // MARK: - Validation
-    
-    func validate() throws {
-        // Validate color is not empty
-        guard !color.isEmpty else {
-            throw CircuitValidationError.emptyColor
-        }
-        
-        // Validate hex format
-        guard isValidHexColor(color) else {
-            throw CircuitValidationError.invalidHexColor(color)
-        }
-        
-        // Validate grade range (min <= max)
-        let proto = GradeSystemFactory.safeProtocol(for: baseGradeSystem)
-        let minIndex = proto.gradeIndex(for: minGrade)
-        let maxIndex = proto.gradeIndex(for: maxGrade)
-        
-        guard minIndex <= maxIndex else {
-            throw CircuitValidationError.invalidGradeRange(min: minGrade, max: maxGrade)
-        }
-    }
-    
-    private func isValidHexColor(_ hex: String) -> Bool {
-        let pattern = "^#[0-9A-Fa-f]{6}$"
-        return hex.range(of: pattern, options: .regularExpression) != nil
-    }
 }
-
-// MARK: - Validation Errors
-
-enum CircuitValidationError: LocalizedError {
-    case emptyName
-    case emptyColor
-    case invalidHexColor(String)
-    case invalidGradeRange(min: String, max: String)
-    case duplicateColor(String)
-    case noMappings
-    case invalidSortOrder
-    case invalidGymConfiguration
-    
-    var errorDescription: String? {
-        switch self {
-        case .emptyName:
-            return "Circuit name cannot be empty"
-        case .emptyColor:
-            return "Color cannot be empty"
-        case .invalidHexColor(let color):
-            return "Invalid hex color format: \(color)"
-        case .invalidGradeRange(let min, let max):
-            return "Grade range invalid: \(min) must be ≤ \(max)"
-        case .duplicateColor(let color):
-            return "Duplicate color: \(color)"
-        case .noMappings:
-            return "Circuit must have at least one color"
-        case .invalidSortOrder:
-            return "Sort order must be sequential starting from 0"
-        case .invalidGymConfiguration:
-            return "Gym grade configuration is invalid"
-        }
-    }
-}
-

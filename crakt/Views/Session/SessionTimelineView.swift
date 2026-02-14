@@ -106,7 +106,6 @@ struct SessionTimelineView: View {
         return SessionStats(
             totalAttempts: attempts.count,
             successfulAttempts: successfulCount,
-            totalRoutes: session.routes.count,
             sessionDuration: totalTime,
             averageRestTime: calculateAverageRestTime()
         )
@@ -221,11 +220,6 @@ struct TimelineEvent: Identifiable {
     var route: Route?
     var attempt: RouteAttempt?
     var duration: TimeInterval?
-
-    var timeSinceSessionStart: TimeInterval {
-        // This would need to be calculated relative to session start
-        return timestamp.timeIntervalSince1970
-    }
 }
 
 enum TimelineEventType {
@@ -259,22 +253,6 @@ enum TimelineEventType {
 struct TimelineRow: View {
     let event: TimelineEvent
     let isLast: Bool
-
-    @State private var isExpanded: Bool = false
-
-    private func styleSummary(route: Route) -> String {
-        var parts: [String] = []
-        if !route.wallAngles.isEmpty {
-            parts.append(route.wallAngles.map { $0.description }.joined(separator: ", "))
-        }
-        if !route.holdTypes.isEmpty {
-            parts.append(route.holdTypes.map { $0.description }.joined(separator: ", "))
-        }
-        if !route.movementStyles.isEmpty {
-            parts.append(route.movementStyles.map { $0.description }.joined(separator: ", "))
-        }
-        return parts.joined(separator: " • ")
-    }
     
     @ViewBuilder
     private func routeChip(_ text: String, color: Color) -> some View {
@@ -468,14 +446,6 @@ struct TimelineRow: View {
 struct SessionStats {
     let totalAttempts: Int
     let successfulAttempts: Int
-    let totalRoutes: Int
     let sessionDuration: TimeInterval
     let averageRestTime: TimeInterval?
-}
-
-struct SessionTimelineView_Previews: PreviewProvider {
-    static var previews: some View {
-        SessionTimelineView(session: Session.preview)
-            .modelContainer(for: [Route.self, RouteAttempt.self, Session.self, User.self])
-    }
 }

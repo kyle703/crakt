@@ -80,10 +80,6 @@ struct VolumeChart: View {
         return max(maxAttempts, maxSends)
     }
 
-    private func weekLabel(for week: Date) -> String {
-        let weekNumber = Calendar.current.component(.weekOfYear, from: week)
-        return "W\(weekNumber)"
-    }
 }
 
 #Preview {

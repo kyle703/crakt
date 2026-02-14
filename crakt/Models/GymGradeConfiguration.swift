@@ -46,43 +46,6 @@ class GymGradeConfiguration: Identifiable {
         self.lastModifiedDate = Date()
     }
     
-    // MARK: - Regional Defaults
-    
-    /// Get default grade systems for a region
-    static func defaultsForRegion(_ region: GymRegion) -> (boulder: GradeSystem, rope: GradeSystem) {
-        return (region.defaultBoulderSystem, region.defaultRopeSystem)
-    }
-    
-    /// Create configuration with regional defaults
-    static func withRegionalDefaults(gymId: UUID, countryCode: String?) -> GymGradeConfiguration {
-        let region = GymRegion.from(countryCode: countryCode)
-        let defaults = defaultsForRegion(region)
-        return GymGradeConfiguration(
-            gymId: gymId,
-            boulderGradeSystem: defaults.boulder,
-            ropeGradeSystem: defaults.rope
-        )
-    }
-    
-    // MARK: - Validation
-    
-    func validate() throws {
-        // Validate boulder system is valid for bouldering
-        guard [.circuit, .vscale, .font].contains(boulderGradeSystem) else {
-            throw CircuitValidationError.invalidGymConfiguration
-        }
-        
-        // Validate rope system is valid for ropes
-        guard [.yds, .french].contains(ropeGradeSystem) else {
-            throw CircuitValidationError.invalidGymConfiguration
-        }
-        
-        // If boulder system is circuit, must have associated circuit
-        if boulderGradeSystem == .circuit && boulderCircuit == nil {
-            throw CircuitValidationError.invalidGymConfiguration
-        }
-    }
-    
     // MARK: - Update Methods
     
     func setBoulderSystem(_ system: GradeSystem, circuit: CustomCircuitGrade? = nil) {
@@ -96,4 +59,3 @@ class GymGradeConfiguration: Identifiable {
         lastModifiedDate = Date()
     }
 }
-

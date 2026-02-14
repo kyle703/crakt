@@ -91,18 +91,6 @@ final class Stopwatch: ObservableObject {
         resetBackgroundState()
     }
 
-    /// Resets the stopwatch completely.
-    func reset() {
-        stop()
-        totalTime = 0
-        currentLapTime = 0
-        laps.removeAll()
-        startTime = nil
-        lapStartTime = nil
-        lastStopDate = nil
-        resetBackgroundState()
-    }
-
     /// Records a lap and resets the current lap counter.
     func lap() {
         guard isRunning else { return }

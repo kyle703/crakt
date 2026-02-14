@@ -15,26 +15,6 @@ enum WorkoutIntensity: String, Codable, CaseIterable {
     case hard = "Hard"
     case limit = "Limit"
     case progressive = "Progressive"
-
-    var description: String {
-        switch self {
-        case .easy: return "Focus on technique and efficiency"
-        case .moderate: return "Build strength and technique"
-        case .hard: return "Push limits with challenging problems"
-        case .limit: return "Maximum effort at your current level"
-        case .progressive: return "Gradually increase difficulty"
-        }
-    }
-
-    var colorIntensity: Double {
-        switch self {
-        case .easy: return 0.3
-        case .moderate: return 0.5
-        case .hard: return 0.7
-        case .limit: return 1.0
-        case .progressive: return 0.6
-        }
-    }
 }
 
 /// Represents the recommended rest duration for a workout
@@ -42,36 +22,18 @@ struct RestDuration: Codable {
     /// The typical/default rest duration in seconds
     let typical: TimeInterval
 
-    /// The minimum recommended rest duration in seconds
-    let minimum: TimeInterval
-
-    /// The maximum recommended rest duration in seconds
-    let maximum: TimeInterval
-
-    /// Whether this workout has variable rest periods
-    let isVariable: Bool
-
     /// Human-readable description of the rest duration
     let details: String
 
     /// Initialize with duration values in seconds
-    init(typical: TimeInterval, minimum: TimeInterval, maximum: TimeInterval, isVariable: Bool = false, details: String) {
+    init(typical: TimeInterval, details: String) {
         self.typical = typical
-        self.minimum = minimum
-        self.maximum = maximum
-        self.isVariable = isVariable
         self.details = details
     }
 
     /// Initialize with duration values in minutes (converted to seconds)
-    static func minutes(typical: Double, minimum: Double, maximum: Double, isVariable: Bool = false, details: String) -> RestDuration {
-        return RestDuration(
-            typical: typical * 60,
-            minimum: minimum * 60,
-            maximum: maximum * 60,
-            isVariable: isVariable,
-            details: details
-        )
+    static func minutes(typical: Double, details: String) -> RestDuration {
+        RestDuration(typical: typical * 60, details: details)
     }
 }
 
@@ -202,21 +164,21 @@ enum WorkoutType: String, Codable, CaseIterable {
     var restDuration: RestDuration {
         switch self {
         case .limitBouldering:
-            return .minutes(typical: 4, minimum: 3, maximum: 5, details: "3–5 minutes between attempts")
+            return .minutes(typical: 4, details: "3–5 minutes between attempts")
         case .project:
-            return .minutes(typical: 3.5, minimum: 2, maximum: 5, details: "2–5 minutes between burns")
+            return .minutes(typical: 3.5, details: "2–5 minutes between burns")
         case .redpointBurns:
-            return .minutes(typical: 12.5, minimum: 10, maximum: 15, details: "10–15 minutes between burns")
+            return .minutes(typical: 12.5, details: "10–15 minutes between burns")
         case .flashPass:
-            return .minutes(typical: 5, minimum: 3, maximum: 10, isVariable: true, details: "full rest as needed")
+            return .minutes(typical: 5, details: "full rest as needed")
         case .mileageSessions:
-            return .minutes(typical: 1, minimum: 0.5, maximum: 2, isVariable: true, details: "short minimal rest")
+            return .minutes(typical: 1, details: "short minimal rest")
         case .pyramid:
-            return .minutes(typical: 3, minimum: 1, maximum: 5, isVariable: true, details: "1–3 minutes (easy) or 3–5 minutes (hard)")
+            return .minutes(typical: 3, details: "1–3 minutes (easy) or 3–5 minutes (hard)")
         case .intervals:
-            return .minutes(typical: 4, minimum: 3, maximum: 5, details: "3–5 minutes between sets")
+            return .minutes(typical: 4, details: "3–5 minutes between sets")
         case .upDown:
-            return .minutes(typical: 2.5, minimum: 1, maximum: 4, details: "1–4 minutes between reps")
+            return .minutes(typical: 2.5, details: "1–4 minutes between reps")
         }
     }
 }
@@ -225,22 +187,6 @@ enum WorkoutCategory {
     case bouldering
     case ropes
     case both
-
-    var displayName: String {
-        switch self {
-        case .bouldering: return "🧗 Bouldering Workouts"
-        case .ropes: return "🧗‍♂️ Rope Workouts"
-        case .both: return "🧗‍♀️ Universal Workouts"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .bouldering: return "figure.climbing"
-        case .ropes: return "figure.climbing"
-        case .both: return "figure.climbing"
-        }
-    }
 }
 
 enum WorkoutStatus: Int, Codable {
@@ -317,7 +263,7 @@ class Workout {
         sets.prefix(currentSetIndex).reduce(0) { $0 + $1.reps.count } + currentRepIndex
     }
 
-    public init(session: Session, type: WorkoutType, selectedGrade: String? = nil, pyramidStartGrade: String? = nil, pyramidPeakGrade: String? = nil) {
+    init(session: Session, type: WorkoutType, selectedGrade: String? = nil, pyramidStartGrade: String? = nil, pyramidPeakGrade: String? = nil) {
         self.id = UUID()
         self.session = session
         self.type = type
@@ -327,10 +273,10 @@ class Workout {
         self.startedAt = Date()
 
         // Initialize sets based on workout type
-        self.sets = Self.createSetsForType(type, session: session)
+        self.sets = Self.createSetsForType(type)
     }
 
-    private static func createSetsForType(_ type: WorkoutType, session: Session) -> [WorkoutSet] {
+    private static func createSetsForType(_ type: WorkoutType) -> [WorkoutSet] {
         switch type {
         // Bouldering workouts
         case .limitBouldering:
@@ -435,20 +381,7 @@ class WorkoutSet {
     @Relationship(inverse: \Workout.sets)
     var workout: Workout?
 
-    var isCompleted: Bool {
-        completedAt != nil
-    }
-
-    var actualReps: Int {
-        reps.count
-    }
-
-    var completionRate: Double {
-        guard targetReps > 0 else { return 0.0 }
-        return Double(actualReps) / Double(targetReps)
-    }
-
-    public init(workout: Workout?, setNumber: Int, targetReps: Int) {
+    init(workout: Workout?, setNumber: Int, targetReps: Int) {
         self.id = UUID()
         self.setNumber = setNumber
         self.targetReps = targetReps
@@ -477,22 +410,13 @@ class WorkoutRep {
         completedAt != nil && routeAttempt != nil
     }
 
-    var duration: TimeInterval? {
-        guard let startedAt = startedAt, let completedAt = completedAt else { return nil }
-        return completedAt.timeIntervalSince(startedAt)
-    }
-
-    public init(workoutSet: WorkoutSet?, repNumber: Int) {
+    init(workoutSet: WorkoutSet?, repNumber: Int) {
         self.id = UUID()
         self.repNumber = repNumber
         self.workoutSet = workoutSet
 
         // Set the rest duration from the workout type
         self.restDuration = workoutSet?.workout?.type.restDuration
-    }
-
-    func start() {
-        startedAt = Date()
     }
 
     func complete(with attempt: RouteAttempt) {
@@ -511,10 +435,6 @@ struct WorkoutMetrics {
 
     var totalReps: Int {
         workout.totalReps
-    }
-
-    var completedReps: Int {
-        workout.completedReps
     }
 
     var sendRate: Double {

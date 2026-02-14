@@ -41,8 +41,7 @@ struct GymFinderView: View {
                     GymMapView(
                         gyms: filteredGyms,
                         region: $mapRegion,
-                        selectedGym: $selectedGym,
-                        userLocation: locationManager.currentLocation
+                        selectedGym: $selectedGym
                     )
                 }
                 
@@ -231,4 +230,3 @@ class Debouncer {
 #Preview {
     GymFinderView()
 }
-

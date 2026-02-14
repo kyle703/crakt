@@ -73,22 +73,6 @@ enum GradeSystem: Int16, CustomStringConvertible, Codable {
     
     static let allCases: [GradeSystem] = [.circuit, .vscale, .font, .french, .yds]
     
-    /// Grade systems valid for bouldering
-    static let boulderSystems: [GradeSystem] = [.circuit, .vscale, .font]
-    
-    /// Grade systems valid for rope climbing
-    static let ropeSystems: [GradeSystem] = [.yds, .french]
-    
-    /// Whether this system is a circuit (requires CustomCircuitGrade)
-    var isCircuit: Bool {
-        self == .circuit
-    }
-    
-    /// Whether this is a concrete grade system (not circuit)
-    var isConcrete: Bool {
-        self != .circuit
-    }
-    
     /// Get grade protocol for non-circuit systems.
     /// For circuit grades, use GradeSystemFactory.gradeProtocol() instead.
     var _protocol: any GradeProtocol {
@@ -109,4 +93,3 @@ enum GradeSystem: Int16, CustomStringConvertible, Codable {
         }
     }
 }
-

@@ -9,12 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct UnifiedSessionHeader: View {
-    @Environment(\.modelContext) private var modelContext
-
     var session: Session
     @ObservedObject var stopwatch: Stopwatch
     var workoutOrchestrator: WorkoutOrchestrator?
-    var onSessionEnd: ((Session?) -> Void)?
 
     @Binding var selectedClimbType: ClimbType
     @Binding var selectedGradeSystem: GradeSystem
@@ -23,7 +20,6 @@ struct UnifiedSessionHeader: View {
     // Feedback popover state (managed by parent)
     @Binding var showFeedbackBanner: Bool
     var feedbackRoute: Route?
-    var feedbackAttempt: RouteAttempt?
     var onFeedbackAccept: (() -> Void)?
     var onFeedbackDismiss: (() -> Void)?
 
@@ -420,7 +416,6 @@ struct UnifiedSessionHeader: View {
         selectedTab: .constant(.routes),
         showFeedbackBanner: .constant(false),
         feedbackRoute: nil,
-        feedbackAttempt: nil,
         onFeedbackAccept: nil,
         onFeedbackDismiss: nil
     )

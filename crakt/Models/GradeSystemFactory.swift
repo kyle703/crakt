@@ -54,33 +54,6 @@ struct GradeSystemFactory {
         }
     }
     
-    // MARK: - Gym Grade Configuration
-    
-    /// Get or create grade configuration for a gym
-    static func gradeConfiguration(forGymId gymId: UUID,
-                                   countryCode: String?,
-                                   modelContext: ModelContext) -> GymGradeConfiguration {
-        // Try to fetch existing configuration
-        let descriptor = FetchDescriptor<GymGradeConfiguration>(
-            predicate: #Predicate { $0.gymId == gymId }
-        )
-        
-        if let config = try? modelContext.fetch(descriptor).first {
-            return config
-        }
-        
-        // Create new configuration with regional defaults
-        let config = GymGradeConfiguration.withRegionalDefaults(
-            gymId: gymId,
-            countryCode: countryCode
-        )
-        
-        modelContext.insert(config)
-        try? modelContext.save()
-        
-        return config
-    }
-    
     // MARK: - Default Circuit Management
     
     /// Get or create the default circuit
@@ -96,14 +69,6 @@ struct GradeSystemFactory {
         
         // Create and save default circuit
         return createAndSaveDefaultCircuit(modelContext)
-    }
-    
-    /// Check if a default circuit exists
-    static func hasDefaultCircuit(_ modelContext: ModelContext) -> Bool {
-        let descriptor = FetchDescriptor<CustomCircuitGrade>(
-            predicate: #Predicate { $0.isDefault == true }
-        )
-        return (try? modelContext.fetchCount(descriptor)) ?? 0 > 0
     }
     
     // MARK: - Circuit Creation
@@ -213,20 +178,4 @@ struct GradeSystemFactory {
         }
     }
     
-    /// Find a circuit for a gym
-    static func circuit(forGymId gymId: UUID, modelContext: ModelContext) -> CustomCircuitGrade? {
-        let descriptor = FetchDescriptor<CustomCircuitGrade>(
-            predicate: #Predicate { $0.gymId == gymId }
-        )
-        return try? modelContext.fetch(descriptor).first
-    }
-    
-    /// Get all circuits
-    static func allCircuits(_ modelContext: ModelContext) -> [CustomCircuitGrade] {
-        let descriptor = FetchDescriptor<CustomCircuitGrade>(
-            sortBy: [SortDescriptor(\.name)]
-        )
-        return (try? modelContext.fetch(descriptor)) ?? []
-    }
 }
-

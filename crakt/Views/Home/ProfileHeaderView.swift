@@ -6,10 +6,8 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ProfileHeaderView: View {
-    var user: User
     var sessions: [Session]
     var onTrackEvent: (String) -> Void
 

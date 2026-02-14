@@ -42,11 +42,6 @@ class HapticManager {
         playHapticPattern(intensity: 0.7, sharpness: 0.5, duration: 0.2)
     }
 
-    /// Play error haptic feedback (for invalid actions)
-    func playError() {
-        playHapticPattern(intensity: 0.8, sharpness: 0.8, duration: 0.4)
-    }
-
     /// Play custom haptic pattern
     func playHapticPattern(intensity: Float, sharpness: Float, duration: Double) {
         guard let hapticEngine = hapticEngine else {

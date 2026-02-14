@@ -26,9 +26,6 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
         return description
     }
     
-
-    var boulderTypes: Set<ClimbStatus> { [.fall, .send, .highPoint] }
-    
     var description: String {
         switch self {
         case .fall:
@@ -53,17 +50,6 @@ enum ClimbStatus: CaseIterable, Codable, Plottable {
             return false
         }
     }
-    
-    /// Whether this status shows improvement/progress signal
-    var isProgress: Bool {
-        switch self {
-        case .highPoint:
-            return true
-        default:
-            return false
-        }
-    }
-    
     
     var color: Color {
         switch self {

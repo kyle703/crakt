@@ -108,18 +108,6 @@ struct ProgressionChart: View {
             .suffix(20) // Show last 20 sessions
     }
 
-    private func formatDIAsGrade(_ di: Int) -> String {
-        if let grade = DifficultyIndex.gradeForDI(di, system: .vscale, climbType: ClimbType.boulder) {
-            return grade
-        }
-        return "V\(di / 10)" // Fallback
-    }
-}
-
-struct Square: Shape {
-    func path(in rect: CGRect) -> Path {
-        Path(rect)
-    }
 }
 
 #Preview {

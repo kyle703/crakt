@@ -13,33 +13,6 @@ import AppKit
 #endif
 
 extension Color {
-    
-    // MARK: - Color Name Initialization (Legacy)
-    
-    init?(colorName: String) {
-        switch colorName.lowercased() {
-        case "clear":       self = .clear
-        case "black":       self = .black
-        case "white":       self = .white
-        case "gray":        self = .gray
-        case "red":         self = .red
-        case "green":       self = .green
-        case "blue":        self = .blue
-        case "orange":      self = .orange
-        case "yellow":      self = .yellow
-        case "pink":        self = .pink
-        case "purple":      self = .purple
-        case "primary":     self = .primary
-        case "secondary":   self = .secondary
-        case "cyan":        self = .cyan
-        case "mint":        self = .mint
-        case "teal":        self = .teal
-        case "indigo":      self = .indigo
-        case "brown":       self = .brown
-        default:            return nil
-        }
-    }
-    
     // MARK: - Hex Color Support
     
     /// Initialize Color from hex string (e.g., "#FF5733", "FF5733", "#FFF")
@@ -208,4 +181,3 @@ extension Color {
         )
     }
 }
-

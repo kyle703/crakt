@@ -43,7 +43,6 @@ struct ActiveRouteCardView: View {
 
     // Gesture State
     @State private var dragOffset: CGSize = .zero
-    @State private var lastDragValue: DragGesture.Value?
     @State private var isDragging = false
 
     // Rest timer state
@@ -471,17 +470,6 @@ struct ActiveRouteCardView: View {
         self.workoutOrchestrator = workoutOrchestrator
         self._selectedGrade = .constant(nil)
         self._selectedGradeSystem = .constant(.vscale)
-        self.onShowFeedbackPopover = { _, _ in }
-
-        // Timer initialization is now handled in .onAppear using stopwatch timing
-    }
-
-    init(session: Session, stopwatch: Stopwatch, workoutOrchestrator: WorkoutOrchestrator, selectedGrade: Binding<String?>, selectedGradeSystem: Binding<GradeSystem>) {
-        self.session = session
-        self.stopwatch = stopwatch
-        self.workoutOrchestrator = workoutOrchestrator
-        self._selectedGrade = selectedGrade
-        self._selectedGradeSystem = selectedGradeSystem
         self.onShowFeedbackPopover = { _, _ in }
 
         // Timer initialization is now handled in .onAppear using stopwatch timing

@@ -101,18 +101,6 @@ struct CircuitColorSwatch: View {
     }
 }
 
-/// Compact version of circuit color swatch (just the color, no label)
-struct CompactCircuitSwatch: View {
-    let mapping: CircuitColorMapping
-    var size: CGFloat = 44
-    
-    var body: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(mapping.swiftUIColor)
-            .frame(width: size, height: size)
-    }
-}
-
 /// Display a circuit grade inline with color indicator
 struct CircuitGradeDisplay: View {
     let mapping: CircuitColorMapping
@@ -202,4 +190,3 @@ struct CircuitColorBar: View {
             .padding(.horizontal)
     }
 }
-

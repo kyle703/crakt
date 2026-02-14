@@ -20,39 +20,12 @@ class SessionDetailViewModel: ObservableObject {
     }
 
     // MARK: - Session Overview
-    var sessionDateRangeText: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, yyyy • h:mm a"
-
-        let startTime = formatter.string(from: session.startDate)
-
-        if let endDate = session.endDate {
-            formatter.dateFormat = "h:mm a"
-            let endTime = formatter.string(from: endDate)
-            return "\(startTime) – \(endTime)"
-        } else {
-            return startTime
-        }
-    }
-
-    var elapsedTimeText: String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: TimeInterval(session.elapsedTime)) ?? "N/A"
-    }
-
     var sessionStatusText: String {
         switch session.status {
         case .active: return "Active Session"
         case .complete: return "Completed"
         case .cancelled: return "Cancelled"
         }
-    }
-
-    var sessionSummaryLine: String {
-        let location = session.gymName ?? "your gym"
-        return "You climbed at \(location) for \(elapsedTimeText). Here's how it went."
     }
 
     var sessionDateText: String {
@@ -152,10 +125,6 @@ class SessionDetailViewModel: ObservableObject {
         hardestGradeSent ?? "—"
     }
 
-    var flashRateText: String {
-        String(format: "%.0f%% flash rate", flashRate * 100)
-    }
-
     // MARK: - Time Analysis
     var averageRestTime: TimeInterval? {
         let completedAttempts = session.allAttempts.sorted { $0.date < $1.date }
@@ -170,46 +139,7 @@ class SessionDetailViewModel: ObservableObject {
         return restPeriods.isEmpty ? nil : restPeriods.reduce(0, +) / Double(restPeriods.count)
     }
 
-    var activeClimbingTime: TimeInterval {
-        // Use session elapsed time minus estimated rest periods for active climbing time
-        let attempts = session.allAttempts.sorted { $0.date < $1.date }
-        guard attempts.count > 1 else { return session.elapsedTime }
-
-        let estimatedRestTime = Double(attempts.count - 1) * (averageRestTime ?? 180.0) // Default 3min rest
-        return max(0, session.elapsedTime - estimatedRestTime)
-    }
-
-    var activeClimbingTimeText: String {
-        format(duration: activeClimbingTime)
-    }
-
-    var averageRestText: String {
-        guard let rest = averageRestTime else { return "No rest data" }
-        return "\(format(duration: rest)) avg rest"
-    }
-
-    var restToClimbRatioText: String {
-        guard let rest = averageRestTime else { return "Balanced pacing" }
-        let attemptsCount = max(totalAttempts, 1)
-        let climbTimePerAttempt = attemptsCount > 0 ? activeClimbingTime / Double(attemptsCount) : 0
-        guard climbTimePerAttempt > 0 else { return "Balanced pacing" }
-        let ratio = rest / max(climbTimePerAttempt, 1)
-        if ratio > 2 {
-            return "Long rests"
-        } else if ratio < 0.5 {
-            return "Fast pacing"
-        }
-        return "Balanced pacing"
-    }
-
     // MARK: - Grade Analysis
-    var gradeProgression: [String] {
-        session.routes
-            .filter { !$0.attempts.isEmpty }
-            .sorted { ($0.firstAttemptDate ?? Date.distantPast) < ($1.firstAttemptDate ?? Date.distantPast) }
-            .compactMap { $0.grade }
-    }
-
     var hardestGradeSent: String? {
         // Use session's built-in method which already handles gradeDescription
         return session.hardestGradeSent
@@ -253,20 +183,7 @@ class SessionDetailViewModel: ObservableObject {
 
     // MARK: - Workouts
     var completedWorkouts: [Workout] {
-        session.workouts.filter { $0.isCompleted }
-    }
-
-    var workoutCompletionRate: Double {
-        let totalWorkouts = session.workouts.count
-        return totalWorkouts > 0 ? Double(completedWorkouts.count) / Double(totalWorkouts) : 0.0
-    }
-
-    // MARK: - Helpers
-    private func format(duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: duration) ?? "0s"
+        session.workouts.filter { $0.status == .completed }
     }
 }
 
@@ -395,28 +312,13 @@ struct MetricCard: View {
     let subtitle: String?
     let icon: String
     let color: Color
-    let trend: Trend?
 
-    enum Trend {
-        case up, down, neutral
-    }
-
-    init(title: String, value: String, icon: String, color: Color) {
-        self.title = title
-        self.value = value
-        self.subtitle = nil
-        self.icon = icon
-        self.color = color
-        self.trend = nil
-    }
-
-    init(title: String, value: String, subtitle: String? = nil, icon: String, color: Color, trend: Trend? = nil) {
+    init(title: String, value: String, subtitle: String? = nil, icon: String, color: Color) {
         self.title = title
         self.value = value
         self.subtitle = subtitle
         self.icon = icon
         self.color = color
-        self.trend = trend
     }
 
     var body: some View {

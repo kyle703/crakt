@@ -37,23 +37,3 @@ struct ScrollingSelectionView<Content: View>: View {
         }
     }
 }
-struct ScrollingSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        ScrollingSelectionView_PreviewWrapper()
-    }
-    
-    struct ScrollingSelectionView_PreviewWrapper: View {
-        @State private var selectedIdx: Int = 0
-        
-        var body: some View {
-            ScrollingSelectionView(items: Array(0..<10).map { index in
-                Text("Item \(index)")
-                    .frame(width: 100, height: 100)
-                    .background(Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }, selectedIdx: $selectedIdx)
-        }
-    }
-}
-

@@ -86,18 +86,3 @@ struct ClimbingGradeSelector<GS: GradeProtocol>: View {
             }
         }
 }
-
-struct ClimbingGradeSelector_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            ClimbingGradeSelector(gradeSystem: FrenchGrade(), selectedGrade: .constant(""))
-            ClimbingGradeSelector(gradeSystem: YDS(), selectedGrade: .constant(""))
-            ClimbingGradeSelector(gradeSystem: FontGrade(), selectedGrade: .constant(""))
-            ClimbingGradeSelector(gradeSystem: VGrade(), selectedGrade: .constant(""))
-            ClimbingGradeSelector(gradeSystem: FrenchGrade(), selectedGrade: .constant(""))
-            // For circuit grades, use GradeSystemFactory.gradeProtocol() with ModelContext
-            ClimbingGradeSelector(gradeSystem: CircuitGrade(customCircuit: GradeSystemFactory.createVScaleDefaultCircuit()), selectedGrade: .constant(""))
-        }
-        
-    }
-}

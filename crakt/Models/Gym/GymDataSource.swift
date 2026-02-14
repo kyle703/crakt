@@ -76,9 +76,6 @@ protocol GymDataSource {
         limit: Int
     ) async throws -> [Gym]
     
-    /// Get a specific gym by ID
-    func fetchGym(id: Int) async throws -> Gym?
-    
     /// Insert a user-provided gym and return the stored record
     func addCustomGym(_ details: NewGymDetails) async throws -> Gym
 }

@@ -126,10 +126,6 @@ enum DifficultyRating: String, Codable, CaseIterable {
     case justRight = "Just Right"
     case hard = "Hard"
 
-    var description: String {
-        return self.rawValue
-    }
-
     var iconName: String {
         switch self {
         case .easy: return "hand.thumbsup"
@@ -143,31 +139,6 @@ enum DifficultyRating: String, Codable, CaseIterable {
         case .easy: return .green
         case .justRight: return .blue
         case .hard: return .orange
-        }
-    }
-}
-
-// MARK: - Grade Feel (how accurate the grade felt)
-enum GradeFeel: String, Codable, CaseIterable {
-    case soft = "Soft"
-    case onGrade = "On Grade"
-    case stiff = "Stiff"
-    
-    var description: String { rawValue }
-    
-    var iconName: String {
-        switch self {
-        case .soft: return "arrow.down.circle.fill"
-        case .onGrade: return "checkmark.circle.fill"
-        case .stiff: return "arrow.up.circle.fill"
-        }
-    }
-    
-    var color: Color {
-        switch self {
-        case .soft: return .green
-        case .onGrade: return .blue
-        case .stiff: return .red
         }
     }
 }
@@ -305,23 +276,11 @@ enum ClimbExperience: String, Codable, CaseIterable {
     
     // MARK: - Date Properties
     
-    var firstAttemptDate: Date? {
-        attempts.min(by: { $0.date < $1.date })?.date
-    }
-    
-    var lastAttemptDate: Date? {
-        attempts.max(by: { $0.date < $1.date })?.date
-    }
-    
-    var attemptDateRange: ClosedRange<Date> {
-        guard let first = firstAttemptDate, let last = lastAttemptDate else {
-            let now = Date()
-            return now...now
-        }
-        return first...last
-    }
-    
-    // MARK: - Status & Relationships
+	    var firstAttemptDate: Date? {
+	        attempts.min(by: { $0.date < $1.date })?.date
+	    }
+	    
+	    // MARK: - Status & Relationships
     
     var status: RouteStatus = RouteStatus.inactive
 
@@ -343,25 +302,14 @@ enum ClimbExperience: String, Codable, CaseIterable {
 
     // MARK: - Initializers
     
-    public init(gradeSystem: GradeSystem) {
-        self.id = UUID()
-        self.gradeSystem = gradeSystem
-    }
-    
-    public init(gradeSystem: GradeSystem, attempts: [RouteAttempt] = []) {
-        self.id = UUID()
-        self.gradeSystem = gradeSystem
-        self.attempts = attempts
-    }
-    
-    public init(gradeSystem: GradeSystem, grade: String, attempts: [RouteAttempt] = []) {
+    init(gradeSystem: GradeSystem, grade: String, attempts: [RouteAttempt] = []) {
         self.id = UUID()
         self.gradeSystem = gradeSystem
         self.attempts = attempts
         self.grade = grade
     }
     
-    public init(gradeSystem: GradeSystem, grade: String, attempts: [RouteAttempt] = [], session: Session) {
+    init(gradeSystem: GradeSystem, grade: String, attempts: [RouteAttempt] = [], session: Session) {
         self.id = UUID()
         self.gradeSystem = gradeSystem
         self.attempts = attempts
@@ -369,63 +317,9 @@ enum ClimbExperience: String, Codable, CaseIterable {
         self.session = session
     }
     
-    public init(gradeSystem: GradeSystem, grade: String) {
+    init(gradeSystem: GradeSystem, grade: String) {
         self.id = UUID()
         self.gradeSystem = gradeSystem
         self.grade = grade
-    }
-    
-    /// Create a circuit route with proper circuit reference
-    public init(circuit: CustomCircuitGrade, grade: String, session: Session? = nil) {
-        self.id = UUID()
-        self.gradeSystem = .circuit
-        self.grade = grade
-        self.customCircuit = circuit
-        self.customCircuitId = circuit.id
-        self.session = session
-    }
-    
-    // MARK: - Grade Protocol Helper
-    
-    /// Get appropriate grade protocol, using circuit if available
-    func gradeProtocol(modelContext: ModelContext) -> any GradeProtocol {
-        switch gradeSystem {
-        case .circuit:
-            // Try to use stored circuit
-            if let circuit = customCircuit {
-                return CircuitGrade(customCircuit: circuit)
-            }
-            // Try to fetch by ID
-            if let circuitId = customCircuitId,
-               let circuit = GradeSystemFactory.circuit(forId: circuitId, modelContext: modelContext) {
-                return CircuitGrade(customCircuit: circuit)
-            }
-            // Fallback to default circuit
-            return CircuitGrade(customCircuit: GradeSystemFactory.defaultCircuit(modelContext))
-        default:
-            return GradeSystemFactory.safeProtocol(for: gradeSystem)
-        }
-    }
-    
-    /// Set circuit for this route (use when grade system is circuit)
-    func setCircuit(_ circuit: CustomCircuitGrade) {
-        self.customCircuit = circuit
-        self.customCircuitId = circuit.id
-    }
-}
-
-extension Route {
-    var actionCounts: [ClimbStatus: Int] {
-        var counts: [ClimbStatus: Int] = [:]
-        
-        for attempt in attempts {
-            counts[attempt.status, default: 0] += 1
-        }
-        
-        return counts
-    }
-    
-    func addAttempt(status: ClimbStatus) {
-        attempts.append(RouteAttempt(status: status))
     }
 }

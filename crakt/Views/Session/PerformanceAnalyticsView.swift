@@ -24,7 +24,7 @@ struct PerformanceAnalyticsView: View {
         }
         
         return distribution.map { gradeLabel, count in
-            GradeData(grade: gradeLabel, attempts: count, successRate: successRateForGrade(gradeLabel))
+            GradeData(grade: gradeLabel, attempts: count)
         }.sorted { $0.attempts > $1.attempts }
     }
     
@@ -82,15 +82,11 @@ struct PerformanceAnalyticsView: View {
         for (index, attempt) in attempts.enumerated() {
             let timeFromStart = attempt.date.timeIntervalSince(sessionStart)
             let success = attempt.status == .send || attempt.status == .flash || attempt.status == .topped
-            
-            // Use gradeDescription to avoid UUIDs
-            let gradeLabel = attempt.route?.gradeDescription ?? attempt.route?.grade
-            
+
             pacingPoints.append(PacingData(
                 attemptNumber: index + 1,
                 timeFromStart: timeFromStart,
-                successful: success,
-                grade: gradeLabel
+                successful: success
             ))
         }
 
@@ -117,18 +113,6 @@ struct PerformanceAnalyticsView: View {
         guard !routesWithAttempts.isEmpty else { return 0 }
         let totalAttempts = routesWithAttempts.reduce(0) { $0 + $1.attempts.count }
         return Double(totalAttempts) / Double(routesWithAttempts.count)
-    }
-
-    private func successRateForGrade(_ gradeLabel: String) -> Double {
-        // Match by gradeDescription first, then fall back to grade for compatibility
-        let gradeAttempts = session.allAttempts.filter { attempt in
-            guard let route = attempt.route else { return false }
-            let routeGradeLabel = route.gradeDescription ?? route.grade ?? ""
-            return routeGradeLabel == gradeLabel
-        }
-        let successful = gradeAttempts.filter { $0.status == .send || $0.status == .flash || $0.status == .topped }
-        let successfulCount = successful.count
-        return gradeAttempts.isEmpty ? 0 : Double(successfulCount) / Double(gradeAttempts.count)
     }
 
     private func formatDuration(_ interval: TimeInterval) -> String {
@@ -382,7 +366,6 @@ struct GradeData: Identifiable {
     let id = UUID()
     let grade: String
     let attempts: Int
-    let successRate: Double
 }
 
 struct EfficiencyData: Identifiable {
@@ -403,7 +386,6 @@ struct PacingData: Identifiable {
     let attemptNumber: Int
     let timeFromStart: TimeInterval
     let successful: Bool
-    let grade: String?
 }
 
 struct InsightCard: View {
@@ -431,12 +413,5 @@ struct InsightCard: View {
         .padding(8)
         .background(color.opacity(0.1))
         .cornerRadius(8)
-    }
-}
-
-struct PerformanceAnalyticsView_Previews: PreviewProvider {
-    static var previews: some View {
-        PerformanceAnalyticsView(session: Session.preview)
-            .modelContainer(for: [Route.self, RouteAttempt.self, Session.self, User.self])
     }
 }

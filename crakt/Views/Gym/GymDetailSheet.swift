@@ -141,7 +141,6 @@ struct GymDetailSheet: View {
         .sheet(isPresented: $showGradeConfiguration) {
             GymGradeConfigurationView(
                 gymId: UUID(uuidString: String(gym.id)) ?? UUID(),
-                gymName: gym.name,
                 countryCode: gym.address.country
             )
         }
@@ -331,4 +330,3 @@ struct GradeConfigurationSection: View {
     )
     .modelContainer(for: [GymGradeConfiguration.self, CustomCircuitGrade.self, CircuitColorMapping.self])
 }
-

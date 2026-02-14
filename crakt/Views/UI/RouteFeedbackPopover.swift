@@ -10,7 +10,6 @@ import SwiftUI
 
 struct RouteFeedbackPopover: View {
     let route: Route
-    let attempt: RouteAttempt?
     let onAccept: () -> Void
     let onDismiss: () -> Void
     
@@ -145,7 +144,6 @@ struct RouteFeedbackPopover: View {
 
 struct RouteFeedbackPopoverOverlay: View {
     let route: Route
-    let attempt: RouteAttempt?
     let onAccept: () -> Void
     let onDismiss: () -> Void
     
@@ -167,7 +165,6 @@ struct RouteFeedbackPopoverOverlay: View {
                     
                     RouteFeedbackPopover(
                         route: route,
-                        attempt: attempt,
                         onAccept: onAccept,
                         onDismiss: onDismiss
                     )
@@ -213,7 +210,6 @@ struct RouteFeedbackPopoverOverlay: View {
         
         RouteFeedbackPopoverOverlay(
             route: Route(gradeSystem: .vscale, grade: "V4"),
-            attempt: RouteAttempt(status: .send),
             onAccept: { print("Accepted") },
             onDismiss: { print("Dismissed") }
         )

@@ -9,7 +9,6 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query private var users: [User]
     @Query private var circuits: [CustomCircuitGrade]
     
@@ -194,8 +193,6 @@ struct CircuitGradeBuilderView: View {
     @State private var baseSystem: GradeSystem = .vscale
     @State private var colorMappings: [EditableColorMapping] = []
     @State private var isDefault: Bool = false
-    @State private var showingColorPicker = false
-    @State private var editingMappingIndex: Int?
     
     private let availableColors: [(name: String, hex: String, color: Color)] = [
         ("Blue", "#007AFF", .blue),

@@ -95,8 +95,6 @@ struct SessionConfigView: View {
 
     // Location
     @State private var gymName: String = ""
-    @State private var selectedGym: Gym?
-    @State private var gymGradeConfig: GymGradeConfiguration?
 
     // Navigation
     @State private var showSession = false
@@ -272,8 +270,7 @@ struct SessionConfigView: View {
                         ClimbTypeToggle(
                             selectedType: $selectedClimbType,
                             selectedGradeSystem: $selectedGradeSystem,
-                            selectedCircuit: $selectedCircuit,
-                            modelContext: modelContext
+                            selectedCircuit: $selectedCircuit
                         )
 
                         // Session Type Selection
@@ -482,7 +479,7 @@ struct SessionConfigView: View {
 
     private func finishSession(_ session: Session) {
         let elapsed = Date().timeIntervalSince(session.startDate)
-        session.completeSession(context: modelContext, elapsedTime: elapsed)
+        session.completeSession(elapsedTime: elapsed)
         do {
             try modelContext.save()
         } catch {
@@ -529,7 +526,6 @@ struct ClimbTypeToggle: View {
     @Binding var selectedType: ClimbType
     @Binding var selectedGradeSystem: GradeSystem
     @Binding var selectedCircuit: CustomCircuitGrade?
-    var modelContext: ModelContext
     
     @Query private var circuits: [CustomCircuitGrade]
 

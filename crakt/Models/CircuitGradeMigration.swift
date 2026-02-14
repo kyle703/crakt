@@ -70,17 +70,6 @@ struct CircuitGradeMigration {
         "clear": "#808080",
     ]
     
-    /// Default V-scale grade ranges for each color in the old system
-    private static let defaultColorGradeRanges: [(color: String, min: String, max: String)] = [
-        ("#007AFF", "B", "0"),     // Blue
-        ("#34C759", "1", "2"),     // Green
-        ("#FFCC00", "3", "4"),     // Yellow
-        ("#FF9500", "5", "6"),     // Orange
-        ("#FF3B30", "7", "8"),     // Red
-        ("#AF52DE", "9", "10"),    // Purple
-        ("#1C1C1E", "11", "17"),   // Black
-    ]
-    
     // MARK: - Migration Entry Point
     
     /// Performs the V1 to V2 migration if needed
@@ -142,12 +131,7 @@ struct CircuitGradeMigration {
         let message = "Migrated \(migratedRoutesCount) routes" + 
                      (createdDefaultCircuit ? ", created default circuit" : "")
         
-        return MigrationResult(
-            status: .success,
-            message: message,
-            migratedRoutesCount: migratedRoutesCount,
-            createdDefaultCircuit: createdDefaultCircuit
-        )
+        return MigrationResult(status: .success, message: message)
     }
     
     /// Ensures a default circuit exists, creating one if necessary
@@ -245,13 +229,6 @@ struct CircuitGradeMigration {
         return false
     }
     
-    // MARK: - Force Reset (Developer Use Only)
-    
-    /// Resets migration state - USE WITH CAUTION
-    static func resetMigrationState() {
-        UserDefaults.standard.removeObject(forKey: migrationCompletedKey)
-        print("🔄 Circuit grade migration state reset")
-    }
 }
 
 // MARK: - Migration Result
@@ -265,11 +242,6 @@ struct MigrationResult {
     
     let status: Status
     let message: String
-    var migratedRoutesCount: Int = 0
-    var createdDefaultCircuit: Bool = false
     
     var isSuccess: Bool { status == .success }
-    var wasSkipped: Bool { status == .skipped }
-    var didFail: Bool { status == .failed }
 }
-

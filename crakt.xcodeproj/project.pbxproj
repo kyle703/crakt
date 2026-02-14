@@ -27,12 +27,8 @@
 		084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */; };
 		084EACAE2E6CE3C20011DD3F /* RoutePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */; };
 		084EACB22E6CE7910011DD3F /* CompactGradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */; };
-		084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4B82ABF581B00ADF994 /* PickerMenu.swift */; };
 		084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */; };
-		084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */; };
-		084FA4C72ABF592F00ADF994 /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C62ABF592F00ADF994 /* ActionButton.swift */; };
 		084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */; };
-		084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */; };
 		084FA4D12AC2645A00ADF994 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FA4D02AC2645A00ADF994 /* HomeView.swift */; };
 		084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAAB2AB6590B0015E8EE /* MainApp.swift */; };
 		084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084FDAB22AB6590B0015E8EE /* ContentView.swift */; };
@@ -66,17 +62,10 @@
 		0896B12F2BAF7A7F00D31AD3 /* RouteAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1282BAD07E000D31AD3 /* RouteAttempt.swift */; };
 		0896B1302BAF7A7F00D31AD3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B12A2BAD07E000D31AD3 /* User.swift */; };
 		0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */; };
-		0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */; };
 		08C3EF2A2E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C3EF292E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift */; };
 		08C3F4B12EC0F606004F8B28 /* SessionGymSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C3F4B02EC0F606004F8B28 /* SessionGymSelectorView.swift */; };
 		08C7F4952BDDACDC0063827E /* Session.stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4942BDDACDC0063827E /* Session.stats.swift */; };
-		08C7F4962BDDAF280063827E /* SessionChartsControllerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4902BDDABC50063827E /* SessionChartsControllerView.swift */; };
-		08C7F4972BDDAF2B0063827E /* AttemptsHistogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4912BDDAC1A0063827E /* AttemptsHistogramView.swift */; };
-		08C7F4982BDDAF2D0063827E /* AttemptStatusByGradeStackedBarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4922BDDAC490063827E /* AttemptStatusByGradeStackedBarChartView.swift */; };
 		08C7F49A2BDDAFF90063827E /* Route.stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4992BDDAFF90063827E /* Route.stats.swift */; };
-		08C7F49D2BF1B42F0063827E /* ExpandableSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */; };
-		08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F49F2BF1B46A0063827E /* AttemptsList.swift */; };
-		08C7F4A22BF1B4900063827E /* RouteSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08C7F4A12BF1B4900063827E /* RouteSummaryView.swift */; };
 		08D1F3A12F04A0010000001A /* DifficultyTimelineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D1F3A02F04A0010000001A /* DifficultyTimelineChartView.swift */; };
 		08D1F3A52F04A0010000001C /* GradePyramidChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D1F3A42F04A0010000001C /* GradePyramidChartView.swift */; };
 		08D1F3B02F060001000000CC /* CircuitColorMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D1F3C02F060001000000CC /* CircuitColorMapping.swift */; };
@@ -138,12 +127,8 @@
 		084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerView.swift; sourceTree = "<group>"; };
 		084EACAD2E6CE3C20011DD3F /* RoutePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutePickerView.swift; sourceTree = "<group>"; };
 		084EACB12E6CE7910011DD3F /* CompactGradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactGradeSelector.swift; sourceTree = "<group>"; };
-		084FA4B82ABF581B00ADF994 /* PickerMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerMenu.swift; sourceTree = "<group>"; };
 		084FA4BE2ABF587400ADF994 /* ClimbStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbStatus.swift; sourceTree = "<group>"; };
-		084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteLogRowItem.swift; sourceTree = "<group>"; };
-		084FA4C62ABF592F00ADF994 /* ActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
 		084FA4C82ABF7AF600ADF994 /* Stopwatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stopwatch.swift; sourceTree = "<group>"; };
-		084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Preview.swift"; sourceTree = "<group>"; };
 		084FA4CC2AC0F32D00ADF994 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		084FA4D02AC2645A00ADF994 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		084FDAA82AB6590B0015E8EE /* crakt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = crakt.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -182,17 +167,10 @@
 		0896B12A2BAD07E000D31AD3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0896B12B2BAD07E000D31AD3 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		0896B1312BB263DF00D31AD3 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
-		0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptsByGradePieChartView.swift; sourceTree = "<group>"; };
 		08C3EF292E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedSessionHeader.swift; sourceTree = "<group>"; };
 		08C3F4B02EC0F606004F8B28 /* SessionGymSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionGymSelectorView.swift; sourceTree = "<group>"; };
-		08C7F4902BDDABC50063827E /* SessionChartsControllerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionChartsControllerView.swift; sourceTree = "<group>"; };
-		08C7F4912BDDAC1A0063827E /* AttemptsHistogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptsHistogramView.swift; sourceTree = "<group>"; };
-		08C7F4922BDDAC490063827E /* AttemptStatusByGradeStackedBarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptStatusByGradeStackedBarChartView.swift; sourceTree = "<group>"; };
 		08C7F4942BDDACDC0063827E /* Session.stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.stats.swift; sourceTree = "<group>"; };
 		08C7F4992BDDAFF90063827E /* Route.stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.stats.swift; sourceTree = "<group>"; };
-		08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableSection.swift; sourceTree = "<group>"; };
-		08C7F49F2BF1B46A0063827E /* AttemptsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptsList.swift; sourceTree = "<group>"; };
-		08C7F4A12BF1B4900063827E /* RouteSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSummaryView.swift; sourceTree = "<group>"; };
 		08D1F3A02F04A0010000001A /* DifficultyTimelineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DifficultyTimelineChartView.swift; sourceTree = "<group>"; };
 		08D1F3A42F04A0010000001C /* GradePyramidChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradePyramidChartView.swift; sourceTree = "<group>"; };
 		08D1F3C02F060001000000CC /* CircuitColorMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircuitColorMapping.swift; sourceTree = "<group>"; };
@@ -268,13 +246,10 @@
 				084EAC912E6933000011DD3F /* HapticManager.swift */,
 				08760D6A2E6FCA1500E7A584 /* PerformanceAnalyticsView.swift */,
 				08760D6C2E6FCA2000E7A584 /* SessionTimelineView.swift */,
-				084FA4C62ABF592F00ADF994 /* ActionButton.swift */,
 				088B9AEB2E883C100084C3F0 /* DifficultyRatingView.swift */,
-				084FA4C42ABF590800ADF994 /* RouteLogRowItem.swift */,
 				084EAC8D2E6932F30011DD3F /* SessionManager.swift */,
 				084EAC932E69330D0011DD3F /* SessionTabView.swift */,
 				088B9AE52E883BA80084C3F0 /* WarmupModeView.swift */,
-				084FA4B82ABF581B00ADF994 /* PickerMenu.swift */,
 				084EAC7F2E6726F50011DD3F /* WorkoutSelectorView.swift */,
 				084EAC812E6726FD0011DD3F /* WorkoutSummaryCard.swift */,
 			);
@@ -376,7 +351,6 @@
 			children = (
 				084FDAEB2AB7EEC60015E8EE /* Date+String.swift */,
 				084FDAF22ABF1E560015E8EE /* Color.swift */,
-				084FA4CA2ABF8DA000ADF994 /* View+Preview.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -446,12 +420,8 @@
 		0896B1332BC77A0100D31AD3 /* Charts */ = {
 			isa = PBXGroup;
 			children = (
-				08C7F4922BDDAC490063827E /* AttemptStatusByGradeStackedBarChartView.swift */,
-				08C7F4912BDDAC1A0063827E /* AttemptsHistogramView.swift */,
-				0896B1342BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift */,
 				08D1F3A02F04A0010000001A /* DifficultyTimelineChartView.swift */,
 				08D1F3A42F04A0010000001C /* GradePyramidChartView.swift */,
-				08C7F4902BDDABC50063827E /* SessionChartsControllerView.swift */,
 			);
 			path = Charts;
 			sourceTree = "<group>";
@@ -470,7 +440,6 @@
 			isa = PBXGroup;
 			children = (
 				084EACA52E6CE3A60011DD3F /* ActiveRouteCardView.swift */,
-				08C7F49C2BF1B42F0063827E /* ExpandableSection.swift */,
 				084EACA32E6CE3A00011DD3F /* GradeScrubberView.swift */,
 				084EACA92E6CE3BB0011DD3F /* RestTimerView.swift */,
 				08C3EF292E6D15AA00C1F9B1 /* UnifiedSessionHeader.swift */,
@@ -484,8 +453,6 @@
 		08C7F49E2BF1B45A0063827E /* Route */ = {
 			isa = PBXGroup;
 			children = (
-				08C7F49F2BF1B46A0063827E /* AttemptsList.swift */,
-				08C7F4A12BF1B4900063827E /* RouteSummaryView.swift */,
 			);
 			path = Route;
 			sourceTree = "<group>";
@@ -646,9 +613,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				084EAC862E672A0F0011DD3F /* ActivityHistoryView.swift in Sources */,
-				084FA4C52ABF590800ADF994 /* RouteLogRowItem.swift in Sources */,
 				088B9AEE2E9B5F150084C3F0 /* LaunchScreen.swift in Sources */,
-				0896B1352BC77A5400D31AD3 /* AttemptsByGradePieChartView.swift in Sources */,
 				084EAC942E69330D0011DD3F /* SessionTabView.swift in Sources */,
 				084FDAAC2AB6590B0015E8EE /* MainApp.swift in Sources */,
 				084EAC7C2E669C0A0011DD3F /* WorkoutOrchestrator.swift in Sources */,
@@ -662,12 +627,9 @@
 				084EAC922E6933000011DD3F /* HapticManager.swift in Sources */,
 				084EAC8C2E672A520011DD3F /* ActivityRowView.swift in Sources */,
 				084FDAB32AB6590B0015E8EE /* ContentView.swift in Sources */,
-				084FA4B92ABF581B00ADF994 /* PickerMenu.swift in Sources */,
 				084EACAE2E6CE3C20011DD3F /* RoutePickerView.swift in Sources */,
-				08C7F4962BDDAF280063827E /* SessionChartsControllerView.swift in Sources */,
 				084EAC802E6726F50011DD3F /* WorkoutSelectorView.swift in Sources */,
 				084FDAEC2AB7EEC60015E8EE /* Date+String.swift in Sources */,
-				08C7F49D2BF1B42F0063827E /* ExpandableSection.swift in Sources */,
 				08760D652E6E6C1100E7A584 /* ProgressionChart.swift in Sources */,
 				08760D662E6E6C1100E7A584 /* DistributionChart.swift in Sources */,
 				088B9AE62E883BA90084C3F0 /* WarmupModeView.swift in Sources */,
@@ -677,8 +639,6 @@
 				088B9AEA2E883BF00084C3F0 /* WarmupExercise.swift in Sources */,
 				084EAC7E2E669C140011DD3F /* Workout.swift in Sources */,
 				084EACA62E6CE3A60011DD3F /* ActiveRouteCardView.swift in Sources */,
-				08C7F4A22BF1B4900063827E /* RouteSummaryView.swift in Sources */,
-				08C7F4982BDDAF2D0063827E /* AttemptStatusByGradeStackedBarChartView.swift in Sources */,
 				084EACA82E6CE3B60011DD3F /* AttemptHistoryView.swift in Sources */,
 				084FA4C92ABF7AF600ADF994 /* Stopwatch.swift in Sources */,
 				084FDAE42AB7E3430015E8EE /* ScrollingSectionView.swift in Sources */,
@@ -693,17 +653,13 @@
 				084EAC8E2E6932F30011DD3F /* SessionManager.swift in Sources */,
 				084FA4BF2ABF587400ADF994 /* ClimbStatus.swift in Sources */,
 				08C7F4952BDDACDC0063827E /* Session.stats.swift in Sources */,
-				084FA4CB2ABF8DA000ADF994 /* View+Preview.swift in Sources */,
 				084EAC842E6729F40011DD3F /* SessionConfigView.swift in Sources */,
 				08C3F4B12EC0F606004F8B28 /* SessionGymSelectorView.swift in Sources */,
 				084EACAA2E6CE3BB0011DD3F /* RestTimerView.swift in Sources */,
 				08760D5A2E6E6AC900E7A584 /* GlobalAnalytics.swift in Sources */,
-				08C7F4A02BF1B46A0063827E /* AttemptsList.swift in Sources */,
 				0896B12D2BAF7A7F00D31AD3 /* Route.swift in Sources */,
 				084EACB22E6CE7910011DD3F /* CompactGradeSelector.swift in Sources */,
 				0896B1322BB2644A00D31AD3 /* SessionDetailView.swift in Sources */,
-				084FA4C72ABF592F00ADF994 /* ActionButton.swift in Sources */,
-				08C7F4972BDDAF2B0063827E /* AttemptsHistogramView.swift in Sources */,
 				08D1F3A12F04A0010000001A /* DifficultyTimelineChartView.swift in Sources */,
 				08D1F3A52F04A0010000001C /* GradePyramidChartView.swift in Sources */,
 				084EACA42E6CE3A00011DD3F /* GradeScrubberView.swift in Sources */,

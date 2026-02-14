@@ -113,6 +113,12 @@ struct RestTimerView: View {
             if !isCountingUp {
                 if timeRemaining > 0 {
                     timeRemaining -= 1
+                    if timeRemaining <= 0 {
+                        // Switch to count-up mode when timer reaches 0
+                        isCountingUp = true
+                        timeElapsed = 0
+                        onComplete()
+                    }
                 } else {
                     // Switch to count-up mode when timer reaches 0
                     isCountingUp = true

@@ -23,7 +23,6 @@ struct GradePyramidChartView: View {
         let toppedCount: Int
         let sendCount: Int
         let flashCount: Int
-        let totalAttempts: Int
     }
     
     /// Get all routes deduplicated
@@ -106,8 +105,7 @@ struct GradePyramidChartView: View {
                     fallCount: data.falls,
                     toppedCount: data.topped,
                     sendCount: data.sends,
-                    flashCount: data.flashes,
-                    totalAttempts: data.falls + data.topped + data.sends + data.flashes
+                    flashCount: data.flashes
                 )
             }.sorted { $0.gradeIndex < $1.gradeIndex }
         }
@@ -134,8 +132,7 @@ struct GradePyramidChartView: View {
                     fallCount: data.falls,
                     toppedCount: data.topped,
                     sendCount: data.sends,
-                    flashCount: data.flashes,
-                    totalAttempts: data.falls + data.topped + data.sends + data.flashes
+                    flashCount: data.flashes
                 ))
             } else {
                 result.append(GradeData(
@@ -144,8 +141,7 @@ struct GradePyramidChartView: View {
                     fallCount: 0,
                     toppedCount: 0,
                     sendCount: 0,
-                    flashCount: 0,
-                    totalAttempts: 0
+                    flashCount: 0
                 ))
             }
         }

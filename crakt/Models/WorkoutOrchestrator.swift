@@ -110,44 +110,6 @@ class WorkoutOrchestrator: ObservableObject {
         }
     }
 
-    // MARK: - Attempt Processing
-
-    func processAttempt(_ attempt: RouteAttempt) -> WorkoutRep? {
-        guard let workout = activeWorkout,
-              let currentRep = workout.currentRep else {
-            return nil
-        }
-
-        // Start the rep if not already started
-        if currentRep.startedAt == nil {
-            currentRep.start()
-        }
-
-        // Complete the rep with this attempt
-        currentRep.complete(with: attempt)
-
-        // DON'T advance to next rep here - only advance when route is logged
-        // _ = workout.advanceToNextRep()
-
-        // Update published progress for SwiftUI observation (iOS 18 compatibility)
-        updateWorkoutProgress()
-
-        // Force UI update for iOS 18 SwiftData compatibility
-        DispatchQueue.main.async {
-            self.objectWillChange.send()
-        }
-
-        // If workout is completed, mark as inactive but keep reference for display
-        if workout.isCompleted {
-            session.activeWorkout = nil
-            isWorkoutActive = false
-            // Keep activeWorkout reference for progress display
-        }
-
-        saveContext()
-        return currentRep
-    }
-
     // Advance workout when a route is completed (logged)
     func advanceWorkoutOnRouteCompletion() {
         guard let workout = activeWorkout,
@@ -182,15 +144,6 @@ class WorkoutOrchestrator: ObservableObject {
     }
 
     // MARK: - Current State
-
-    var currentSetDescription: String {
-        guard let workout = activeWorkout,
-              let currentSet = workout.currentSet else {
-            return "No active workout"
-        }
-
-        return "Set \(currentSet.setNumber) of \(workout.sets.count)"
-    }
 
     var currentRepDescription: String {
         guard let workout = activeWorkout,

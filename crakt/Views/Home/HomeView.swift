@@ -10,14 +10,11 @@ import SwiftData
 import Foundation
 
 struct HomeView: View {
-    @Query private var user: [User]
-
     @Query(sort: \Session.startDate, order: .reverse)
     var sessions: [Session] = []
 
     // Navigation
     @State private var navigationPath = NavigationPath()
-    @State private var showActiveSession = false
     @State private var activeSession: Session?
 
     // Analytics tracking
@@ -28,7 +25,7 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // Header Section
-                    ProfileHeaderView(user: user.first ?? User(), sessions: sessions, onTrackEvent: trackEvent)
+                    ProfileHeaderView(sessions: sessions, onTrackEvent: trackEvent)
 
                     VStack(alignment: .leading, spacing: 20) {
                         // Lifetime Stats Section
@@ -275,8 +272,6 @@ struct HomeView: View {
 
 
 struct StartSessionTile: View {
-    @Query private var user: [User]
-    
     var body: some View {
         NavigationLink {
             SessionConfigView()
@@ -313,8 +308,5 @@ struct StartSessionTile: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
-
-
-
 
 

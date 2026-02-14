@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct MainTabView: View {
 
@@ -42,8 +41,6 @@ struct MainTabView: View {
 
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-
     var body: some View {
         MainTabView()
     }
